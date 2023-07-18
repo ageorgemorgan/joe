@@ -21,12 +21,14 @@ from absorbing_layer import damping_coeff
 # First, a function for computing all of the Greeks ("weights" for exponential quadrature).
 # We do this by Pythonizing the code from Kassam and Trefethen 2005 (do Cauchy integrals).
 
-def get_greeks_first_order(length, N, dt, z, model_kw):
+def get_greeks_first_order(N, dt, z):
     M = 2 ** 5
+
+    rad = 1. #1.2 * np.amax(np.abs(dt*z))
 
     theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
 
-    z0 = dt * np.tile(z, (M, 1)) + np.tile(np.exp(1j * theta), (N, 1)).T
+    z0 = dt * np.tile(z, (M, 1)) + dt*np.tile(np.exp(1j * theta), (N, 1)).T
 
     Q = dt * np.real(np.mean((np.exp(0.5 * z0) - 1.) / z0, 0))  # note how we take mean over a certain axis
 
@@ -39,8 +41,8 @@ def get_greeks_first_order(length, N, dt, z, model_kw):
     out = [Q, f1, f2, f3]
 
     # for efficiency, save Greeks on a particular grid.
-    filename = 'greeks_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
-    np.savez(filename, Q=Q, f1=f1, f2=f2, f3=f3)
+    #filename = 'greeks_' + model_kw + '_N=%.1f_dt=%.6f' % (N, dt) + '.npz'
+    #np.savez(filename, Q=Q, f1=f1, f2=f2, f3=f3)
 
     # TODO: make sure this saves in a separate folder to avoid cluttering the project! Learn how to do this.
 
@@ -92,6 +94,27 @@ def get_greeks_second_order(length, N, dt, A, model_kw):
 
     return out
 
+def get_Q1(N, dt, z):
+    M = 2 ** 5
+
+    theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
+
+    z0 = dt * np.tile(z, (M, 1)) + dt * np.tile(np.exp(1j * theta), (N, 1)).T
+
+    out = dt*np.real(np.mean((np.exp(z0) - 1.) / z0, 0))  # note how we take mean over a certain axis
+
+    return out
+
+
+def do_etdrk1_step(V, propagator, forcing, Q1):
+
+    # Q1 = dt*phi1(dt*A)
+
+    fV = forcing(V)
+
+    out = propagator * V + Q1 * fV
+
+    return out
 
 # code for a single ETDRK4 step
 def do_etdrk4_step(V, propagator, propagator2, greeks, forcing):
@@ -207,18 +230,22 @@ def do_time_stepping(sim):
 
         if not absorbing_layer:
 
-            filename = 'greeks_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
+            filename = 'phi1_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
+            #filename = 'greeks_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
 
         elif absorbing_layer:  # be cautious that the right Greeks are used depending on if we need splitting or not!
 
-            filename = 'greeks_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, 0.5 * dt) + '.npz'
+            filename = 'phi1_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
+            #filename = 'greeks_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, 0.5 * dt) + '.npz'
 
         greeks_file = np.load(filename)  # a dictionary-like "npzfile" object
 
+        """
         Q = greeks_file['Q']
         f1 = greeks_file['f1']
         f2 = greeks_file['f2']
         f3 = greeks_file['f3']
+        """
 
     # if the file is not found, compute them here.
     except:
@@ -231,13 +258,15 @@ def do_time_stepping(sim):
 
             if not absorbing_layer:
 
-                [Q, f1, f2, f3] = get_greeks_first_order(length, N, dt, A, model_kw)
+                Q1 = get_Q1(N, dt,A)
+                #[Q, f1, f2, f3] = get_greeks_first_order(N, dt, A)
 
             elif absorbing_layer:
 
-                [Q, f1, f2, f3] = get_greeks_first_order(length, N, 0.5 * dt, A, model_kw)
+                Q1 = get_Q1(N, 0.5*dt, A)
+                #[Q, f1, f2, f3] = get_greeks_first_order(N, 0.5 * dt, A)
 
-    greeks = dict([('Q', Q), ('f1', f1), ('f2', f2), ('f3', f3)])
+    #greeks = dict([('Q', Q), ('f1', f1), ('f2', f2), ('f3', f3)])
 
     if model_kw == 'phi4':
 
@@ -249,12 +278,12 @@ def do_time_stepping(sim):
         if not absorbing_layer:
 
             propagator = np.exp(A * dt)
-            propagator2 = np.exp(A * 0.5 * dt)
+            #propagator2 = np.exp(A * 0.5 * dt)
 
         elif absorbing_layer:
 
             propagator = np.exp(A * 0.5 * dt)
-            propagator2 = np.exp(A * 0.25 * dt)
+            #propagator2 = np.exp(A * 0.25 * dt)
 
             damping_mat = assemble_damping_mat(N, length, x, dt)
 
@@ -285,7 +314,7 @@ def do_time_stepping(sim):
 
     for n in np.arange(1, nsteps + 1):
 
-        Va = do_etdrk4_step(V, propagator, propagator2, greeks, forcing)
+        Va = do_etdrk1_step(V, propagator, forcing, Q1)
 
         if not absorbing_layer:
 
@@ -295,9 +324,12 @@ def do_time_stepping(sim):
 
             Vb = do_diffusion_step(Va, dt, N, damping_mat)
 
-            V = do_etdrk4_step(Vb, propagator, propagator2, greeks, forcing)
+            V = do_etdrk1_step(Vb, propagator, forcing, Q1)
 
             if cnt % 500 == 0:
+
+                pass
+
                 U = np.real(ifft(V))
 
                 U *= 1. - 1. * damping_coeff(-x, length)

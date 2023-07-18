@@ -80,7 +80,7 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True):
     umax = 1.05*np.amax(u)
 
     # TODO: CAREFUL THE xLIM HERE!!!!! MAKE A FUNCTION OF ABSORBING LAYER
-    ax = plt.axes(xlim=(-0.25 * length, 0.25 * length), ylim=(umin, umax))
+    ax = plt.axes(xlim=(-0.5 * length, 0.5 * length), ylim=(umin, umax))
 
     # use cubic spline interpolation to smooth the data
 
@@ -154,7 +154,7 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True):
         # TODO: the above label fixes are kind of a jerry-rigged solution and don't generalize easily to other PDE!
         #     Find a smart way to fix this!
 
-        plt.xlim([-.25*length, .25*length])
+        plt.xlim([-.5*length, .5*length])
 
         plt.tight_layout()
 

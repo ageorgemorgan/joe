@@ -11,11 +11,11 @@ import time
 
 T = 50.  # time to stop simulation at
 
-dt = 1e-3 # time step size
+dt = 2**-9 # time step size
 
 nsteps = int(T / dt)  # total num of time steps we take
 
-length = 100.
+length = 400.
 
 # number of grid nodes
 N = 2 ** 10
@@ -25,7 +25,7 @@ initial_state_kw = 'kdv_soliton'
 
 # create the simulation object by prescribing physical parameters, discretization parameters, initial conditions, and
 # whether or not we want to include nonlinearity
-my_sim = simulation(length, T, N, dt, model_kw, initial_state_kw, nonlinear=True, absorbing_layer=False, ndump=20)
+my_sim = simulation(length, T, N, dt, model_kw, initial_state_kw, nonlinear=True, absorbing_layer=True, ndump=20)
 
 # extract the filename attribute
 my_filename = my_sim.filename
@@ -82,7 +82,7 @@ plt.plot(x,u)
 plt.show()
 """
 
-my_sim.hov_plot(show_figure=False, save_figure=True)
+my_sim.hov_plot(show_figure=True, save_figure=True)
 
 my_sim.save_movie()
 

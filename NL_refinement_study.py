@@ -15,32 +15,32 @@ import time
 
 # start to get the simulations ready
 
-T = 1.  # time to stop simulation at
+T = 50.  # time to stop simulation at
 
 length = 400.
 
-nmin = 7
+nmin = 5
 
-nmax = 10
+nmax = 8
 
 # prescribe the array of dt's we seek to assess
 dts = np.flip(np.logspace(-nmax, -nmin, num=nmax-nmin+1, base=2.))
 num_dts = np.size(dts)
 
 # prescribe the array of N's we seek to assess
-Ns = np.array([2**8, 2**9, 2**10, 2**11])
+Ns = np.array([2**9, 2**10, 2**11])
 Ns = Ns.astype(int)
 num_Ns = np.size(Ns)
 
 # set what initial condition we want to deal with
 
-model_kw = 'bbm'
+model_kw = 'kdv'
 
-ICkw = 'gaussian_even'
+ICkw = 'kdv_soliton'
 
 nonlinear = True
 
-absorbing_layer = False
+absorbing_layer = True
 
 # initialize outputs
 
@@ -90,13 +90,15 @@ for k in np.arange(0, num_Ns):
 
             fine_sim.save()
 
-        rough_Udata = rough_sim.Udata
+        rough_Udata = rough_sim.Udata[:, int(N/4):int(3*N/4)]
 
-        fine_Udata = fine_sim.Udata
+        fine_Udata = fine_sim.Udata[:, int(N/4):int(3*N/4)]
 
         # use fine sim and rough sim at last time step to get Richardson error estimate
 
-        errors[k, cnt] = (1./15.)*np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
+        ord = 1.
+
+        errors[k, cnt] = (1./(2**(ord-1)))*np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
 
         rough_sim = fine_sim  # redefine for efficiency... only works bcz we refine dt in powers of 1/2
 
@@ -116,15 +118,16 @@ plt.rc('font', family='serif')
 fig, ax = plt.subplots()
 
 dts = 0.5*dts
-
-plt.loglog(dts, errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=256$")
+"""
+plt.loglog(dts, errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=64$")
 plt.loglog(dts, errors[0, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=512$")
+"""
+plt.loglog(dts, errors[0, :], 'v', color='xkcd:slate', markersize='8', label=r"$N=512$")
+plt.loglog(dts, errors[0, :],  color='xkcd:slate', linewidth='2', linestyle='solid')
+plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=1024$")
 plt.loglog(dts, errors[1, :],  color='xkcd:raspberry', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=1024$")
+plt.loglog(dts, errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=2048$")
 plt.loglog(dts, errors[2, :],  color='xkcd:goldenrod', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[3, :], 'v', color='xkcd:slate', markersize='8', label=r"$N=2048$")
-plt.loglog(dts, errors[3, :],  color='xkcd:slate', linewidth='2', linestyle='solid')
 
 ax.legend(fontsize=16)
 
@@ -138,7 +141,7 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-plt.savefig('nonlinear_accuracy_test_gaussian_even', bbox_inches='tight', dpi=800)
+plt.savefig('nonlinear_accuracy_test_kdv_soliton_w_abslayer', bbox_inches='tight', dpi=200)
 
 plt.show()
 
