@@ -50,7 +50,7 @@ class simulation:
             pickle.dump(self, outp, pickle.HIGHEST_PROTOCOL)
 
     # create a Hovmoeller plot (filled contour plot in space-time) of the simulation.
-    def hov_plot(self, show_figure=True, save_figure=False):
+    def hov_plot(self, colourmap = 'cmo.haline', show_figure=True, save_figure=False):
 
         nsteps = int(self.T/self.dt)
         times = np.linspace(0., self.T, num=1+int(nsteps / self.ndump), endpoint=True)
@@ -58,7 +58,7 @@ class simulation:
         u = self.Udata
         # u = self.Udata[0, :, :]
 
-        hov_plot(self.x, times, u, fieldname='$u(x,t)$', show_figure=show_figure, save_figure=save_figure, picname=self.picname, cmap=cmo.haline)
+        hov_plot(self.x, times, u, fieldname='$u(x,t)$', show_figure=show_figure, save_figure=save_figure, picname=self.picname, cmap=colourmap)
 
     # save a movie of the evolution of our solution.
     def save_movie(self):

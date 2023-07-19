@@ -21,18 +21,19 @@ from absorbing_layer import damping_coeff
 # First, a function for computing all of the Greeks ("weights" for exponential quadrature).
 # We do this by Pythonizing the code from Kassam and Trefethen 2005 (do Cauchy integrals).
 
-def get_greeks_first_order(N, dt, z):
+def get_greeks_first_order(N, dt, z, model_kw):
     M = 2 ** 5
 
-    rad = 1. #1.2 * np.amax(np.abs(dt*z))
+    theta = np.linspace(0., 2. * np.pi, num=M, endpoint=False)
 
-    theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
+    rad = 1.  # radius of contour surrounding dt*z over which we integrate
 
-    z0 = dt * np.tile(z, (M, 1)) + dt*np.tile(np.exp(1j * theta), (N, 1)).T
+    z0 = dt * np.tile(z, (M, 1)) + rad * np.tile(np.exp(1j * theta), (N, 1)).T
 
     Q = dt * np.real(np.mean((np.exp(0.5 * z0) - 1.) / z0, 0))  # note how we take mean over a certain axis
 
-    f1 = dt * np.real(np.mean((-4. - z0 + np.exp(z0) * (4. - 3. * z0 + z0 ** 2)) / (z0 ** 3), 0))
+    f1 = dt * np.real(np.mean((-4. - z0 + np.exp(z0) * (4. - 3. * z0 + z0 ** 2)) / (z0 ** 3), 0))  # again note axis
+    # argument of np.mean
 
     f2 = dt * np.real(np.mean((2. + z0 + np.exp(z0) * (-2. + z0)) / (z0 ** 3), 0))
 
@@ -41,8 +42,8 @@ def get_greeks_first_order(N, dt, z):
     out = [Q, f1, f2, f3]
 
     # for efficiency, save Greeks on a particular grid.
-    #filename = 'greeks_' + model_kw + '_N=%.1f_dt=%.6f' % (N, dt) + '.npz'
-    #np.savez(filename, Q=Q, f1=f1, f2=f2, f3=f3)
+    # filename = 'greeks_' + model_kw + '_N=%.1f_dt=%.6f' % (N, dt) + '.npz'
+    # np.savez(filename, Q=Q, f1=f1, f2=f2, f3=f3)
 
     # TODO: make sure this saves in a separate folder to avoid cluttering the project! Learn how to do this.
 
@@ -94,30 +95,83 @@ def get_greeks_second_order(length, N, dt, A, model_kw):
 
     return out
 
-def get_Q1(N, dt, z):
+
+def get_Q1(N, dt, z, model_kw):
     M = 2 ** 5
 
     theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
 
-    z0 = dt * np.tile(z, (M, 1)) + dt * np.tile(np.exp(1j * theta), (N, 1)).T
+    rad = 1.  # radius of contour about dt*z about which we integrate
 
-    out = dt*np.real(np.mean((np.exp(z0) - 1.) / z0, 0))  # note how we take mean over a certain axis
+    z0 = dt * np.tile(z, (M, 1)) + rad * np.tile(np.exp(1j * theta), (N, 1)).T
+
+    # print(z0[np.abs(z0) <1e-3]) # check to see if any of the sample points generated are too small.
+
+    out = dt * np.real(np.mean((np.exp(z0) - 1.) / z0, 0))  # note how we take mean over a certain axis
+
+    # print(out[int(0.5*N)-5:int(0.5*N)+6])
+
+    # TODO: implement saving of this stuff
 
     return out
+
+
+def get_R2(N, dt, z, model_kw):
+    # """
+    M = 2 ** 5
+
+    theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
+
+    rad = 1.  # radius of contour about dt*z about which we integrate
+
+    z0 = dt * np.tile(z, (M, 1)) + rad * np.tile(np.exp(1j * theta), (N, 1)).T
+
+    # print(z0[np.abs(z0) < 1e-3]) # check to see if any generated z's are too close to zero
+
+    out = dt * np.real(np.mean((np.exp(z0) - 1. - z0) / (z0 ** 2), 0))  # note how we take mean over a certain axis
+    # """
+
+    """
+    # a direct computation to show that the formula itself is what's weird!
+    out = np.zeros_like(z)
+
+    out[0] = 0.5
+
+    zh = dt*z[1:]  # if we remove the dt, we get a better (but not ideal) shape. If we remove and mult out by dt again, we're 100% good!
+
+    out[1:] = (np.exp(zh) - 1.-zh) / ((zh)**2)
+
+    out *= dt
+
+    #print(np.amax(np.abs(out)))
+    #print(out)
+    """
+
+    # print(out[int(0.5*N)-5:int(0.5*N)+6])
+
+    # TODO: implement saving of this stuff
+
+    return np.real(out)  # just kill any error that arose
 
 
 def do_etdrk1_step(V, propagator, forcing, Q1):
+    # remark on notation: Q1 = dt*phi1(dt*A)
 
-    # Q1 = dt*phi1(dt*A)
-
-    fV = forcing(V)
-
-    out = propagator * V + Q1 * fV
+    out = propagator * V + Q1 * forcing(V)
 
     return out
 
+
+def do_etdrk2_step(V, propagator, forcing, Q1, R2):
+    a = do_etdrk1_step(V, propagator, forcing, Q1)
+
+    out = a + R2 * (forcing(a) - forcing(V))
+
+    return out
+
+
 # code for a single ETDRK4 step
-def do_etdrk4_step(V, propagator, propagator2, greeks, forcing):
+def do_etdrk4_step(V, propagator, propagator2, forcing, greeks):
     Q = greeks['Q']
     f1 = greeks['f1']
     f2 = greeks['f2']
@@ -145,19 +199,34 @@ def do_etdrk4_step(V, propagator, propagator2, greeks, forcing):
     return out
 
 
-def assemble_damping_mat(N, length, x, dt):
+def do_ifrk4_step(V, propagator, propagator2, forcing, dt):
 
+    a = dt * forcing(V)
+
+    b = dt * forcing(propagator2 * (V + 0.5 * a))
+
+    c = dt * forcing(propagator2 * V + 0.5 * b)
+
+    d = dt * forcing(propagator * V + propagator2 * c)
+
+    out = propagator * V + (1. / 6.) * (propagator * a + 2. * propagator2 * (b + c) + d)
+
+    return out
+
+
+def assemble_damping_mat(N, length, x, dt):
     # By "damping mat", we mean the matrix to be inverted at each time step in the damping stage.
     # Currently only backward Euler inversion is implemented.
+    # TODO: try out Crank-Nicolson as well, cost v. accuracy analysis?
     k = 2 * np.pi * N * fftfreq(N) / length
 
-    # Deal w/ the damping mat as a scipy sparse LinearOperator to avoid matrix mults!
+    # Deal w/ the damping mat as a scipy.sparse LinearOperator to avoid matrix mults!
     # This is an issue here bcz dealing with the matrix of the Fourier transform is a pain
 
     def mv(v):
         # NOTE: v is given ON THE FOURIER SIDE!!!!
 
-        mv_out = v-dt*(-1j * k) * fft(damping_coeff(x, length) * np.real(ifft((-1j * k) * v)))
+        mv_out = v - dt * (-1j * k) * fft(damping_coeff(x, length) * np.real(ifft((-1j * k) * v)))
 
         return mv_out
 
@@ -170,20 +239,11 @@ def assemble_damping_mat(N, length, x, dt):
 
 
 def do_diffusion_step(q, dt, N, B):
-
-    # BACKWARD EULER
-
     B_LHS = B
 
     RHS = q
 
-    # start = time.time()
     out, info = linalg.cg(B_LHS, RHS)  # have to have "info" here otherwise the code throws a fit
-    # TODO: best practice for initial guess/maxiter? Naively just setting first guess to the RHS q doesn't quite work
-    # TODO: try out Crank-Nicolson vs. backward Euler that's currently implemented
-    # end = time.time()
-    # print('solve time = ', end-start, 's')
-    # print(info)
 
     return out
 
@@ -209,7 +269,7 @@ def do_time_stepping(sim):
 
     nsteps = int(T / dt)
 
-    x = np.linspace(-0.5 * length, 0.5 * length, N, endpoint=False)  # the endpoint = False flag is critical!
+    x = sim.x  # the endpoint = False flag is critical!
 
     # preprocessing stage: assemble the spatial operator,
     # the Greeks needed for exponential time-stepping, and
@@ -230,22 +290,22 @@ def do_time_stepping(sim):
 
         if not absorbing_layer:
 
-            filename = 'phi1_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
-            #filename = 'greeks_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
+            # filename = 'Q1_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
+            filename = 'greeks_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
 
-        elif absorbing_layer:  # be cautious that the right Greeks are used depending on if we need splitting or not!
+        elif absorbing_layer:  # be cautious that the right Greeks are used, depending on if we need splitting or not!
 
-            filename = 'phi1_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, dt) + '.npz'
-            #filename = 'greeks_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, 0.5 * dt) + '.npz'
+            # filename = 'Q1_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, 0.5*dt) + '.npz'
+            filename = 'greeks_' + model_kw + '_length=%.1f_N=%.1f_dt=%.6f' % (length, N, 0.5 * dt) + '.npz'
 
         greeks_file = np.load(filename)  # a dictionary-like "npzfile" object
 
-        """
+        # """
         Q = greeks_file['Q']
         f1 = greeks_file['f1']
         f2 = greeks_file['f2']
         f3 = greeks_file['f3']
-        """
+        # """
 
     # if the file is not found, compute them here.
     except:
@@ -258,15 +318,18 @@ def do_time_stepping(sim):
 
             if not absorbing_layer:
 
-                Q1 = get_Q1(N, dt,A)
-                #[Q, f1, f2, f3] = get_greeks_first_order(N, dt, A)
+                Q1 = get_Q1(N, dt, A, model_kw)
+                R2 = get_R2(N, dt, A, model_kw)
+
+                [Q, f1, f2, f3] = get_greeks_first_order(N, dt, A, model_kw)
 
             elif absorbing_layer:
 
-                Q1 = get_Q1(N, 0.5*dt, A)
-                #[Q, f1, f2, f3] = get_greeks_first_order(N, 0.5 * dt, A)
+                Q1 = get_Q1(N, 0.5 * dt, A, model_kw)
+                R2 = get_R2(N, 0.5 * dt, A, model_kw)
+                [Q, f1, f2, f3] = get_greeks_first_order(N, 0.5 * dt, A, model_kw)
 
-    #greeks = dict([('Q', Q), ('f1', f1), ('f2', f2), ('f3', f3)])
+    greeks = dict([('Q', Q), ('f1', f1), ('f2', f2), ('f3', f3)])
 
     if model_kw == 'phi4':
 
@@ -278,12 +341,12 @@ def do_time_stepping(sim):
         if not absorbing_layer:
 
             propagator = np.exp(A * dt)
-            #propagator2 = np.exp(A * 0.5 * dt)
+            propagator2 = np.exp(A * 0.5 * dt)
 
         elif absorbing_layer:
 
             propagator = np.exp(A * 0.5 * dt)
-            #propagator2 = np.exp(A * 0.25 * dt)
+            propagator2 = np.exp(A * 0.25 * dt)
 
             damping_mat = assemble_damping_mat(N, length, x, dt)
 
@@ -308,33 +371,38 @@ def do_time_stepping(sim):
         Udata = np.zeros([1 + int(nsteps / ndump), N], dtype=float)
         Udata[0, :] = Uinit[0]
 
-    # print('num of times sampled = ',  1+int(nsteps / ndump))
-
     cnt = 0.  # counter
 
     for n in np.arange(1, nsteps + 1):
 
-        Va = do_etdrk1_step(V, propagator, forcing, Q1)
+        # TODO: have a user-specified time-stepping order of accuracy in the simulation object
+        # Va = do_etdrk1_step(V, propagator, forcing, Q1)
+        # Va = do_etdrk2_step(V, propagator, forcing, Q1, R2)
+        Va = do_etdrk4_step(V, propagator, propagator2, forcing, greeks)
 
         if not absorbing_layer:
+
+            #Va = do_ifrk4_step(V, propagator, propagator2, forcing, dt)
 
             V = Va
 
         elif absorbing_layer:
 
+            Va = do_ifrk4_step(V, propagator, propagator2, forcing, 0.5*dt)
+
             Vb = do_diffusion_step(Va, dt, N, damping_mat)
 
-            V = do_etdrk1_step(Vb, propagator, forcing, Q1)
+            # V = do_etdrk1_step(Vb, propagator, forcing, Q1)
+            # V = do_etdrk2_step(Vb, propagator, forcing, Q1, R2)
+            V = do_etdrk4_step(Vb, propagator, propagator2, forcing, greeks)
+            #V = do_ifrk4_step(Vb, propagator, propagator2, forcing, 0.5*dt)
 
             if cnt % 500 == 0:
-
                 pass
 
                 U = np.real(ifft(V))
 
                 U *= 1. - 1. * damping_coeff(-x, length)
-
-                # U *= 1. - 1. * damping_coeff(x, length)
 
                 V = fft(U)
 
@@ -350,8 +418,6 @@ def do_time_stepping(sim):
 
                 Udata[0, int(n / ndump), :] = np.real(ifft(V[0:N]))
                 Udata[1, int(n / ndump), :] = np.real(ifft(V[N:]))
-
-                # print('saved at step', n)
 
             else:
 

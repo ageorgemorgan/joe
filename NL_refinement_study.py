@@ -15,32 +15,32 @@ import time
 
 # start to get the simulations ready
 
-T = 50.  # time to stop simulation at
+T = 150.  # time to stop simulation at
 
-length = 400.
+length = 32*np.pi
 
-nmin = 5
+nmin = 1
 
-nmax = 8
+nmax = 9
 
 # prescribe the array of dt's we seek to assess
 dts = np.flip(np.logspace(-nmax, -nmin, num=nmax-nmin+1, base=2.))
 num_dts = np.size(dts)
 
 # prescribe the array of N's we seek to assess
-Ns = np.array([2**9, 2**10, 2**11])
+Ns = np.array([2**8, 2**9, 2**10, 2**11])
 Ns = Ns.astype(int)
 num_Ns = np.size(Ns)
 
 # set what initial condition we want to deal with
 
-model_kw = 'kdv'
+model_kw = 'ks'
 
-ICkw = 'kdv_soliton'
+ICkw = 'ks_chaos'
 
 nonlinear = True
 
-absorbing_layer = True
+absorbing_layer = False
 
 # initialize outputs
 
@@ -90,13 +90,13 @@ for k in np.arange(0, num_Ns):
 
             fine_sim.save()
 
-        rough_Udata = rough_sim.Udata[:, int(N/4):int(3*N/4)]
+        rough_Udata = rough_sim.Udata #[:, int(N/4):int(3*N/4)]
 
-        fine_Udata = fine_sim.Udata[:, int(N/4):int(3*N/4)]
+        fine_Udata = fine_sim.Udata #[:, int(N/4):int(3*N/4)]
 
         # use fine sim and rough sim at last time step to get Richardson error estimate
 
-        ord = 1.
+        ord = 4.
 
         errors[k, cnt] = (1./(2**(ord-1)))*np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
 
@@ -122,13 +122,16 @@ dts = 0.5*dts
 plt.loglog(dts, errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=64$")
 plt.loglog(dts, errors[0, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
 """
-plt.loglog(dts, errors[0, :], 'v', color='xkcd:slate', markersize='8', label=r"$N=512$")
+#"""
+plt.loglog(dts, errors[0, :], 'v', color='xkcd:slate', markersize='8', label=r"$N=256$")
 plt.loglog(dts, errors[0, :],  color='xkcd:slate', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=1024$")
+plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=512$")
 plt.loglog(dts, errors[1, :],  color='xkcd:raspberry', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=2048$")
+plt.loglog(dts, errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=1024$")
 plt.loglog(dts, errors[2, :],  color='xkcd:goldenrod', linewidth='2', linestyle='solid')
-
+plt.loglog(dts, errors[3, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=2048$")
+plt.loglog(dts, errors[3, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
+#"""
 ax.legend(fontsize=16)
 
 plt.xlabel(r"$\Delta t$", fontsize=26, color='k')
@@ -141,7 +144,7 @@ plt.yticks(fontsize=16, rotation=0, color='k')
 
 plt.tight_layout()
 
-plt.savefig('nonlinear_accuracy_test_kdv_soliton_w_abslayer', bbox_inches='tight', dpi=200)
+plt.savefig('nonlinear_accuracy_test_ks', bbox_inches='tight', dpi=200)
 
 plt.show()
 
@@ -151,8 +154,8 @@ plt.show()
 # we can get level-off or rounding error domination in the error curve, destroying the linear trend after a certain
 # threshold
 
-params = np.polyfit(np.log10(dts), np.log10(errors[-1,:]), 1)
+params = np.polyfit(np.log10(dts[3:8]), np.log10(errors[-1,3:8]), 1)
 slope = params[0]
-
+print(dts[3:8])
 print('Estimated slope at N = 2048 is slope = ', slope)
 #"""

@@ -50,6 +50,9 @@ def get_spatial_operator(length, N, model_kw):
         A = -1j * (-(9./20.)*k + k ** 3 - k**5)  # Note how this is the Kawahara dispersion in the frame travelling
         # with the head of the wave train (at a group vel of c_g = 9/20)
 
+    elif model_kw == 'ks':
+        A = k ** 2 - k ** 4
+
     return A
 
 
@@ -87,7 +90,18 @@ def fourier_forcing(V, x, length, model_kw, nonlinear=True):
 
         out = -6.*float(nonlinear)*(1. / (p + 1.)) * 1j * k / (1. + k ** 2) * (fft(np.real(ifft(V)) ** (p + 1)))
 
+    elif model_kw == 'ks':
+
+        N = np.size(V)
+
+        k = 2 * np.pi * N * fftfreq(N) / length
+
+        p = 1.
+
+        out = -float(nonlinear) * (1. / (p + 1.)) * 1j * k * (fft(np.real(ifft(V)) ** (p + 1)))
+
     elif model_kw == 'kdv' or 'kawahara' or 'shore_kdv':
+
         N = np.size(V)
 
         k = 2 * np.pi * N * fftfreq(N) / length

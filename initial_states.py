@@ -53,6 +53,10 @@ def initial_state(x, initial_state_kw):
 
         out[0, :] = -1. + 3. * np.tanh(x / np.sqrt(2)) ** 2
 
+    elif initial_state_kw == 'ks_chaos':
+
+        out[0,:] = np.cos((x+16.*np.pi)/16.) * (1. + np.sin((x+16.*np.pi) / 16.))
+
     else:
 
         raise NameError("Invalid initial state keyword string. Acceptable keywords: gaussian_even, gaussian_odd, "
