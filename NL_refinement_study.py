@@ -5,7 +5,7 @@ import numpy.linalg
 
 import matplotlib.pyplot as plt
 
-from simulation_lib import simulation
+from main_lib import simulation
 
 import time
 

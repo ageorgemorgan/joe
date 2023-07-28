@@ -1,11 +1,13 @@
 import numpy as np
 
+import main_lib
+
 
 def initial_state(x, initial_state_kw):
-    amp = 0.1 #20. ** -0.25
+    amp = 0.1
     x0 = 0.
-    k0 = .2
-    width = 0.125
+    k0 = 1.
+    width = 1.
 
     out = np.zeros([2, np.size(x)], dtype=float)
 
@@ -61,5 +63,15 @@ def initial_state(x, initial_state_kw):
 
         raise NameError("Invalid initial state keyword string. Acceptable keywords: gaussian_even, gaussian_odd, "
                         "gaussian_no_parity, translational_mode, internal_mode, tritone, 0_energy, trivial")
+
+    return out
+
+
+def builtin_initial_state(initial_state_kw):
+
+    def my_initial_state_func(x):
+        return initial_state(x, initial_state_kw)
+
+    out = main_lib.initial_state(initial_state_kw, my_initial_state_func)
 
     return out

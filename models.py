@@ -2,7 +2,7 @@ import numpy as np
 
 from numpy.fft import fft, ifft, fftfreq
 
-from scipy import sparse
+import main_lib
 
 
 # Aux functions needed for special cases...
@@ -26,28 +26,22 @@ def V0(x):
 
 # if model is first order in time, below just gives linear, const. coeff. part. in Fourier space
 # if model is second order in time, instead obtain the spatial operator for the first order system as a block matrix
-def get_spatial_operator(length, N, model_kw):
-    # get wavenumbers for the grid of S^1 with N samples
-    k = 2 * np.pi * N * fftfreq(N) / length
-
+def get_symbol(k, model_kw='bbm'):
     if model_kw == 'phi4':
-        # linear, constant-coefficient part of PDE
-        L = -(k ** 2 + 2. * np.ones_like(k))  # CHANGE FOR WAVE EQN
-
-        # put L together into sparse block matrix , multiply by dt
-        A = sparse.diags([L, np.ones(N, dtype=float)], [-N, N], shape=[2 * N, 2 * N]).tocsc()
+        A = -(k ** 2 + 2. * np.ones_like(k))
 
     elif model_kw == 'bbm':
-        A = 1j * (k**3) / (1. + k ** 2)     # -1j * k / (1. + k ** 2)
+        A = 1j * (k ** 3) / (1. + k ** 2)  # -1j * k / (1. + k ** 2)
 
     elif model_kw == 'kdv':
-        A = 1j*k**3
+        A = 1j * k ** 3
 
     elif model_kw == 'shore_kdv':
-        A = -1j*(k-k**3)
+        A = -1j * (k - k ** 3)
 
     elif model_kw == 'kawahara':
-        A = -1j * (-(9./20.)*k + k ** 3 - k**5)  # Note how this is the Kawahara dispersion in the frame travelling
+        A = -1j * (-(
+                9. / 20.) * k + k ** 3 - k ** 5)  # Note how this is the Kawahara dispersion in the frame travelling
         # with the head of the wave train (at a group vel of c_g = 9/20)
 
     elif model_kw == 'ks':
@@ -56,7 +50,7 @@ def get_spatial_operator(length, N, model_kw):
     return A
 
 
-def fourier_forcing(V, x, length, model_kw, nonlinear=True):
+def fourier_forcing(V, k, x, model_kw='bbm', nonlinear=True):
     # Fourier transform of forcing term, acting on pair fncs V=(v_1, v_2)^T (concatenation)
     # on Fourier space. V has size 2N
 
@@ -82,19 +76,12 @@ def fourier_forcing(V, x, length, model_kw, nonlinear=True):
         out[N:] = fft(spatial_forcing)
 
     elif model_kw == 'bbm':
-        N = np.size(V)
-
-        k = 2 * np.pi * N * fftfreq(N) / length
 
         p = 1.
 
-        out = -6.*float(nonlinear)*(1. / (p + 1.)) * 1j * k / (1. + k ** 2) * (fft(np.real(ifft(V)) ** (p + 1)))
+        out = -6. * float(nonlinear) * (1. / (p + 1.)) * 1j * k / (1. + k ** 2) * (fft(np.real(ifft(V)) ** (p + 1)))
 
     elif model_kw == 'ks':
-
-        N = np.size(V)
-
-        k = 2 * np.pi * N * fftfreq(N) / length
 
         p = 1.
 
@@ -102,12 +89,32 @@ def fourier_forcing(V, x, length, model_kw, nonlinear=True):
 
     elif model_kw == 'kdv' or 'kawahara' or 'shore_kdv':
 
-        N = np.size(V)
-
-        k = 2 * np.pi * N * fftfreq(N) / length
-
         p = 1.
 
-        out = -6.*float(nonlinear) * (1. / (p + 1.)) * 1j*k * (fft(np.real(ifft(V)) ** (p + 1)))
+        out = -6. * float(nonlinear) * (1. / (p + 1.)) * 1j * k * (fft(np.real(ifft(V)) ** (p + 1)))
+
+    return out
+
+
+def builtin_model(model_kw, nonlinear=True):
+
+    def my_symbol(k):
+        return get_symbol(k, model_kw)
+
+    if model_kw == 'phi4':
+
+        t_ord = 2
+
+        def my_fourier_forcing(V, k, x, nonlinear):
+            return fourier_forcing(V, k, x, model_kw, nonlinear)
+
+    else:
+
+        t_ord = 1
+
+        def my_fourier_forcing(V, k, nonlinear):
+            return fourier_forcing(V, k, 0., model_kw, nonlinear)
+
+    out = main_lib.model(model_kw, t_ord, my_symbol, my_fourier_forcing, nonlinear=nonlinear)
 
     return out
