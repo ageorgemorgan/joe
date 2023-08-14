@@ -17,7 +17,7 @@ numpy, scipy, matplotlib, cmocean (https://matplotlib.org/cmocean/)
 
 GETTING STARTED
 
-See the Jupyter notebook here TODO: link to it!!!
+See the Jupyter notebook here: https://github.com/ageorgemorgan/joe/blob/main/tutorial_START_HERE!.ipynb
 
 FUTURE DIRECTIONS
 
