@@ -1,10 +1,6 @@
 # joe
 A library for solving partial differential equations with Fourier spectral discretization in space and high-order exponential time-stepping. 
 
-![joe](https://github.com/ageorgemorgan/joe/assets/78241397/617e9f7d-af9d-4e49-b046-f442faaa88ab)
-
-(^ Joseph Fourier, the namesake of this project) 
-
 FEATURES
 
 -Fast, accurate numerical solutions of first and second order in time partial differential equations (PDEs) for real scalar fields defined on an interval
