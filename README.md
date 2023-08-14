@@ -13,7 +13,7 @@ FEATURES
 
 -Users can either call the PDE they want to simulate from a catalogue of built-in options, or define their own custom PDE.
 
--Clean, object-oriented approach to handling simulations makes producing visualizations (pictures AND movie) and analysis (ie. accuracy assesment) quite easy 
+-Clean, object-oriented approach to handling simulations makes producing visualizations (pictures AND movies) and analysis (ie. accuracy assesment) quite easy 
 
 DEPENDENCIES
 
