@@ -1,12 +1,10 @@
 import pickle
 
-from inspect import signature
+import os
 
 import numpy as np
 
 import time
-
-import sys
 
 from numpy.fft import fft, ifft, fftfreq
 
@@ -114,22 +112,6 @@ def get_R2(N, dt, z):
     out = dt * np.real(np.mean((np.exp(z0) - 1. - z0) / (z0 ** 2), 0))  # note how we take mean over a certain axis
     # """
 
-    """
-    # a direct computation to show that the formula itself is what's weird!
-    out = np.zeros_like(z)
-
-    out[0] = 0.5
-
-    zh = dt*z[1:]  # if we remove the dt, we get a better (but not ideal) shape. If we remove and mult out by dt again, we're 100% good!
-
-    out[1:] = (np.exp(zh) - 1.-zh) / ((zh)**2)
-
-    out *= dt
-
-    #print(np.amax(np.abs(out)))
-    #print(out)
-    """
-
     return np.real(out)  # just kill any error that arose
 
 
@@ -217,6 +199,7 @@ def do_etdrk4_step_second_order(V, propagator, propagator2, forcing, greeks):
     return out
 
 
+# code for a single integrating factor Runge-Kutta fourth-order step
 def do_ifrk4_step(V, propagator, propagator2, forcing, dt):
     a = dt * forcing(V)
 
@@ -334,12 +317,19 @@ class timestepper:
 
     def save_aux(self):
 
-        with open(self.auxfilename, 'wb') as outp:
+        # add the folder "timestepper_aux" to our path... more on this below
+        my_path = os.path.join("timestepper_aux")
+
+        # first, if the folder doesn't exist, make it
+        if not os.path.isdir(my_path):
+            os.makedirs(my_path)
+
+        with open('timestepper_aux/'+self.auxfilename, 'wb') as outp:
             pickle.dump(self.aux, outp, pickle.HIGHEST_PROTOCOL)
 
     def load_aux(self):
 
-        with open(self.auxfilename, 'rb') as inp:
+        with open('timestepper_aux/'+self.auxfilename, 'rb') as inp:
             self.aux = pickle.load(inp)
 
     def do_time_step(self, V, forcing):
@@ -432,26 +422,14 @@ def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
 
     def forcing(V):
 
-        """
-        # OK this is not very pleasant but right now I don't see a better way to have flexibility for different forcing
-        # terms. I especially despise how this fix requires you to use specify variable names, and also requires you to
-        # input variables in a specific order!
-        # TODO : Find a better, and faster, solution. Currently too slow to be practical, can almost DOUBLE the runtime!
-        #     the elegance is not worth it! So, may have to bite the bullet and just say that forcing functions need to take a
-        #     specific form, and balls to you if you don't like it.
-        sig = signature(model.fourier_forcing['fourier_forcing'])
-        param_names = sig.parameters.keys()
-
-        if 'k' in param_names and 'x' in param_names:
-            out = model.get_fourier_forcing(V, k, x, nonlinear) + float(absorbing_layer)*rayleigh_damping(V, x, length, delta=0.2*length)
-
-        elif 'k' in param_names and 'x' not in param_names:
-            out = model.get_fourier_forcing(V, k, nonlinear)
-
-        elif 'k' not in param_names and 'x' in param_names:
-            out = model.get_fourier_forcing(V, x, nonlinear)
-        """
         out = model.get_fourier_forcing(V, k, x, nonlinear)
+
+        # if we're second-order in time and using a sponge layer, damping can be realized simply
+        # by modifying the forcing term ie. damping can be dealt with explicitly!
+        if t_ord == 2 and absorbing_layer:
+
+            out += rayleigh_damping(V, x, length,  delta=0.25 * length)
+
         return out
 
     # obtain the aux quantities. Thanks to all the hard work we did when defining the timestepper class, the code here
@@ -478,8 +456,15 @@ def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
 
     if t_ord == 2:
 
-        v1 = fft(Uinit[0, :])
-        v2 = fft(Uinit[1, :])
+        try:
+
+            v1 = fft(Uinit[0, :])
+            v2 = fft(Uinit[1, :])
+
+        except: # if no initial speed is provided in second order case, default to assuming it's zero.
+
+            v1 = fft(Uinit)
+            v2 = np.zeros_like(Uinit, dtype=float)
 
         V = np.concatenate((v1, v2))
 
@@ -489,11 +474,11 @@ def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
 
     elif t_ord == 1:
 
-        V = fft(Uinit[0, :])
+        V = fft(Uinit)
 
         # make data storage array
         Udata = np.zeros([1 + int(nsteps / ndump), N], dtype=float)
-        Udata[0, :] = Uinit[0]
+        Udata[0, :] = Uinit
 
     cnt = 0.  # counter
 
@@ -518,6 +503,8 @@ def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
                 V = Vc
 
             if cnt % 500 == 0:
+
+                # TODO: be able to toggle "harsh" exponential damping!
                 pass
 
                 U = np.real(ifft(V))
@@ -532,6 +519,7 @@ def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
 
         cnt += 1
 
+        # data storage step
         if cnt % ndump == 0:
 
             if t_ord == 2:

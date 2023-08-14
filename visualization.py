@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -12,11 +14,11 @@ from numpy.fft import fft, fftfreq, fftshift
 
 import sys
 
+
 # create Hovmoeller plot of a scalar field u
 
 
 def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname="", cmap=cmo.haline):
-
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
 
@@ -51,7 +53,15 @@ def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname=""
 
     if save_figure is True:
 
-        plt.savefig(picname, bbox_inches='tight', dpi=800)
+        # add the folder "visuals" to our path... more on this below
+        my_path = os.path.join("visuals")
+
+        # first, if the folder doesn't exist, make it
+        if not os.path.isdir(my_path):
+            os.makedirs(my_path)
+
+        # and save the fig
+        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=800)
 
     else:
 
@@ -65,19 +75,19 @@ def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname=""
 
         pass
 
+
 # create a movie from a scalar field u(t,x) sampled at various times.
 
 
-def save_movie(u, x, length, dt, ndump, filename, periodic=True):
-
+def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
     # Create movie file in mp4 format. Warning: this is very slow!
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
 
     fig = plt.figure()
 
-    umin = 1.05*np.amin(u)
-    umax = 1.05*np.amax(u)
+    umin = 1.05 * np.amin(u)
+    umax = 1.05 * np.amax(u)
 
     # TODO: CAREFUL THE xLIM HERE!!!!! MAKE A FUNCTION OF ABSORBING LAYER
     ax = plt.axes(xlim=(-0.5 * length, 0.5 * length), ylim=(umin, umax))
@@ -90,11 +100,11 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True):
     if periodic:
 
         # add endpoint
-        x_end = np.append(x, 0.5*length)
+        x_end = np.append(x, 0.5 * length)
 
         [M, N] = np.shape(u)
 
-        u_end = np.zeros([M, N+1], dtype=float)
+        u_end = np.zeros([M, N + 1], dtype=float)
 
         u_end[:, 0:N] = u
 
@@ -154,7 +164,7 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True):
         # TODO: the above label fixes are kind of a jerry-rigged solution and don't generalize easily to other PDE!
         #     Find a smart way to fix this!
 
-        plt.xlim([-.5*length, .5*length])
+        plt.xlim([-.5 * length, .5 * length])
 
         plt.tight_layout()
 
@@ -162,20 +172,25 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True):
 
     anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
 
-    dpi = 100
-    anim.save(filename, fps=200, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    # add the folder "visuals" to our path... more on this below
+    my_path = os.path.join("visuals")
+
+    # first, if the folder doesn't exist, make it
+    if not os.path.isdir(my_path):
+        os.makedirs(my_path)
+
+    anim.save('visuals/' + filename, fps=200, extra_args=['-vcodec', 'libx264'], dpi=dpi)
 
 
-def save_combomovie(u, x, length, dt, ndump, filename):
-
+def save_combomovie(u, x, length, dt, ndump, filename, dpi=100):
     # Create movie file in mp4 format. Warning: this is very slow!
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
 
     fig = plt.figure()
 
-    umin = 1.05*np.amin(u)
-    umax = 1.05*np.amax(u)
+    umin = 1.05 * np.amin(u)
+    umax = 1.05 * np.amax(u)
 
     ax = plt.axes(xlim=(-0.5 * length, 0.5 * length), ylim=(umin, umax))
 
@@ -202,11 +217,11 @@ def save_combomovie(u, x, length, dt, ndump, filename):
     # use of barycentric interpolation is not an option.
 
     # add endpoint
-    x_end = np.append(x, 0.5*length)
+    x_end = np.append(x, 0.5 * length)
 
     [M, N] = np.shape(u)
 
-    u_end = np.zeros([M, N+1], dtype=float)
+    u_end = np.zeros([M, N + 1], dtype=float)
 
     u_end[:, 0:N] = u
 
@@ -272,5 +287,11 @@ def save_combomovie(u, x, length, dt, ndump, filename):
 
     anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
 
-    dpi = 60
-    anim.save(filename, fps=300, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    # add the folder "visuals" to our path... more on this below
+    my_path = os.path.join("visuals")
+
+    # first, if the folder doesn't exist, make it
+    if not os.path.isdir(my_path):
+        os.makedirs(my_path)
+
+    anim.save('visuals/' + filename, fps=200, extra_args=['-vcodec', 'libx264'], dpi=dpi)

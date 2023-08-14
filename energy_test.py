@@ -8,7 +8,7 @@ from scipy.integrate import simpson
 
 import matplotlib.pyplot as plt
 
-from main_lib import simulation
+from joe_main_lib import simulation
 
 from phi4_model import K0, V0
 
