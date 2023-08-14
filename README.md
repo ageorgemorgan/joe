@@ -17,7 +17,7 @@ numpy, scipy, matplotlib, cmocean (https://matplotlib.org/cmocean/)
 
 GETTING STARTED
 
-See the Jupyter notebook here: https://github.com/ageorgemorgan/joe/blob/main/tutorial_START_HERE!.ipynb
+Simply download the zip of the library from github and extract it (of course, you should be a good Python-er and make a new venv with all the dependencies as well). Then, open up the Jupyter tutorial (https://github.com/ageorgemorgan/joe/blob/main/tutorial_START_HERE!.ipynb) to see joe in action. 
 
 FUTURE DIRECTIONS
 
