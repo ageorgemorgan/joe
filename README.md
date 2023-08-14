@@ -26,3 +26,7 @@ FUTURE DIRECTIONS
 -Add functionality for fields defined on 2D domains 
 
 -Allow for higher-order-derivatives in time (ie. Timoshenko beam equations)
+
+KNOWN ISSUES
+
+- ETDRK4 doesn't quite work with KdV, but IFRK4 seems to work fine. So, if using the code to solve KdV make sure your write " method_kw='ifrk4' " when you run a simulation. 
