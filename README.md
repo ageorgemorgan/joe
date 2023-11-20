@@ -31,3 +31,5 @@ KNOWN ISSUES
 
 -ETDRK4 doesn't quite work with KdV, but IFRK4 seems to work fine. So, if using the code to solve KdV make sure you
 write " method_kw='ifrk4' " when you run a simulation. 
+
+-At least one user has said their installation of LaTeX (which joe uses to make labels on graphs) doesn't like to cooperate with matplotlib, so in the Aug. 23 version no visuals could be produced. I've put a band-aid on this by shifting to a default matplotlib font when TeX can't be found. Overall this doesn't cause serious visual problems (TeX still looks 100x better than defaults!), except for when making solution + power spectrum movies. 
