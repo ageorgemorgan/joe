@@ -25,10 +25,10 @@ def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname=""
     # OK but not that nice)
     try:
         plt.rc('text', usetex=True)
-        plt.rc('font', family='serif')
 
     except RuntimeError:
         plt.rcParams["font.family"] = "serif"
+
 
     umin = np.amin(u)
     umax = np.amax(u)
@@ -90,14 +90,14 @@ def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname=""
 def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
     # Create movie file in mp4 format. Warning: this is very slow!
 
+    no_tex = False
+
     try:
         plt.rc('text', usetex=True)
-        plt.rc('font', family='serif')
-        usetex=True
 
     except RuntimeError:
         plt.rcParams["font.family"] = "serif"
-        usetex=False
+        no_tex = True
 
     fig = plt.figure()
 
@@ -194,11 +194,11 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
 
         #plt.title('$t=%.2f$' % tplot, fontsize=22)
 
-        if usetex == True:
-            ylabel_str= '$u(x,t=%.2f)$' % tplot
-
-        elif usetex == False:
+        if no_tex:
             ylabel_str= 'u(x,t=%.2f)' % tplot
+
+        else:
+            ylabel_str= r'$u(x,t=%.2f)$' % tplot
 
         ax.set_ylabel(ylabel_str, fontsize=22)
         """
@@ -250,14 +250,14 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
 def save_combomovie(u, x, length, dt, ndump, filename, dpi=100):
     # Create movie file in mp4 format. Warning: this is very slow!
 
+    no_tex = False
+
     try:
         plt.rc('text', usetex=True)
-        plt.rc('font', family='serif')
-        usetex = True
 
     except RuntimeError:
         plt.rcParams["font.family"] = "serif"
-        usetex = False
+        no_tex = True
 
     fig = plt.figure()
 
@@ -349,11 +349,12 @@ def save_combomovie(u, x, length, dt, ndump, filename, dpi=100):
 
         tplot = i * dt * ndump
 
-        if usetex == True:
-            ylabel_str= '$u(x,t=%.2f)$' % tplot
+        if no_tex:
+            ylabel_str = 'u(x,t=%.2f)' % tplot
 
-        elif usetex == False:
-            ylabel_str= 'u(x,t=%.2f)' % tplot
+        else:
+            ylabel_str = r'$u(x,t=%.2f)$' % tplot
+
 
         ax.set_ylabel(ylabel_str, fontsize=22)
 
