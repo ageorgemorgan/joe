@@ -136,7 +136,16 @@ class simulation:
         elif self.t_ord == 2:
             u = self.Udata[0, :, :]
 
-        hov_plot(self.x, times, u, fieldname='$u(x,t)$', show_figure=show_figure, save_figure=save_figure,
+        # add right endpoint to prevent a stripe from appearing in the pics
+        x_end = np.append(self.x, 0.5 * self.length)
+
+        u_end = np.zeros((1+int(self.T/(self.ndump*self.dt)), self.N+1), dtype=float)
+
+        u_end[:, 0:self.N] = np.copy(u)
+
+        u_end[:,-1] = np.copy(u[:, 0])
+
+        hov_plot(x_end, times, u_end, fieldname='$u(x,t)$', show_figure=show_figure, save_figure=save_figure,
                  picname=self.picname, cmap=colourmap)
 
     # save a movie of the evolution of our solution.

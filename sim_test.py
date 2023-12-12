@@ -16,27 +16,27 @@ import time
 
 # first prescribe all the simulation parameters etc.
 
-T = 10.  # time to stop simulation at
+T = 65.  # time to stop simulation at
 
-dt = 2**-7  # time step size
+dt = 0.01  # time step size
 
 nsteps = int(T / dt)  # total num of time steps we take
 
-length = 128.
+length = 400.
 
 # number of grid nodes
-N = 2 ** 10
+N = 2 ** 11
 
 # get the model object from the built-in options just using the
-model_kw = 'bbm'
-my_model = builtin_model(model_kw, nonlinear=True)
+model_kw = 'bbm_lab'
+my_model = builtin_model(model_kw, nonlinear=False)
 
 # get the initial state object from the built-in options:
-initial_state_kw = 'gaussian_odd'
+initial_state_kw = 'bbm_weird_wavepacket'
 my_initial_state = builtin_initial_state(initial_state_kw)
 
 # create the simulation object by prescribing physical parameters, discretization parameters, initial conditions
-my_sim = simulation(length, T, N, dt, my_model, my_initial_state, bc='sponge_layer', ndump=6)
+my_sim = simulation(length, T, N, dt, my_model, my_initial_state, bc='sponge_layer', ndump=10)
 
 # extract the filename attribute
 my_filename = my_sim.filename
@@ -44,7 +44,7 @@ my_filename = my_sim.filename
 try:
     # """
     # load the pkl file containing the sim data (if it exists!) to save a lot of time
-    with open('sim_archive/'+my_filename+'asdf', 'rb') as inp:
+    with open('sim_archive/'+my_filename, 'rb') as inp:
         my_sim = pickle.load(inp)
 
         print('Saved simulation found, loading saved data.')
@@ -88,5 +88,5 @@ plt.show()
 
 my_sim.hov_plot(colourmap='cmo.haline', show_figure=True, save_figure=True)
 
-my_sim.save_movie()
+#my_sim.save_movie(dpi=400)
 #my_sim.save_combomovie()

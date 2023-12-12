@@ -57,6 +57,10 @@ def initial_state(x, initial_state_kw):
 
         out = np.cos((x+16.*np.pi)/16.) * (1. + np.sin((x+16.*np.pi) / 16.))
 
+    elif initial_state_kw == 'bbm_weird_wavepacket':
+
+        out = (0.1*np.cos(20.*x) + np.cos(0.2*x))*np.exp(-x**2)
+
     else:
 
         raise NameError("Invalid initial state keyword string. Acceptable keywords: gaussian_even, gaussian_odd, "

@@ -33,6 +33,9 @@ def get_symbol(k, model_kw='bbm'):
     elif model_kw == 'bbm':
         A = 1j * (k ** 3) / (1. + k ** 2)  # -1j * k / (1. + k ** 2)
 
+    elif model_kw == 'bbm_lab':
+        A = -1j * k / (1. + k ** 2)
+
     elif model_kw == 'kdv':
         A = 1j * k ** 3
 

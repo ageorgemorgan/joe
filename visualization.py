@@ -21,17 +21,13 @@ import sys
 def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname="", cmap=cmo.haline):
     # I like to use tex to render the graph labels nicely. However, for the benefit of users who either don't
     # have tex installed or are encountering some issue where matplotlib doesn't want to talk to tex,
-    # I've introduced the following "out" that just uses a default matplotlib serif font instead (which looks
-    # OK but not that nice)
-    try:
-        plt.rc('text', usetex=True)
+    # I need an "out" ... TODO: this!
 
-    except RuntimeError:
-        plt.rcParams["font.family"] = "serif"
+    plt.rc('text', usetex=True)
+    plt.rcParams["font.family"] = "serif"
 
-
-    umin = np.amin(u)
-    umax = np.amax(u)
+    umin = -0.8#np.amin(u)
+    umax = 1.1#np.amax(u)
     levels = np.linspace(umin, umax, num=300)
 
     CF = plt.contourf(x, t, u, cmap=cmap, levels=levels)
@@ -44,6 +40,8 @@ def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname=""
     plt.xticks(fontsize=16, rotation=0, color='k')
     plt.tick_params(axis='y', which='both', right=False, color='k')
     plt.yticks(fontsize=16, rotation=0, color='k')
+
+    plt.xlim([-25, 100])
 
     # make colorbar
     cbar = plt.colorbar(CF, format='%.2f')
@@ -89,6 +87,8 @@ def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname=""
 
 def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
     # Create movie file in mp4 format. Warning: this is very slow!
+
+    # TODO: I think the "no_tex" killswitch isn't working
 
     no_tex = False
 
