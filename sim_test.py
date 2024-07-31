@@ -16,27 +16,27 @@ import time
 
 # first prescribe all the simulation parameters etc.
 
-T = 65.  # time to stop simulation at
+T = 150.  # time to stop simulation at
 
-dt = 0.01  # time step size
+dt = 2**-6 # time step size
 
 nsteps = int(T / dt)  # total num of time steps we take
 
-length = 400.
+length = 32.*np.pi # 400.
 
 # number of grid nodes
-N = 2 ** 11
+N = 2 ** 7
 
 # get the model object from the built-in options just using the
-model_kw = 'bbm_lab'
-my_model = builtin_model(model_kw, nonlinear=False)
+model_kw = 'ks'
+my_model = builtin_model(model_kw, nonlinear=True)
 
 # get the initial state object from the built-in options:
-initial_state_kw = 'bbm_weird_wavepacket'
+initial_state_kw = 'ks_chaos'
 my_initial_state = builtin_initial_state(initial_state_kw)
 
 # create the simulation object by prescribing physical parameters, discretization parameters, initial conditions
-my_sim = simulation(length, T, N, dt, my_model, my_initial_state, bc='sponge_layer', ndump=10)
+my_sim = simulation(length, T, N, dt, my_model, my_initial_state, bc='periodic', ndump=10)
 
 # extract the filename attribute
 my_filename = my_sim.filename
@@ -86,7 +86,7 @@ plt.plot(x,u)
 plt.show()
 """
 
-my_sim.hov_plot(colourmap='cmo.haline', show_figure=True, save_figure=True)
+my_sim.hov_plot(colourmap='cmo.solar', show_figure=True, save_figure=True)
 
 #my_sim.save_movie(dpi=400)
 #my_sim.save_combomovie()

@@ -7,6 +7,10 @@ import matplotlib.pyplot as plt
 
 from joe_main_lib import simulation
 
+from models import builtin_model
+
+from initial_states import builtin_initial_state
+
 import time
 
 
@@ -28,19 +32,22 @@ dts = np.flip(np.logspace(-nmax, -nmin, num=nmax-nmin+1, base=2.))
 num_dts = np.size(dts)
 
 # prescribe the array of N's we seek to assess
-Ns = np.array([2**8, 2**9, 2**10, 2**11])
+Ns = np.array([2**6, 2**7, 2**8])
 Ns = Ns.astype(int)
 num_Ns = np.size(Ns)
 
-# set what initial condition we want to deal with
-
-model_kw = 'ks'
-
-ICkw = 'ks_chaos'
 
 nonlinear = True
 
-absorbing_layer = False
+model_kw = 'ks'
+
+my_model = builtin_model(model_kw, nonlinear=nonlinear)
+
+bc = 'periodic'
+
+ICkw = 'ks_chaos'
+
+my_IC = builtin_initial_state(ICkw)
 
 # initialize outputs
 
@@ -49,25 +56,25 @@ errors = np.zeros([num_Ns, num_dts], dtype=float)
 cnt = 0
 
 start = time.time()
-
+print('Running accuracy tests...')
 for k in np.arange(0, num_Ns):
 
     N = Ns[k]
 
     # do simulation at the worst order (largest time step) first
 
-    rough_sim = simulation(length, T, N, dts[0], model_kw=model_kw, initial_state_kw=ICkw, nonlinear=nonlinear, absorbing_layer=absorbing_layer)
+    rough_sim = simulation(length, T, N, dts[0], model=my_model, initial_state=my_IC, bc=bc)
 
     rough_filename = rough_sim.filename
 
     try:
         # load the pkl file
-        with open(rough_filename, 'rb') as inp:
+        with open('sim_archive/'+rough_filename, 'rb') as inp:
             rough_sim = pickle.load(inp)
 
     except:
 
-        rough_sim.run_sim()
+        rough_sim.run_sim(print_runtime=False)
 
         rough_sim.save()
 
@@ -75,18 +82,18 @@ for k in np.arange(0, num_Ns):
 
     for dt in dts:
 
-        fine_sim = simulation(length, T, N, 0.5*dt,  model_kw=model_kw, initial_state_kw=ICkw, nonlinear=nonlinear, absorbing_layer=absorbing_layer)
+        fine_sim = simulation(length, T, N, 0.5*dt, model=my_model, initial_state=my_IC, bc=bc)
 
         fine_filename = fine_sim.filename
 
         try:
             # load the pkl file and try plotting again
-            with open(fine_filename, 'rb') as inp:
+            with open('sim_archive/'+fine_filename, 'rb') as inp:
                 fine_sim = pickle.load(inp)
 
         except:
 
-            fine_sim.run_sim()
+            fine_sim.run_sim(print_runtime=False)
 
             fine_sim.save()
 
@@ -104,8 +111,6 @@ for k in np.arange(0, num_Ns):
 
         cnt += 1
 
-        print(cnt)
-
     cnt = 0  # reinit the counter
 
 end = time.time()
@@ -118,19 +123,16 @@ plt.rc('font', family='serif')
 fig, ax = plt.subplots()
 
 dts = 0.5*dts
-"""
-plt.loglog(dts, errors[0, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=64$")
-plt.loglog(dts, errors[0, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
-"""
+
 #"""
-plt.loglog(dts, errors[0, :], 'v', color='xkcd:slate', markersize='8', label=r"$N=256$")
+plt.loglog(dts, errors[0, :], 'v', color='xkcd:slate', markersize='8', label=r"$N=64$")
 plt.loglog(dts, errors[0, :],  color='xkcd:slate', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=512$")
+plt.loglog(dts, errors[1, :], '*', color='xkcd:raspberry', markersize='8', label=r"$N=128$")
 plt.loglog(dts, errors[1, :],  color='xkcd:raspberry', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[2, :], '^', color='xkcd:goldenrod', markersize='8', label=r"$N=1024$")
+plt.loglog(dts, errors[2, :], 'o', color='xkcd:goldenrod', markersize='6', label=r"$N=256$")
 plt.loglog(dts, errors[2, :],  color='xkcd:goldenrod', linewidth='2', linestyle='solid')
-plt.loglog(dts, errors[3, :], 'o', color='xkcd:deep green', markersize='8', label=r"$N=2048$")
-plt.loglog(dts, errors[3, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
+#plt.loglog(dts, errors[3, :], 'o', color='xkcd:deep green', markersize='2', label=r"$N=128$")
+#plt.loglog(dts, errors[3, :],  color='xkcd:deep green', linewidth='2', linestyle='solid')
 #"""
 ax.legend(fontsize=16)
 
@@ -156,6 +158,6 @@ plt.show()
 
 params = np.polyfit(np.log10(dts[3:8]), np.log10(errors[-1,3:8]), 1)
 slope = params[0]
-print(dts[3:8])
-print('Estimated slope at N = 2048 is slope = ', slope)
+#print(dts[3:8])
+print('Estimated slope at N = 256 is slope = ', slope)
 #"""

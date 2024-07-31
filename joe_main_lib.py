@@ -1,14 +1,13 @@
 import pickle
-
 import os
+import time
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 from time_stepper import do_time_stepping
-
 from initial_states import initial_state
-
-from visualization import hov_plot, save_movie, save_combomovie
+from visualization import hov_plot, save_movie, save_combomovie, spinner
 
 
 # a class for models. Note how the init takes in two callables for the symbol and forcing terms: to avoid making the
@@ -21,7 +20,7 @@ class model:
         self.model_kw = model_kw
         self.t_ord = t_ord  # an integer
         self.symbol = {'symbol': symbol}  # callable
-        self.fourier_forcing = {'fourier_forcing': fourier_forcing} # callable
+        self.fourier_forcing = {'fourier_forcing': fourier_forcing}  # callable
         self.nonlinear = nonlinear
 
         # this defines a model PDE with the name 'model_kw' in the Fourier-space form
@@ -47,19 +46,20 @@ class initial_state:
         self.initial_state_func = {'initial_state_func': initial_state_func}
         self.initial_state = None
 
-    # obtain the actual symbol on a given mesh
+    # obtain the actual initial state fnc
     def get_initial_state(self, *args):
         return self.initial_state_func['initial_state_func'](*args)
 
 
-# a class for simulations. You init with a "model" object to specify the PDE, an "initial_state" object, and discretization parameters.
-# Then you can call a run simulation function on a simulation object to solve the IVP and store/save the soln.
+# a class for simulations. You init with a "stgrid" (space-time grid) dict, a "model" object to specify the PDE,
+# and an "initial_state" object. Then you can call a run simulation function on a simulation object to solve
+# the IVP and store/save the soln, or load up the soln from an experiment you've already done.
 class simulation:
-    def __init__(self, length, T, N, dt, model, initial_state, bc, ndump=10):
-        self.length = length
-        self.T = T
-        self.N = N
-        self.dt = dt
+    def __init__(self, stgrid, model, initial_state, bc, ndump=10):
+        self.length = stgrid['length']
+        self.T = stgrid['T']
+        self.N = stgrid['N']
+        self.dt = stgrid['dt']
         self.model = model  # a model object
         self.model_kw = model.model_kw
         self.t_ord = model.t_ord  # an integer
@@ -125,8 +125,36 @@ class simulation:
         with open('sim_archive/'+self.filename, 'wb') as outp:
             pickle.dump(self, outp, pickle.HIGHEST_PROTOCOL)
 
+    # if we know for sure the sim has been done, we can just load it. Since time-stepping only fills the Udata attribute
+    # to the simulation object, "loading" a saved sim just means
+    # 1) loading the pickle and
+    # 2) adding the Udata attribute to our new sim
+    def load(self):
+
+        with open('sim_archive/' + self.filename, 'rb') as inp:
+            loaded_sim = pickle.load(inp)
+            self.Udata = loaded_sim.Udata
+
+    # now put everything together: load if possible, but run if you gotta
+    def load_or_run(self, method_kw='etdrk4', splitting_method_kw='naive', print_runtime=True, verbose=True):
+
+        try:
+            self.load()
+            if verbose:
+                print('Saved simulation found, loading saved data.')
+            else:
+                pass
+
+        except:
+            if verbose:
+                print('No saved simulation found, running simulation.')
+            else:
+                pass
+            self.run_sim(method_kw=method_kw, splitting_method_kw=splitting_method_kw, print_runtime=print_runtime)
+            self.save()
+
     # create a Hovmoeller plot (filled contour plot in space-time) of the simulation.
-    def hov_plot(self, colourmap='cmo.haline', show_figure=True, save_figure=False):
+    def hov_plot(self, dpi=100, colormap='cmo.haline', fieldname='u', usetex=True, show_figure=True, save_figure=False):
         nsteps = int(self.T / self.dt)
         times = np.linspace(0., self.T, num=1 + int(nsteps / self.ndump), endpoint=True)
 
@@ -143,13 +171,14 @@ class simulation:
 
         u_end[:, 0:self.N] = np.copy(u)
 
-        u_end[:,-1] = np.copy(u[:, 0])
+        u_end[:, -1] = np.copy(u[:, 0])
 
-        hov_plot(x_end, times, u_end, fieldname='$u(x,t)$', show_figure=show_figure, save_figure=save_figure,
-                 picname=self.picname, cmap=colourmap)
+        with spinner('Rendering Hovmoeller plot...'):
+            hov_plot(x_end, times, u_end, fieldname=fieldname, dpi=dpi, show_figure=show_figure, save_figure=save_figure,
+                     picname=self.picname, cmap=colormap, usetex=usetex)
 
     # save a movie of the evolution of our solution.
-    def save_movie(self, dpi=100):
+    def save_movie(self, fieldname='u', usetex=True, fieldcolor='xkcd:ocean green', dpi=100):
 
         if self.t_ord == 1:
             u = self.Udata
@@ -157,15 +186,169 @@ class simulation:
         elif self.t_ord == 2:
             u = self.Udata[0, :, :]
 
-        save_movie(u, x=self.x, length=self.length, dt=self.dt, ndump=self.ndump, filename=self.moviename,
-                   periodic=True, dpi=dpi)
+        with spinner('Rendering movie...'):
+            save_movie(u, x=self.x, length=self.length, dt=self.dt, fieldname=fieldname, ndump=self.ndump, filename=self.moviename,
+                       periodic=self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
 
     # save a movie of the evolution of our perturbation AND a nested movie of its power spectrum
-    def save_combomovie(self, dpi=100):
+    def save_combomovie(self, fieldname='u', fieldcolor='xkcd:ocean green', speccolor='xkcd:dark orange', usetex=True, dpi=100):
         if self.t_ord == 1:
             u = self.Udata
 
         elif self.t_ord == 2:
             u = self.Udata[0, :, :]
 
-        save_combomovie(u, x=self.x, length=self.length, dt=self.dt, ndump=self.ndump, filename=self.combomoviename, dpi=dpi)
+        with spinner('Rendering combo movie...'):
+            save_combomovie(u, x=self.x, length=self.length, dt=self.dt, fieldname=fieldname, fieldcolor=fieldcolor,
+                            speccolor=speccolor, ndump=self.ndump, filename=self.combomoviename, usetex=usetex, dpi=dpi)
+
+
+# a function that performs a refinement study based on Richardson extrapolation for error estimation. Very
+# useful for quickly checking accuracy. It's here because it doesn't have a better home right now, and it
+# *almost* takes simulation objects in as input.
+def do_refinement_study(model, initial_state, length, T, Ns, dts, bc='periodic', show_figure=True, save_figure=False, usetex=True,
+                        fit_min=3, fit_max=7):
+
+    plt.rcParams["font.family"] = "serif"
+
+    try:
+        plt.rc('text', usetex=usetex)
+
+    except RuntimeError:  # catch a user error thinking they have tex when they don't
+        usetex = False
+
+    Ns = Ns.astype(int)
+    num_Ns = np.size(Ns)
+    num_dts = np.size(dts)
+
+    # initialize outputs
+
+    errors = np.zeros([num_Ns, num_dts], dtype=float)
+
+    cnt = 0
+
+    #start = time.time()
+    with spinner('Performing refinement study...'):
+        for k in np.arange(0, num_Ns):
+
+            N = Ns[k]
+
+            # do simulation at the worst order (largest time step) first
+            rough_st_grid = {'length':length, 'T':T, 'N':N, 'dt':dts[0]}
+            rough_sim = simulation(rough_st_grid, model, initial_state, bc=bc)
+
+            rough_sim.load_or_run(print_runtime=False, verbose=False)
+
+            for dt in dts:
+
+                fine_st_grid = {'length': length, 'T': T, 'N': N, 'dt': 0.5*dt}
+                fine_sim = simulation(fine_st_grid, model, initial_state, bc=bc)
+
+                fine_sim.load_or_run(print_runtime=False, verbose=False)
+
+                rough_Udata = rough_sim.Udata  # [:, int(N/4):int(3*N/4)]
+
+                fine_Udata = fine_sim.Udata  # [:, int(N/4):int(3*N/4)]
+
+                # use fine sim and rough sim at last time step to get Richardson error estimate
+
+                ord = 4.
+
+                errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
+
+                rough_sim = fine_sim  # redefine for efficiency... only works bcz we refine dt in powers of 1/2
+
+                cnt += 1
+
+            cnt = 0  # reinit the counter
+
+    #end = time.time()
+    #runtime = end - start
+    #print('Runtime for accuracy tests = %.4f' % runtime + ' s')
+
+    # now we produce a plot of the errors
+    fig, ax = plt.subplots()
+
+    dts = 0.5 * dts
+
+    # define the cycler
+    my_cycler = (
+                plt.cycler(color=['xkcd:slate', 'xkcd:raspberry', 'xkcd:goldenrod', 'xkcd:deep green'])
+                + plt.cycler(lw=[3.5, 3, 2.5, 2])
+                + plt.cycler(linestyle=['dotted', 'dashed', 'solid', 'dashdot'])
+                + plt.cycler(marker=['v', '*', 'o', 'P'])
+                + plt.cycler(markersize=[8, 12, 8, 8])
+    )
+
+    ax.set_prop_cycle(my_cycler)
+
+    for m in range(0, num_Ns):
+        if usetex:
+            plt.loglog(dts, errors[m, :], label=r'$N = z$'.replace('z', str(Ns[m])))
+        # ^ an awesome trick from
+        # https://stackoverflow.com/questions/33786332/matplotlib-using-variables-in-latex-expressions
+        # was used to get the labels working as above
+        else:
+            plt.loglog(dts, errors[m, :], label='N = z'.replace('z', str(Ns[m])))
+
+    ax.legend(fontsize=16)
+
+    if usetex:
+        plt.xlabel(r"$\Delta t$", fontsize=26, color='k')
+        plt.ylabel(r"Absolute Error", fontsize=26, color='k')
+    else:
+        plt.xlabel("Δt", fontsize=26, color='k')
+        plt.ylabel("Absolute Error", fontsize=26, color='k')
+
+    plt.tick_params(axis='x', which='both', top='off', color='k')
+    plt.xticks(fontsize=16, rotation=0, color='k')
+    plt.tick_params(axis='y', which='both', right='off', color='k')
+    plt.yticks(fontsize=16, rotation=0, color='k')
+
+    plt.tight_layout()
+
+    if save_figure is True:
+
+        # add the folder "visuals" to our path
+        my_path = os.path.join("visuals")
+
+        # first, if the folder doesn't exist, make it
+        if not os.path.isdir(my_path):
+            os.makedirs(my_path)
+
+        # and now we can save the fig
+        if bc == 'sponge_layer':
+            absorbing_layer = True
+        elif bc == 'periodic':
+            absorbing_layer = False
+
+        my_string = '_length=%.1f_T=%.1f' % (
+        length, T) + '_modelkw=' + model.model_kw + '_ICkw=' + initial_state.initial_state_kw + '_nonlinear=' + str(
+            model.nonlinear) + '_abslayer=' + str(absorbing_layer)
+
+        picname = 'refinement_study' + my_string + '.png'
+        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=400)
+
+    else:
+
+        pass
+
+    if show_figure is True:
+
+        plt.show()
+
+    else:
+
+        pass
+
+    plt.close()
+
+    # estimate the slope of particular error curves if you want. Needs a bit of by-hand tweaking (controlled by the
+    # inputs fit_min, fit_max) bcz for small enough dt we can get level-off or rounding error domination in the error
+    # curve, destroying the linear trend after a certain threshold
+
+    params = np.polyfit(np.log10(dts[fit_min:fit_max+1]), np.log10(errors[-1, fit_min:fit_max+1]), 1)
+    slope = params[0]
+    print('Estimated Slope of Error Line at N = %i' % Ns[-1] + ' is slope = %.3f' % slope)
+
+    return None

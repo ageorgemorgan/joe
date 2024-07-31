@@ -6,6 +6,8 @@ import numpy as np
 
 import time
 
+from alive_progress import alive_bar
+
 from numpy.fft import fft, ifft, fftfreq
 
 from scipy import sparse
@@ -15,7 +17,7 @@ from scipy.sparse import linalg, diags
 from absorbing_layer import damping_coeff_lt, rayleigh_damping
 
 
-# The intention with this script is to independent of the particular
+# The intention here is to make the code independent of the particular
 # PDE we're considering insofar as is possible.
 
 

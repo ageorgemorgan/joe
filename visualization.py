@@ -1,53 +1,78 @@
 import os
 
+from typing import ContextManager, Optional
+from alive_progress import alive_bar
+
+#https://stackoverflow.com/questions/44851940/python-cli-progress-bar-spinner-without-iteration
+def spinner(title: Optional[str] = None) -> ContextManager:
+    """
+    Context manager to display a spinner while a long-running process is running.
+
+    Usage:
+        with spinner("Fetching data..."):
+            fetch_data()
+
+    Args:
+        title: The title of the spinner. If None, no title will be displayed.
+    """
+    return alive_bar(monitor=None, stats=None, title=title, force_tty=True)
+
 import numpy as np
-
 import matplotlib.pyplot as plt
-
 import cmocean.cm as cmo
-
 import matplotlib.animation as animation
-
+os.environ["XDG_SESSION_TYPE"] = "xcb" # prevents a warning from being thrown up for certain linux users, thanks to
+# https://stackoverflow.com/questions/69828508/warning-ignoring-xdg-session-type-wayland-on-gnome-use-qt-qpa-platform-wayland
 from scipy.interpolate import CubicSpline
-
 from numpy.fft import fft, fftfreq, fftshift
-
-import sys
-
 
 # create Hovmoeller plot of a scalar field u
 
 
-def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname="", cmap=cmo.haline):
-    # I like to use tex to render the graph labels nicely. However, for the benefit of users who either don't
-    # have tex installed or are encountering some issue where matplotlib doesn't want to talk to tex,
-    # I need an "out" ... TODO: this!
+def hov_plot(x, t, u, fieldname, dpi=100, show_figure=True, save_figure=False, picname="", cmap=cmo.haline, usetex=True):
 
-    plt.rc('text', usetex=True)
     plt.rcParams["font.family"] = "serif"
 
-    umin = -0.8#np.amin(u)
-    umax = 1.1#np.amax(u)
+    try:
+        plt.rc('text', usetex=usetex)
+
+    except RuntimeError: # catch a user error thinking they have tex when they don't
+        usetex = False
+
+    umin = np.amin(u)
+    umax = np.amax(u)
     levels = np.linspace(umin, umax, num=300)
 
     CF = plt.contourf(x, t, u, cmap=cmap, levels=levels)
 
     # axis labels
-    plt.xlabel(r"$x$", fontsize=22, color='k')
-    plt.ylabel(r"$t$", fontsize=22, color='k')
+    if usetex:
+        plt.xlabel(r"$x$", fontsize=22, color='k')
+        plt.ylabel(r"$t$", fontsize=22, color='k')
+
+    else:
+        plt.xlabel(r"x", fontsize=22, color='k')
+        plt.ylabel(r"t", fontsize=22, color='k')
 
     plt.tick_params(axis='x', which='both', top=False, color='k')
     plt.xticks(fontsize=16, rotation=0, color='k')
     plt.tick_params(axis='y', which='both', right=False, color='k')
     plt.yticks(fontsize=16, rotation=0, color='k')
 
-    plt.xlim([-25, 100])
+    plt.xlim([np.amin(x), np.amax(x)])
 
     # make colorbar
     cbar = plt.colorbar(CF, format='%.2f')
     cbar.ax.tick_params(labelsize=16, color='k')
     plt.clim(umin, umax)
-    cbar.ax.set_ylabel(fieldname, fontsize=22, color='k')
+
+    if usetex:
+        cbarlabel_str = r'$u(x,t)$'.replace('u', str(fieldname))
+
+    else:
+        cbarlabel_str = 'u(x,t)'.replace('u', str(fieldname))
+
+    cbar.ax.set_ylabel(cbarlabel_str, fontsize=22, color='k')
 
     # the final piece of the colorbar defn is to change the colorbar ticks to an acceptable color.
     # This is not so easy, and relies on the thread at
@@ -67,7 +92,7 @@ def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname=""
             os.makedirs(my_path)
 
         # and save the fig
-        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=800)
+        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
 
     else:
 
@@ -81,23 +106,21 @@ def hov_plot(x, t, u, fieldname, show_figure=True, save_figure=False, picname=""
 
         pass
 
+    plt.close()
 
 # create a movie from a scalar field u(t,x) sampled at various times.
 
 
-def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
+def save_movie(u, x, length, dt, fieldname, ndump, filename, periodic=True, usetex=True, fieldcolor='xkcd:ocean green', dpi=100):
     # Create movie file in mp4 format. Warning: this is very slow!
 
-    # TODO: I think the "no_tex" killswitch isn't working
-
-    no_tex = False
+    plt.rcParams["font.family"] = "serif"
 
     try:
-        plt.rc('text', usetex=True)
+        plt.rc('text', usetex=usetex)
 
-    except RuntimeError:
-        plt.rcParams["font.family"] = "serif"
-        no_tex = True
+    except RuntimeError: # catch a user error thinking they have tex when they don't
+        usetex = False
 
     fig = plt.figure()
 
@@ -106,7 +129,7 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
 
     #from scipy.integrate import simps
 
-    #coeff = simps(np.abs(u[0, :]),x)  #TODO: multiplying by a factor of 4 gives a solid result , but for BBM 6 is # the
+    # coeff = simps(np.abs(u[0, :]),x)  #TODO: multiplying by a factor of 4 gives a solid result , but for BBM 6 is # the
     # correct "back of the envelope" value.
 
     # TODO: CAREFUL THE xLIM HERE!!!!! MAKE A FUNCTION OF ABSORBING LAYER
@@ -143,28 +166,19 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
 
     # now we can actually do the upsampling
 
-    NN = 1200  # number of points to evaluate interpolant at
+    NN = 2000  # number of points to evaluate interpolant at
 
     xx = np.linspace(-0.5 * length, 0.5 * length, NN, endpoint=True)
 
-    # uu = poly(xx)
+    uu = poly(xx)
 
-    # x = xx
+    x = xx
 
-    # u = uu
+    u = uu
 
     ax.grid('True')
 
-    if periodic:
-
-        # color = 'xkcd:ocean green'
-        color = 'xkcd:cerulean'
-
-    else:
-
-        color = 'xkcd:dark magenta'
-
-    line, = ax.plot([], [], linewidth=2, color=color, label='$u(t,x)$')
+    line, = ax.plot([], [], linewidth=2, color=fieldcolor, label=fieldname)
     #bound_line_up, = ax.plot([], [], linewidth=2, color='xkcd:emerald', linestyle='dashed',
                             # label='$\|u_0\|_{L^{1}_{x}} (1+t)^{-1/3}$')
     #bound_line_down, = ax.plot([], [], linewidth=2, color='xkcd:emerald', linestyle='dashed')
@@ -180,8 +194,10 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
     plt.tick_params(axis='y', which='both', right=False, color='k')
     plt.yticks(fontsize=20, rotation=0, color='k')
 
-    plt.xlabel(r"$x$", fontsize=22, color='k')
-
+    if usetex:
+        plt.xlabel(r"$x$", fontsize=22, color='k')
+    else:
+        plt.xlabel(r"x", fontsize=22, color='k')
 
     # Animation function.
     def animate(i):
@@ -194,27 +210,13 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
 
         #plt.title('$t=%.2f$' % tplot, fontsize=22)
 
-        if no_tex:
-            ylabel_str= 'u(x,t=%.2f)' % tplot
+        if usetex:
+            ylabel_str = r'$u(x,t=%.2f)$'.replace('u', str(fieldname)) % tplot
 
         else:
-            ylabel_str= r'$u(x,t=%.2f)$' % tplot
+            ylabel_str = 'u(x,t=%.2f)'.replace('u', str(fieldname)) % tplot
 
         ax.set_ylabel(ylabel_str, fontsize=22)
-        """
-
-        if periodic:
-
-            ax.set_ylabel('$u(x,t=%.2f)$' % tplot, fontsize=22)
-
-        else:
-
-            ax.set_ylabel('$\phi(x,t=%.2f)$' % tplot, fontsize=22)
-            
-        """
-
-        # TODO: the above label fixes are kind of a jerry-rigged solution and don't generalize easily to other PDE!
-        #     Find a smart way to fix this!
 
         plt.xlim([-.5 * length, .5 * length])
         #plt.xlim = ([-60., 25.])
@@ -229,7 +231,7 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
             pass 
         """
 
-        # plt.tight_layout()
+        plt.tight_layout()
 
         return line,
 
@@ -244,20 +246,21 @@ def save_movie(u, x, length, dt, ndump, filename, periodic=True, dpi=100):
     if not os.path.isdir(my_path):
         os.makedirs(my_path)
 
-    anim.save('visuals/' + filename, fps=50, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    anim.save('visuals/' + filename, writer='ffmpeg', fps=200, extra_args=['-vcodec', 'libx264'], dpi=dpi)
 
+    plt.close()
 
-def save_combomovie(u, x, length, dt, ndump, filename, dpi=100):
+def save_combomovie(u, x, length, dt, ndump, filename, fieldname, fieldcolor, speccolor, usetex, dpi=100):
     # Create movie file in mp4 format. Warning: this is very slow!
 
-    no_tex = False
+    plt.rcParams["font.family"] = "serif"
 
     try:
-        plt.rc('text', usetex=True)
+        plt.rc('text', usetex=usetex)
 
-    except RuntimeError:
-        plt.rcParams["font.family"] = "serif"
-        no_tex = True
+    except RuntimeError:  # catch a user error thinking they have tex when they don't
+        usetex = False
+
 
     fig = plt.figure()
 
@@ -281,7 +284,8 @@ def save_combomovie(u, x, length, dt, ndump, filename, dpi=100):
 
     v = fftshift(v, axes=1)
 
-    ins = ax.inset_axes([0.69, 0.685, 0.3, 0.3], xlim=(kmin, kmax), ylim=(vmin, vmax))
+    ins = ax.inset_axes([0.15, 0.68, 0.3, 0.3], xlim=(kmin, kmax), ylim=(vmin, vmax))
+    # phi4 vals: [0.69, 0.685, 0.3, 0.3]
 
     # use cubic spline interpolation to smooth the state data
 
@@ -305,7 +309,7 @@ def save_combomovie(u, x, length, dt, ndump, filename, dpi=100):
 
     # now we can actually do the spatial upsampling
 
-    NN = 600  # number of points to evaluate interpolant at
+    NN = 2000  # number of points to evaluate interpolant at
 
     xx = np.linspace(-0.5 * length, 0.5 * length, NN, endpoint=True)
 
@@ -330,13 +334,19 @@ def save_combomovie(u, x, length, dt, ndump, filename, dpi=100):
     v = vv
 
     ax.grid(True)
-    ax.set_xlabel('$x$', fontsize=22)
+    if usetex:
+        ax.set_xlabel('$x$', fontsize=22)
+    else:
+        ax.set_xlabel('x', fontsize=22)
 
     ins.grid(False)
-    ins.set_xlabel('$k$', fontsize=11)
+    if usetex:
+        ins.set_xlabel('$k$', fontsize=11)
+    else:
+        ins.set_xlabel('k', fontsize=11)
 
-    line, = ax.plot([], [], linewidth=2, color='xkcd:ocean green')
-    iline, = ins.plot([], [], linewidth=1., color='xkcd:dark orange')
+    line, = ax.plot([], [], linewidth=2, color=fieldcolor)
+    iline, = ins.plot([], [], linewidth=1., color=speccolor)
 
     timer = fig.canvas.new_timer(interval=100)
     timer.add_callback(u, ax)
@@ -349,17 +359,22 @@ def save_combomovie(u, x, length, dt, ndump, filename, dpi=100):
 
         tplot = i * dt * ndump
 
-        if no_tex:
-            ylabel_str = 'u(x,t=%.2f)' % tplot
+        if usetex:
+            ylabel_str = r'$u(x,t=%.2f)$'.replace('u', str(fieldname)) % tplot
 
         else:
-            ylabel_str = r'$u(x,t=%.2f)$' % tplot
-
+            ylabel_str = 'u(x,t=%.2f)'.replace('u', str(fieldname)) % tplot
 
         ax.set_ylabel(ylabel_str, fontsize=22)
 
-        # TODO: get this looking better when tex doesn't want to work!
         in_ylabel_str = '$|\widehat{u}|^2(k,t=%.2f)$' % tplot
+
+        if usetex:
+            in_ylabel_str = r'$|\widehat{u}|^2(k,t=%.2f)$'.replace('u', str(fieldname)) % tplot
+
+        else:
+            in_ylabel_str = 'Pow[u](k,t=%.2f)'.replace('u', str(fieldname)) % tplot
+
         ins.set_ylabel(in_ylabel_str, fontsize=11)
 
         plt.tight_layout()
@@ -376,3 +391,5 @@ def save_combomovie(u, x, length, dt, ndump, filename, dpi=100):
         os.makedirs(my_path)
 
     anim.save('visuals/' + filename, fps=200, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+
+    plt.close()
