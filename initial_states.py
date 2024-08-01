@@ -2,6 +2,9 @@ import numpy as np
 
 import joe_main_lib
 
+def kdv_soliton(x, c=1.):
+    return 0.5*c*(np.cosh(0.5*np.sqrt(c)*(x))**-2)
+
 
 def initial_state(x, initial_state_kw):
     amp = 0.1
@@ -21,19 +24,16 @@ def initial_state(x, initial_state_kw):
 
         c = 2.
 
-        out = 0.5*c*(np.cosh(0.5*np.sqrt(c)*(x))**-2)
+        out = kdv_soliton(x, c=c)
 
-    elif initial_state_kw == 'kdv_two_solitons':
+    elif initial_state_kw == 'kdv_multisoliton':
+        c0 = 3.2
 
-        c1 = 2.2
+        c1 = 2.5
 
-        sol1 = 0.5*c1*(np.cosh(0.5*np.sqrt(c1)*(x+50))**-2)
+        c2 = 1.
 
-        c2 = 1.4
-
-        sol2 = 0.5 * c2 * (np.cosh(0.5 * np.sqrt(c2) * (x)) ** -2)
-
-        out = sol1 + sol2
+        out =  kdv_soliton(x+80., c=c0) + kdv_soliton(x+50., c=c1) + kdv_soliton(x+10, c=c2)
 
     elif initial_state_kw == 'gaussian_odd':
 

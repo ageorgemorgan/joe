@@ -197,7 +197,7 @@ class simulation:
                      picname=self.picname, cmap=colormap, usetex=usetex)
 
     # save a movie of the evolution of our solution.
-    def save_movie(self, fieldname='u', usetex=True, fieldcolor='xkcd:ocean green', dpi=100):
+    def save_movie(self, fps=200, fieldname='u', usetex=True, fieldcolor='xkcd:ocean green', dpi=100):
 
         if self.t_ord == 1:
             u = clip_spongeless(self.Udata, self.sfrac)
@@ -206,11 +206,11 @@ class simulation:
             u = clip_spongeless(self.Udata[0, :, :], self.sfrac)
 
         with spinner('Rendering movie...'):
-            save_movie(u, x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, ndump=self.ndump, filename=self.moviename,
+            save_movie(u, x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, fps=fps, ndump=self.ndump, filename=self.moviename,
                        periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
 
     # save a movie of the evolution of our perturbation AND a nested movie of its power spectrum
-    def save_combomovie(self, fieldname='u', fieldcolor='xkcd:ocean green', speccolor='xkcd:dark orange', usetex=True, dpi=100):
+    def save_combomovie(self, fps=200, fieldname='u', fieldcolor='xkcd:ocean green', speccolor='xkcd:dark orange', usetex=True, dpi=100):
         if self.t_ord == 1:
             u = clip_spongeless(self.Udata, self.sfrac)
 
@@ -218,7 +218,7 @@ class simulation:
             u = clip_spongeless(self.Udata[0, :, :], self.sfrac)
 
         with spinner('Rendering combo movie...'):
-            save_combomovie(u,  x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, fieldcolor=fieldcolor,
+            save_combomovie(u,  x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, fps=fps, fieldcolor=fieldcolor,
                             speccolor=speccolor, ndump=self.ndump, filename=self.combomoviename, periodic=not self.absorbing_layer, usetex=usetex, dpi=dpi)
 
 

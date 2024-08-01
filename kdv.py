@@ -9,7 +9,7 @@ length, T, N, dt = 400., 150., 2**10, 0.01
 
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 my_model = builtin_model('kdv', nonlinear=True)
-my_initial_state = builtin_initial_state('gaussian_even_alt')
+my_initial_state = builtin_initial_state('gaussian_even_alt')  # also try 'kdv_soliton', 'kdv_multisoliton'
 
 # we need a sponge layer here, which requires parameter tuning to get right.
 # in joe, the sponge layer params are contained in a dict called "sponge_params"
@@ -30,8 +30,8 @@ my_sim.load_or_run(method_kw='ifrk4', print_runtime=True, save=True)
 
 # produce plots and movies
 my_sim.hov_plot(colormap='cmo.haline', fieldname='u', show_figure=True, save_figure=True, usetex=True)
-my_sim.save_movie(dpi=200, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
-my_sim.save_combomovie(dpi=200, usetex=False, fieldcolor='xkcd:cerulean', speccolor='xkcd:dark magenta', fieldname='u')
+my_sim.save_movie(dpi=200, fps=100, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
+#my_sim.save_combomovie(dpi=200, fps=100, usetex=False, fieldcolor='xkcd:cerulean', speccolor='xkcd:dark magenta', fieldname='u')
 
 # do refinement study to verify accuracy
 #Ns = np.array([2**9, 2**10, 2**11])
