@@ -23,6 +23,18 @@ def initial_state(x, initial_state_kw):
 
         out = 0.5*c*(np.cosh(0.5*np.sqrt(c)*(x))**-2)
 
+    elif initial_state_kw == 'kdv_two_solitons':
+
+        c1 = 2.2
+
+        sol1 = 0.5*c1*(np.cosh(0.5*np.sqrt(c1)*(x+50))**-2)
+
+        c2 = 1.4
+
+        sol2 = 0.5 * c2 * (np.cosh(0.5 * np.sqrt(c2) * (x)) ** -2)
+
+        out = sol1 + sol2
+
     elif initial_state_kw == 'gaussian_odd':
 
         out = amp * (np.sin(k0 * x)) * np.exp(-width * (x - x0) ** 2)

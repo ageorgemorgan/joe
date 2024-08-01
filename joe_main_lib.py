@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from time_stepper import do_time_stepping
 from initial_states import initial_state
 from visualization import hov_plot, save_movie, save_combomovie, spinner
-
+from absorbing_layer import clip_spongeless
 
 # a class for models. Note how the init takes in two callables for the symbol and forcing terms: to avoid making the
 # weird no-no of having callable attributes, we use a trick from
@@ -54,8 +54,9 @@ class initial_state:
 # a class for simulations. You init with a "stgrid" (space-time grid) dict, a "model" object to specify the PDE,
 # and an "initial_state" object. Then you can call a run simulation function on a simulation object to solve
 # the IVP and store/save the soln, or load up the soln from an experiment you've already done.
+
 class simulation:
-    def __init__(self, stgrid, model, initial_state, bc, ndump=10):
+    def __init__(self, stgrid, model, initial_state, bc, sponge_params=None, ndump=10):
         self.length = stgrid['length']
         self.T = stgrid['T']
         self.N = stgrid['N']
@@ -65,11 +66,22 @@ class simulation:
         self.t_ord = model.t_ord  # an integer
         self.initial_state_kw = initial_state.initial_state_kw
         self.nonlinear = model.nonlinear
+        self.sponge_params = sponge_params
 
         if bc == 'sponge_layer':
             self.absorbing_layer = True
         elif bc == 'periodic':
             self.absorbing_layer = False
+        else:
+            raise ValueError('User-defined BC string not accepted. Valid BC strings: periodic, sponge_layer')
+
+        # the "spongeless fraction" attribute is a bit special for plotting and so deserves to be
+        # singled out early on
+        try:
+            self.sfrac = self.sponge_params['spongeless_frac']
+        except TypeError:
+            self.sfrac = 1.
+
 
         self.ndump = ndump  # hyperparameter describing how often we save our time steps
         self.x = np.linspace(-0.5 * self.length, 0.5 * self.length, self.N, endpoint=False)
@@ -88,10 +100,10 @@ class simulation:
 
     # a function for actually performing the time-stepping on a simulation object. Adds the property Udata
     # to the simulation object (the actual values of our solution throughout the simulation)
-    def run_sim(self, method_kw='etdrk4', splitting_method_kw='naive', print_runtime=True):
+    def run_sim(self, method_kw='etdrk4', print_runtime=True):
         import time
         start = time.time()
-        Udata = do_time_stepping(self, method_kw, splitting_method_kw)
+        Udata = do_time_stepping(self, method_kw)
         end = time.time()
 
         self.Udata = Udata
@@ -136,7 +148,7 @@ class simulation:
             self.Udata = loaded_sim.Udata
 
     # now put everything together: load if possible, but run if you gotta
-    def load_or_run(self, method_kw='etdrk4', splitting_method_kw='naive', print_runtime=True, verbose=True):
+    def load_or_run(self, method_kw='etdrk4', print_runtime=True, save=True, verbose=True):
 
         try:
             self.load()
@@ -150,8 +162,12 @@ class simulation:
                 print('No saved simulation found, running simulation.')
             else:
                 pass
-            self.run_sim(method_kw=method_kw, splitting_method_kw=splitting_method_kw, print_runtime=print_runtime)
-            self.save()
+            self.run_sim(method_kw=method_kw, print_runtime=print_runtime)
+
+            if save:
+                self.save()
+            else:
+                pass
 
     # create a Hovmoeller plot (filled contour plot in space-time) of the simulation.
     def hov_plot(self, dpi=100, colormap='cmo.haline', fieldname='u', usetex=True, show_figure=True, save_figure=False):
@@ -166,12 +182,15 @@ class simulation:
 
         # add right endpoint to prevent a stripe from appearing in the pics
         x_end = np.append(self.x, 0.5 * self.length)
+        x_end = clip_spongeless(x_end, self.sfrac)
 
         u_end = np.zeros((1+int(self.T/(self.ndump*self.dt)), self.N+1), dtype=float)
 
         u_end[:, 0:self.N] = np.copy(u)
 
         u_end[:, -1] = np.copy(u[:, 0])
+
+        u_end = clip_spongeless(u_end, self.sfrac)
 
         with spinner('Rendering Hovmoeller plot...'):
             hov_plot(x_end, times, u_end, fieldname=fieldname, dpi=dpi, show_figure=show_figure, save_figure=save_figure,
@@ -181,32 +200,32 @@ class simulation:
     def save_movie(self, fieldname='u', usetex=True, fieldcolor='xkcd:ocean green', dpi=100):
 
         if self.t_ord == 1:
-            u = self.Udata
+            u = clip_spongeless(self.Udata, self.sfrac)
 
         elif self.t_ord == 2:
-            u = self.Udata[0, :, :]
+            u = clip_spongeless(self.Udata[0, :, :], self.sfrac)
 
         with spinner('Rendering movie...'):
-            save_movie(u, x=self.x, length=self.length, dt=self.dt, fieldname=fieldname, ndump=self.ndump, filename=self.moviename,
-                       periodic=self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
+            save_movie(u, x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, ndump=self.ndump, filename=self.moviename,
+                       periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
 
     # save a movie of the evolution of our perturbation AND a nested movie of its power spectrum
     def save_combomovie(self, fieldname='u', fieldcolor='xkcd:ocean green', speccolor='xkcd:dark orange', usetex=True, dpi=100):
         if self.t_ord == 1:
-            u = self.Udata
+            u = clip_spongeless(self.Udata, self.sfrac)
 
         elif self.t_ord == 2:
-            u = self.Udata[0, :, :]
+            u = clip_spongeless(self.Udata[0, :, :], self.sfrac)
 
         with spinner('Rendering combo movie...'):
-            save_combomovie(u, x=self.x, length=self.length, dt=self.dt, fieldname=fieldname, fieldcolor=fieldcolor,
-                            speccolor=speccolor, ndump=self.ndump, filename=self.combomoviename, usetex=usetex, dpi=dpi)
+            save_combomovie(u,  x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, fieldcolor=fieldcolor,
+                            speccolor=speccolor, ndump=self.ndump, filename=self.combomoviename, periodic=not self.absorbing_layer, usetex=usetex, dpi=dpi)
 
 
 # a function that performs a refinement study based on Richardson extrapolation for error estimation. Very
 # useful for quickly checking accuracy. It's here because it doesn't have a better home right now, and it
 # *almost* takes simulation objects in as input.
-def do_refinement_study(model, initial_state, length, T, Ns, dts, bc='periodic', show_figure=True, save_figure=False, usetex=True,
+def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etdrk4', bc='periodic', show_figure=True, save_figure=False, usetex=True,
                         fit_min=3, fit_max=7):
 
     plt.rcParams["font.family"] = "serif"
@@ -237,14 +256,14 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, bc='periodic',
             rough_st_grid = {'length':length, 'T':T, 'N':N, 'dt':dts[0]}
             rough_sim = simulation(rough_st_grid, model, initial_state, bc=bc)
 
-            rough_sim.load_or_run(print_runtime=False, verbose=False)
+            rough_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
 
             for dt in dts:
 
                 fine_st_grid = {'length': length, 'T': T, 'N': N, 'dt': 0.5*dt}
                 fine_sim = simulation(fine_st_grid, model, initial_state, bc=bc)
 
-                fine_sim.load_or_run(print_runtime=False, verbose=False)
+                fine_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
 
                 rough_Udata = rough_sim.Udata  # [:, int(N/4):int(3*N/4)]
 
@@ -254,7 +273,20 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, bc='periodic',
 
                 ord = 4.
 
-                errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
+                if bc == 'sponge_layer':
+
+                    errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(rough_Udata[-1, int(0.5*N):int(0.75*N)+1]
+                                                                              - fine_Udata[-1, int(0.5*N):int(0.75*N)+1]))
+
+                    #errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
+
+
+                elif bc == 'periodic':
+
+                    errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
+
+                else:
+                    raise ValueError('User-defined BC string not accepted. Valid BC strings: periodic, sponge_layer')
 
                 rough_sim = fine_sim  # redefine for efficiency... only works bcz we refine dt in powers of 1/2
 
@@ -322,9 +354,9 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, bc='periodic',
         elif bc == 'periodic':
             absorbing_layer = False
 
-        my_string = '_length=%.1f_T=%.1f' % (
-        length, T) + '_modelkw=' + model.model_kw + '_ICkw=' + initial_state.initial_state_kw + '_nonlinear=' + str(
-            model.nonlinear) + '_abslayer=' + str(absorbing_layer)
+        my_string = ('_length=%.1f_T=%.1f' % (
+        length, T) + '_modelkw=' + model.model_kw + '_ICkw=' + initial_state.initial_state_kw + '_method_kw='
+                     + method_kw + '_nonlinear=' + str(model.nonlinear) + '_abslayer=' + str(absorbing_layer))
 
         picname = 'refinement_study' + my_string + '.png'
         plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=400)

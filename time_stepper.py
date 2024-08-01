@@ -216,7 +216,7 @@ def do_ifrk4_step(V, propagator, propagator2, forcing, dt):
     return out
 
 
-def assemble_damping_mat(N, length, x, dt):
+def assemble_damping_mat(N, length, x, dt, sponge_params):
     # By "damping mat", we mean the matrix to be inverted at each time step in the damping stage.
     # Currently only backward Euler inversion is implemented.
     # TODO: try out Crank-Nicolson as well, perform cost v. accuracy analysis?
@@ -228,7 +228,11 @@ def assemble_damping_mat(N, length, x, dt):
     def mv(v):
         # NOTE: v is given ON THE FOURIER SIDE!!!!
 
-        mv_out = v - dt * (-1j * k) * fft(damping_coeff_lt(x, length) * np.real(ifft((-1j * k) * v)))
+        damping_coeff = damping_coeff_lt(x, sponge_params) + damping_coeff_lt(-x, sponge_params)
+
+        damping_coeff *= sponge_params['damping_amplitude']
+
+        mv_out = v - dt * (-1j * k) * fft(damping_coeff * np.real(ifft((-1j * k) * v)))
 
         return mv_out
 
@@ -380,7 +384,7 @@ class timestepper:
         return out
 
 
-def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
+def do_time_stepping(sim, method_kw='etdrk4'):
     length = sim.length
 
     T = sim.T
@@ -398,6 +402,10 @@ def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
     nonlinear = sim.nonlinear
 
     absorbing_layer = sim.absorbing_layer
+
+    sponge_params = sim.sponge_params
+
+    splitting_method_kw = sponge_params['splitting_method_kw']
 
     ndump = sim.ndump
 
@@ -428,6 +436,7 @@ def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
 
         # if we're second-order in time and using a sponge layer, damping can be realized simply
         # by modifying the forcing term ie. damping can be dealt with explicitly!
+        # TODO: bring this up to speed with sponge_params dict
         if t_ord == 2 and absorbing_layer:
 
             out += rayleigh_damping(V, x, length,  delta=0.25 * length)
@@ -450,7 +459,7 @@ def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
 
     # now assemble the stuff needed for damping, if needed
     if absorbing_layer and t_ord == 1:
-        damping_mat = assemble_damping_mat(N, length, x, dt)
+        damping_mat = assemble_damping_mat(N, length, x, dt, sponge_params)
     else:
         pass
 
@@ -504,14 +513,11 @@ def do_time_stepping(sim, method_kw='etdrk4', splitting_method_kw='naive'):
 
                 V = Vc
 
-            if cnt % 500 == 0:
-
-                # TODO: be able to toggle "harsh" exponential damping!
-                pass
+            if cnt % int(sponge_params['expdamp_freq']) == 0:
 
                 U = np.real(ifft(V))
 
-                U *= 1. - 1. * damping_coeff_lt(-x, length)
+                U *= 1. - 1. * damping_coeff_lt(-x, sponge_params) - 1. * damping_coeff_lt(x, sponge_params)
 
                 V = fft(U)
 

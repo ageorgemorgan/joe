@@ -5,20 +5,20 @@ from numpy.fft import fft, ifft, fftfreq
 
 # create all the stuff we need to implement the absorbing boundary layer
 
-
 # first, create a function that gives the damping coefficient a la Lu/Trogdon 2023.
-def damping_coeff_lt(x, length):
+def damping_coeff_lt(x, sponge_params):
     amp = 1.
 
-    l_endpt = -length * 0.5 + 0.5 * length * 0.08
+    l_endpt = sponge_params['l_endpt']  # -length * 0.5 + 0.5 * length * 0.1
 
-    r_endpt = l_endpt + 0.17 * length
+    r_endpt = sponge_params['r_endpt']  # l_endpt + 0.01 * length
 
-    w = (2 ** -4) * length / 100.
+    w = sponge_params['width']  # (2 ** -6) * length / 100.
 
     out = 0.5 * (np.tanh(w * (x - l_endpt)) + 1.) - 0.5 * (np.tanh(w * (x - r_endpt)) + 1.)
 
     return amp * out
+
 
 # create a function that gives the damping coefficient a la Bronski 1998.
 def damping_coeff_bronski(x, length, delta=0.1):
@@ -33,7 +33,7 @@ def damping_coeff_bronski(x, length, delta=0.1):
 
     w = np.pi / (2. * delta)
 
-    funclist = [lambda x: 0, lambda x: 2.*np.cos(w * (x - lep)), lambda x: 2.*np.cos(w * (rep - x))]
+    funclist = [lambda x: 0, lambda x: 2. * np.cos(w * (x - lep)), lambda x: 2. * np.cos(w * (rep - x))]
 
     out = np.piecewise(x, condlist, funclist)
 
@@ -61,4 +61,12 @@ def rayleigh_damping(V, x, length, delta=0.1):
     beta = damping_coeff_bronski(x, length, delta=delta)
     out[N:] = fft(-1. * beta * v)
 
+    return out
+
+
+# helper function to clip the "spongeless" part of an array
+def clip_spongeless(z, sfrac):
+    delta = 0.5 * (1. - sfrac)
+    N = np.shape(z)[-1]
+    out = z[..., int(delta * N):int((1. - delta) * N) + 1]
     return out
