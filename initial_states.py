@@ -12,7 +12,13 @@ def initial_state(x, initial_state_kw):
     k0 = 1.
     width = 1.
 
-    if initial_state_kw == 'gaussian_even':
+    if initial_state_kw == 'sine':
+
+        k = 1.5
+
+        out = 1.0*np.sin(k*x)
+
+    elif initial_state_kw == 'gaussian_even':
 
         out = 6.*np.exp(-x**2)
 

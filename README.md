@@ -13,11 +13,14 @@ FEATURES
 
 DEPENDENCIES
 
-numpy, scipy, matplotlib, cmocean (https://matplotlib.org/cmocean/) 
+numpy, scipy, matplotlib, cmocean (https://matplotlib.org/cmocean/), FFMPEG support for movies
 
 GETTING STARTED
 
-Simply download the zip of the library from github and extract it (of course, you should be a good Python-er and make a new venv with all the dependencies as well). Then, open up the Jupyter tutorial (https://github.com/ageorgemorgan/joe/blob/main/tutorial_START_HERE!.ipynb) to see joe in action. 
+1) Download the zip of the library from github and extract it (of course, you should be a good Python-er and make a new venv with all the dependencies as well, but the base Conda environment has all you need). 
+2) Download cmocean for colormaps (conda install conda-forge::cmocean)
+3) For processing movies of your numerical solutions in joe, get ffmpeg support. I recommend using the av package (https://pypi.org/project/av/) which you can install with conda install-c conda-forge av.
+4) Then, open up the Jupyter tutorial (https://github.com/ageorgemorgan/joe/blob/main/tutorial_START_HERE!.ipynb) to see joe in action. 
 
 FUTURE DIRECTIONS
 
@@ -26,10 +29,3 @@ FUTURE DIRECTIONS
 -Add functionality for fields defined on 2D domains 
 
 -Allow for higher-order-derivatives in time (ie. Timoshenko beam equations)
-
-KNOWN ISSUES
-
--ETDRK4 doesn't quite work with KdV, but IFRK4 seems to work fine. So, if using the code to solve KdV make sure you
-write " method_kw='ifrk4' " when you run a simulation. 
-
--Users have said their installation of LaTeX (which joe uses to make labels on graphs) doesn't like to cooperate with matplotlib, so in the Aug. 23 version no visuals could be produced. I will put a band-aid fix on this soon!

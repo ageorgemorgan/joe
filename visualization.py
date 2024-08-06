@@ -111,7 +111,7 @@ def hov_plot(x, t, u, fieldname, dpi=100, show_figure=True, save_figure=False, p
 # create a movie from a scalar field u(t,x) sampled at various times.
 
 
-def save_movie(u, x, length, dt, fieldname, ndump, filename, periodic=True, usetex=True, fieldcolor='xkcd:ocean green', dpi=100):
+def save_movie(u, x, length, dt, fieldname, ndump, filename, fps=200, periodic=True, usetex=True, fieldcolor='xkcd:ocean green', dpi=100):
     # Create movie file in mp4 format. Warning: this is very slow!
 
     plt.rcParams["font.family"] = "serif"
@@ -245,12 +245,12 @@ def save_movie(u, x, length, dt, fieldname, ndump, filename, periodic=True, uset
     if not os.path.isdir(my_path):
         os.makedirs(my_path)
 
-    anim.save('visuals/' + filename, writer='ffmpeg', fps=200, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    anim.save('visuals/' + filename, writer='ffmpeg', fps=fps, extra_args=['-vcodec', 'libx264'], dpi=dpi)
 
     plt.close()
 
 def save_combomovie(u, x, length, dt, ndump, filename, fieldname,
-                    periodic=True, usetex=True, fieldcolor='xkcd:ocean green', speccolor='xkcd: dark magenta', dpi=100):
+                    fps=200, periodic=True, usetex=True, fieldcolor='xkcd:ocean green', speccolor='xkcd: dark magenta', dpi=100):
     # Create movie file in mp4 format. Warning: this is very slow!
 
     plt.rcParams["font.family"] = "serif"
@@ -394,6 +394,6 @@ def save_combomovie(u, x, length, dt, ndump, filename, fieldname,
     if not os.path.isdir(my_path):
         os.makedirs(my_path)
 
-    anim.save('visuals/' + filename, fps=200, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    anim.save('visuals/' + filename, fps=fps, extra_args=['-vcodec', 'libx264'], dpi=dpi)
 
     plt.close()

@@ -1,17 +1,9 @@
 import pickle
-
 import os
 
 import numpy as np
-
-import time
-
-from alive_progress import alive_bar
-
 from numpy.fft import fft, ifft, fftfreq
-
 from scipy import sparse
-
 from scipy.sparse import linalg, diags
 
 from absorbing_layer import damping_coeff_lt, rayleigh_damping
@@ -25,22 +17,22 @@ from absorbing_layer import damping_coeff_lt, rayleigh_damping
 # We do this by Pythonizing the code from Kassam and Trefethen 2005 (do Cauchy integrals).
 
 def get_greeks_first_order(N, dt, z):
-    M = 2 ** 5
+    M = 2 ** 6
 
     theta = np.linspace(0., 2. * np.pi, num=M, endpoint=False)
 
-    rad = 1.  # radius of contour surrounding dt*z over which we integrate
+    rad = 1.
 
     z0 = dt * np.tile(z, (M, 1)) + rad * np.tile(np.exp(1j * theta), (N, 1)).T
 
-    Q = dt * np.real(np.mean((np.exp(0.5 * z0) - 1.) / z0, 0))  # note how we take mean over a certain axis
+    Q = dt * np.mean((np.exp(0.5 * z0) - 1.) / z0, 0)  # note how we take mean over a certain axis
 
-    f1 = dt * np.real(np.mean((-4. - z0 + np.exp(z0) * (4. - 3. * z0 + z0 ** 2)) / (z0 ** 3), 0))  # again note axis
+    f1 = dt * np.mean((-4. - z0 + np.exp(z0) * (4. - 3. * z0 + z0 ** 2)) / (z0 ** 3), 0)  # again note axis
     # argument of np.mean
 
-    f2 = dt * np.real(np.mean((2. + z0 + np.exp(z0) * (-2. + z0)) / (z0 ** 3), 0))
+    f2 = dt * np.mean((2. + z0 + np.exp(z0) * (-2. + z0)) / (z0 ** 3), 0)
 
-    f3 = dt * np.real(np.mean((-4. - 3. * z0 - z0 ** 2 + np.exp(z0) * (4. - z0)) / (z0 ** 3), 0))
+    f3 = dt * np.mean((-4. - 3. * z0 - z0 ** 2 + np.exp(z0) * (4. - z0)) / (z0 ** 3), 0)
 
     out = [Q, f1, f2, f3]
 
@@ -88,7 +80,7 @@ def get_greeks_second_order(length, N, dt, A):
 
 
 def get_Q1(N, dt, z):
-    M = 2 ** 5
+    M = 2 ** 6
 
     theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
 
@@ -96,7 +88,7 @@ def get_Q1(N, dt, z):
 
     z0 = dt * np.tile(z, (M, 1)) + rad * np.tile(np.exp(1j * theta), (N, 1)).T
 
-    out = dt * np.real(np.mean((np.exp(z0) - 1.) / z0, 0))  # note how we take mean over a certain axis
+    out = dt * np.mean((np.exp(z0) - 1.) / z0, 0)  # note how we take mean over a certain axis
 
     return out
 
@@ -111,10 +103,10 @@ def get_R2(N, dt, z):
 
     z0 = dt * np.tile(z, (M, 1)) + rad * np.tile(np.exp(1j * theta), (N, 1)).T
 
-    out = dt * np.real(np.mean((np.exp(z0) - 1. - z0) / (z0 ** 2), 0))  # note how we take mean over a certain axis
+    out = dt * np.mean((np.exp(z0) - 1. - z0) / (z0 ** 2), 0) # note how we take mean over a certain axis
     # """
 
-    return np.real(out)  # just kill any error that arose
+    return out  # just kill any error that arose
 
 
 def do_etdrk1_step(V, propagator, forcing, Q1):
@@ -403,9 +395,15 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
     absorbing_layer = sim.absorbing_layer
 
-    sponge_params = sim.sponge_params
+    if absorbing_layer:
 
-    splitting_method_kw = sponge_params['splitting_method_kw']
+        sponge_params = sim.sponge_params
+
+        splitting_method_kw = sponge_params['splitting_method_kw']
+
+    else:
+
+        splitting_method_kw = 'na'
 
     ndump = sim.ndump
 
@@ -452,12 +450,12 @@ def do_time_stepping(sim, method_kw='etdrk4'):
         my_timestepper.load_aux()
 
     # if the auxfile is not found, compute aux here.
-    except:
+    except FileNotFoundError:
 
         my_timestepper.get_aux()
         my_timestepper.save_aux()
 
-    # now assemble the stuff needed for damping, if needed
+    # now assemble the stuff needed for damping
     if absorbing_layer and t_ord == 1:
         damping_mat = assemble_damping_mat(N, length, x, dt, sponge_params)
     else:
