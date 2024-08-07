@@ -225,7 +225,7 @@ class simulation:
 # a function that performs a refinement study based on Richardson extrapolation for error estimation. Very
 # useful for quickly checking accuracy. It's here because it doesn't have a better home right now, and it
 # *almost* takes simulation objects in as input.
-def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etdrk4', bc='periodic', show_figure=True, save_figure=False, usetex=True,
+def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etdrk4', bc='periodic', sponge_params=None, show_figure=True, save_figure=False, usetex=True,
                         fit_min=3, fit_max=7):
 
     plt.rcParams["font.family"] = "serif"
@@ -254,41 +254,171 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etd
 
             # do simulation at the worst order (largest time step) first
             rough_st_grid = {'length':length, 'T':T, 'N':N, 'dt':dts[0]}
-            rough_sim = simulation(rough_st_grid, model, initial_state, bc=bc)
+            rough_sim = simulation(rough_st_grid, model, initial_state, bc=bc, sponge_params=sponge_params)
 
             rough_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
 
             for dt in dts:
 
                 fine_st_grid = {'length': length, 'T': T, 'N': N, 'dt': 0.5*dt}
-                fine_sim = simulation(fine_st_grid, model, initial_state, bc=bc)
+                fine_sim = simulation(fine_st_grid, model, initial_state, bc=bc, sponge_params=sponge_params)
 
                 fine_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
 
-                rough_Udata = rough_sim.Udata  # [:, int(N/4):int(3*N/4)]
+                rough_Udata = rough_sim.Udata
 
-                fine_Udata = fine_sim.Udata  # [:, int(N/4):int(3*N/4)]
+                fine_Udata = fine_sim.Udata
 
                 # use fine sim and rough sim at last time step to get Richardson error estimate
 
                 ord = 4.
 
-                if bc == 'sponge_layer':
+                diff = clip_spongeless(rough_Udata[-1, :]-fine_Udata[-1, :], fine_sim.sfrac)
 
-                    errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(rough_Udata[-1, int(0.5*N):int(0.75*N)+1]
-                                                                              - fine_Udata[-1, int(0.5*N):int(0.75*N)+1]))
-
-                    #errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
-
-
-                elif bc == 'periodic':
-
-                    errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
-
-                else:
-                    raise ValueError('User-defined BC string not accepted. Valid BC strings: periodic, sponge_layer')
+                errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(diff))
 
                 rough_sim = fine_sim  # redefine for efficiency... only works bcz we refine dt in powers of 1/2
+
+                cnt += 1
+
+            cnt = 0  # reinit the counter
+
+    #end = time.time()
+    #runtime = end - start
+    #print('Runtime for accuracy tests = %.4f' % runtime + ' s')
+
+    # now we produce a plot of the errors
+    fig, ax = plt.subplots()
+
+    dts = 0.5 * dts
+
+    # define the cycler
+    my_cycler = (
+                plt.cycler(color=['xkcd:slate', 'xkcd:raspberry', 'xkcd:goldenrod', 'xkcd:deep green'])
+                + plt.cycler(lw=[3.5, 3, 2.5, 2])
+                + plt.cycler(linestyle=['dotted', 'dashed', 'solid', 'dashdot'])
+                + plt.cycler(marker=['v', '*', 'o', 'P'])
+                + plt.cycler(markersize=[8, 12, 8, 8])
+    )
+
+    ax.set_prop_cycle(my_cycler)
+
+    for m in range(0, num_Ns):
+        if usetex:
+            plt.loglog(dts, errors[m, :], label=r'$N = z$'.replace('z', str(Ns[m])))
+        # ^ an awesome trick from
+        # https://stackoverflow.com/questions/33786332/matplotlib-using-variables-in-latex-expressions
+        # was used to get the labels working as above
+        else:
+            plt.loglog(dts, errors[m, :], label='N = z'.replace('z', str(Ns[m])))
+
+    ax.legend(fontsize=16)
+
+    if usetex:
+        plt.xlabel(r"$\Delta t$", fontsize=26, color='k')
+        plt.ylabel(r"Absolute Error", fontsize=26, color='k')
+    else:
+        plt.xlabel("Δt", fontsize=26, color='k')
+        plt.ylabel("Absolute Error", fontsize=26, color='k')
+
+    plt.tick_params(axis='x', which='both', top='off', color='k')
+    plt.xticks(fontsize=16, rotation=0, color='k')
+    plt.tick_params(axis='y', which='both', right='off', color='k')
+    plt.yticks(fontsize=16, rotation=0, color='k')
+
+    plt.tight_layout()
+
+    if save_figure is True:
+
+        # add the folder "visuals" to our path
+        my_path = os.path.join("visuals")
+
+        # first, if the folder doesn't exist, make it
+        if not os.path.isdir(my_path):
+            os.makedirs(my_path)
+
+        # and now we can save the fig
+        if bc == 'sponge_layer':
+            absorbing_layer = True
+        elif bc == 'periodic':
+            absorbing_layer = False
+
+        my_string = ('_length=%.1f_T=%.1f' % (
+        length, T) + '_modelkw=' + model.model_kw + '_ICkw=' + initial_state.initial_state_kw + '_method_kw='
+                     + method_kw + '_nonlinear=' + str(model.nonlinear) + '_abslayer=' + str(absorbing_layer))
+
+        picname = 'refinement_study' + my_string + '.png'
+        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=400)
+
+    else:
+
+        pass
+
+    if show_figure is True:
+
+        plt.show()
+
+    else:
+
+        pass
+
+    plt.close()
+
+    # estimate the slope of particular error curves if you want. Needs a bit of by-hand tweaking (controlled by the
+    # inputs fit_min, fit_max) bcz for small enough dt we can get level-off or rounding error domination in the error
+    # curve, destroying the linear trend after a certain threshold
+
+    params = np.polyfit(np.log10(dts[fit_min:fit_max+1]), np.log10(errors[-1, fit_min:fit_max+1]), 1)
+    slope = params[0]
+    print('Estimated Slope of Error Line at N = %i' % Ns[-1] + ' is slope = %.3f' % slope)
+
+    return None
+
+def do_refinement_study_alt(model, initial_state, length, T, Ns, dts, benchmark_sim, method_kw='etdrk4', bc='periodic', sponge_params=None, show_figure=True, save_figure=False, usetex=True,
+                        fit_min=3, fit_max=7):
+
+    plt.rcParams["font.family"] = "serif"
+
+    try:
+        plt.rc('text', usetex=usetex)
+
+    except RuntimeError:  # catch a user error thinking they have tex when they don't
+        usetex = False
+
+    Ns = Ns.astype(int)
+    num_Ns = np.size(Ns)
+    num_dts = np.size(dts)
+
+    # initialize outputs
+
+    errors = np.zeros([num_Ns, num_dts], dtype=float)
+
+    cnt = 0
+
+    benchmark_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
+
+    #start = time.time()
+    with spinner('Performing refinement study...'):
+        for k in np.arange(0, num_Ns):
+
+            N = Ns[k]
+
+            for dt in dts:
+
+                stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
+                rough_sim = simulation(stgrid, model, initial_state, bc=bc, sponge_params=sponge_params)
+
+                rough_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
+
+                rough_Udata = rough_sim.Udata
+
+                benchmark_Udata = benchmark_sim.Udata
+
+                # use fine sim and rough sim at last time step to get Richardson error estimate
+
+                diff = clip_spongeless(rough_Udata[-1, :]-benchmark_Udata[-1, :], benchmark_sim.sfrac)
+
+                errors[k, cnt] = np.amax(np.abs(diff))
 
                 cnt += 1
 
