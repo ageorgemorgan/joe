@@ -1,8 +1,8 @@
 import pickle
 import os
-import time
 
 import numpy as np
+from numpy.fft import fft
 import matplotlib.pyplot as plt
 
 from time_stepper import do_time_stepping
@@ -94,9 +94,13 @@ class simulation:
 
         self.filename = 'simdata' + my_string + '.pkl'
         self.picname = 'hovplot' + my_string + '.png'
-        self.moviename = 'movie'+ my_string + '.mp4'
+        self.moviename = 'movie' + my_string + '.mp4'
         self.combomoviename = 'combomovie' + my_string + '.mp4'
         self.Udata = None  # the Udata will be called later!
+        self.fm = None
+        self.fm_error = None
+        self.sm = None
+        self.sm_error = None
 
     # a function for actually performing the time-stepping on a simulation object. Adds the property Udata
     # to the simulation object (the actual values of our solution throughout the simulation)
@@ -220,6 +224,46 @@ class simulation:
         with spinner('Rendering combo movie...'):
             save_combomovie(u,  x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, fps=fps, fieldcolor=fieldcolor,
                             speccolor=speccolor, ndump=self.ndump, filename=self.combomoviename, periodic=not self.absorbing_layer, usetex=usetex, dpi=dpi)
+
+    # obtain first moment of the system
+    def get_fm(self):
+
+        length = self.length
+        u = self.Udata
+
+        fm = (1./length)*np.real(fft(u, axis=1)[:, 0]) # use that the zeroth Fourier coeff is proportional to the mean
+        fm_error = np.abs(fm[1:]-fm[0])
+
+        self.fm = fm
+        self.fm_error = fm_error
+
+    # obtain second moment
+    def get_sm(self):
+
+        length = self.length
+        u = self.Udata
+
+        if self.fm.any() is None:
+
+            self.get_fm()
+
+        fm = self.fm
+
+        # compute the spatial L2 norm of u using Parseval's identity.
+        # I'm pretty sure the normalization 1/N^2 is the correct one here
+        # (I have two different hand-wavy arguments for why) but still something to watch out
+        # for when performing experiments on KdV, Gardner, etc.
+        v = np.sum(np.absolute(fft(u, axis=1)) ** 2, axis=1)
+        sm = v/(self.N**2) - fm**2
+
+        # I also tried this simpler code below, and it turns out Parseval tracks the sm slightly better!
+        #sm = (1./length)*np.real(fft(u**2, axis=1)[:, 0]) # use that the zeroth Fourier coeff is proportional to the mean
+        #sm -= fm**2
+
+        sm_error = np.abs(sm[1:]-sm[0])
+
+        self.sm = sm
+        self.sm_error = sm_error
 
 
 # a function that performs a refinement study based on Richardson extrapolation for error estimation. Very

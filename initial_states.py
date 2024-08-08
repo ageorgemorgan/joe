@@ -46,7 +46,7 @@ def initial_state(x, initial_state_kw):
 
     elif initial_state_kw == 'bbm_solitary_wave':
 
-        c = 10.
+        c = 2.
 
         out = bbm_solitary_wave(x,c=c)
 

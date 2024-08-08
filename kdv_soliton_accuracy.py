@@ -10,7 +10,7 @@ from initial_states import builtin_initial_state
 length, T = 100., 180.
 my_model = builtin_model('kdv', nonlinear=True)
 my_initial_state = builtin_initial_state('kdv_soliton')
-method_kw='etdrk4'
+method_kw = 'etdrk4'
 
 nmin, nmax = 2, 14
 Ns = np.array([2**7, 2**8])

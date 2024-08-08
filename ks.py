@@ -19,8 +19,13 @@ my_sim.hov_plot(colormap='cmo.solar', fieldname='u', show_figure=True, save_figu
 #my_sim.save_movie(dpi=200, fps=200, usetex=False, fieldcolor='xkcd:dark orange', fieldname='u')
 #my_sim.save_combomovie(dpi=200, usetex=False, fieldcolor='xkcd:dark orange', speccolor='xkcd:dark magenta', fieldname='u')
 
+# report error in first moment
+my_sim.get_fm()
+error = np.amax(my_sim.fm_error)
+print('Maximum error in first moment = %.2E' % error)
+
 # do refinement study to verify accuracy
-nmin, nmax = 1, 9
-Ns = np.array([2**6, 2**7, 2**8])
-dts = np.flip(np.logspace(-nmax, -nmin, num=nmax-nmin+1, base=2.))
-do_refinement_study(my_model, my_initial_state, length, T, Ns, dts, bc='periodic', show_figure=True, save_figure=True, usetex=True)
+#nmin, nmax = 1, 9
+#Ns = np.array([2**6, 2**7, 2**8])
+#dts = np.flip(np.logspace(-nmax, -nmin, num=nmax-nmin+1, base=2.))
+#do_refinement_study(my_model, my_initial_state, length, T, Ns, dts, bc='periodic', show_figure=True, save_figure=True, usetex=True)
