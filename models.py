@@ -26,7 +26,7 @@ def V0(x):
 
 # if model is first order in time, below just gives linear, const. coeff. part. in Fourier space
 # if model is second order in time, instead obtain the spatial operator for the first order system as a block matrix
-def get_symbol(k, model_kw='bbm'):
+def get_symbol(k, model_kw):
     if model_kw == 'phi4':
         A = -(k ** 2 + 2. * np.ones_like(k))
 
@@ -53,7 +53,7 @@ def get_symbol(k, model_kw='bbm'):
     return A
 
 
-def fourier_forcing(V, k, x, model_kw='bbm', nonlinear=True):
+def fourier_forcing(V, k, x, model_kw, nonlinear=True):
     # Fourier transform of forcing term, acting on pair fncs V=(v_1, v_2)^T (concatenation)
     # on Fourier space. V has size 2N
 

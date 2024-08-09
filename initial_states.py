@@ -2,11 +2,17 @@ import numpy as np
 
 import joe_main_lib
 
-def kdv_soliton(x, c=1.):
-    return 0.5*c*(np.cosh(0.5*np.sqrt(c)*(x))**-2)
 
-def bbm_solitary_wave(x,c=1.):
-    return 0.5*c*(np.cosh(0.5*np.sqrt(c/(1.+c))*(x))**-2)
+def kdv_soliton(x, c=1.):
+    return 0.5*c*(np.cosh(0.5 * np.sqrt(c) * x) ** -2)
+
+
+def gardner_soliton(x, c=1., p=1.):
+    return c/(-1.+p*np.sqrt(1.+c)*np.cosh(np.sqrt(c) * x))
+
+
+def bbm_solitary_wave(x, c=1.):
+    return 0.5*c*(np.cosh(0.5 * np.sqrt(c/(1.+c)) * x) ** -2)
 
 
 def initial_state(x, initial_state_kw):
@@ -43,6 +49,14 @@ def initial_state(x, initial_state_kw):
         c2 = 1.
 
         out = kdv_soliton(x+80., c=c0) + kdv_soliton(x+50., c=c1) + kdv_soliton(x+10, c=c2)
+
+    elif initial_state_kw == 'gardner_soliton':
+
+        c = 3.
+
+        p = 1.
+
+        out = gardner_soliton(x, c=c, p=p)
 
     elif initial_state_kw == 'bbm_solitary_wave':
 
