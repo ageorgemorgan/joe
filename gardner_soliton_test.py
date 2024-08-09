@@ -4,7 +4,7 @@ from numpy.fft import fft, ifft
 from joe_main_lib import simulation, model, initial_state, do_refinement_study
 
 # get stgrid
-length, T, N, dt = 100., 180., 2 ** 10, 1e-4
+length, T, N, dt = 100., 20., 2 ** 10, 3e-4
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 
 
@@ -28,9 +28,9 @@ def gardner_soliton(x, c=1., p=1.):
 
 
 def my_initial_state(x):
-    c = 3.
+    c = 2.
 
-    p = 1.
+    p = -1.
 
     out = gardner_soliton(x, c=c, p=p)
     return out
@@ -46,7 +46,7 @@ method_kw = 'etdrk4'
 my_sim.load_or_run(method_kw=method_kw, print_runtime=True, save=True)
 
 # produce plots and movies
-my_sim.hov_plot(colormap='cmo.haline', fieldname='u', show_figure=False, save_figure=True, usetex=True)
+my_sim.hov_plot(colormap='cmo.haline', fieldname='u', show_figure=True, save_figure=True, usetex=True)
 my_sim.save_movie(dpi=200, fps=200, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
 
 # report error in first and second moments, which should both be zero on paper
