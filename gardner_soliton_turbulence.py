@@ -1,26 +1,22 @@
 import numpy as np
-from numpy.fft import fft, ifft
+import time
 
-from joe_main_lib import simulation, model, initial_state
+from joe_main_lib import simulation, initial_state
+from models import builtin_model
+from visualization import spinner
 
 np.random.seed(32)
+
+# fix basic params
+num_samples = 50
+num_waves = 30
 
 # get stgrid
 length, T, N, dt = 600., 50., 2 ** 13, 5e-5
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 
-
 # get model
-def symbol(k):
-    return 1j * k ** 3
-
-
-def fourier_forcing(V, k, x, nonlinear=True):
-    out = 6. * float(nonlinear) * (1j * k) * (0.5 * fft(np.real(ifft(V)) ** 2) - (1. / 3.) * fft(np.real(ifft(V)) ** 3))
-    return out
-
-
-my_model = model('gardner', 1, symbol, fourier_forcing, nonlinear=True)
+my_model = builtin_model('gardner', nonlinear=True)
 
 
 # get initial state
@@ -34,9 +30,6 @@ def gardner_soliton(x, c=1., p=1.):
     out[abs(x) > xmax] = 0.
     out[abs(x) <= xmax] = c / (-1. + p * np.sqrt(1. + c) * np.cosh(np.sqrt(c) * x[abs(x) <= xmax]))
     return out
-
-
-m = 30  # number of solitons in the gas
 
 
 def soliton_gas_ic(x, m):
@@ -74,20 +67,40 @@ def soliton_gas_ic(x, m):
     return out
 
 
-my_initial_state = initial_state('soliton_gas', lambda x: soliton_gas_ic(x, m))
+# initialize moment errors
 
-#x = np.linspace(-300, 300, num=N, endpoint=False)
-#import matplotlib.pyplot as plt
-#plt.plot(x, soliton_gas_ic(x, m))
-#plt.show()
+fm_errors = np.zeros(num_samples, dtype=float)
+sm_errors = np.zeros(num_samples, dtype=float)
 
-my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=200)
+start = time.time()
 
-my_sim.load_or_run(print_runtime=True, save=True)
-my_sim.hov_plot(dpi=200, usetex=True, save_figure=True, show_figure=True, colormap='cmo.curl')
+with spinner('Simulating Gardner soliton turbulence...'):
+    for sample in range(0, num_samples):
+        ic_string = 'st_sample_' + str(sample)
+
+        my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
+
+        my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=400)
+        my_sim.load_or_run(print_runtime=False, verbose=False, save=True)
+
+        # my_sim.hov_plot(umin=-3., umax=3., dpi=600, usetex=True, save_figure=True, show_figure=False, cmap='cmo.thermal')
+        # after a lot of experimenting I really think the thermal colormap is the right way to go
+        # for Gardner, where the really thin antisolitons need to stand out as strongly as possible
+
+        my_sim.get_fm()
+        my_sim.get_sm()
+        fm_error = np.amax(my_sim.fm_error)
+        sm_error = np.amax(my_sim.sm_error)
+        fm_errors[sample] = fm_error
+        sm_errors[sample] = sm_error
+
+end = time.time()
+runtime = end - start
+print('Runtime for Gardner soliton turbulence simulation = %.4f' % runtime + ' s')
+
+print(fm_errors)
+print(sm_errors)
+
 #my_sim.save_movie(dpi=200, fps=50, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
 
-my_sim.get_fm()
-my_sim.get_sm()
-print(np.amax(my_sim.fm_error))
-print(np.amax(my_sim.sm_error))
+# plotting ICs TODO wheel this into the sim object at some point

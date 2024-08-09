@@ -1,6 +1,6 @@
 import numpy as np
 
-from numpy.fft import fft, ifft, fftfreq
+from numpy.fft import fft, ifft
 
 import joe_main_lib
 
@@ -30,24 +30,24 @@ def get_symbol(k, model_kw):
     if model_kw == 'phi4':
         A = -(k ** 2 + 2. * np.ones_like(k))
 
-    elif model_kw == 'bbm':
+    if model_kw == 'bbm':
         A = 1j * (k ** 3) / (1. + k ** 2)  # -1j * k / (1. + k ** 2)
 
-    elif model_kw == 'bbm_lab':
+    if model_kw == 'bbm_lab':
         A = -1j * k / (1. + k ** 2)
 
-    elif model_kw == 'kdv':
+    if model_kw == 'kdv' or 'gardner':
         A = 1j * k ** 3
 
-    elif model_kw == 'shore_kdv':
+    if model_kw == 'shore_kdv':
         A = -1j * (k - k ** 3)
 
-    elif model_kw == 'kawahara':
+    if model_kw == 'kawahara':
         A = -1j * (-(
                 9. / 20.) * k + k ** 3 - k ** 5)  # Note how this is the Kawahara dispersion in the frame travelling
         # with the head of the wave train (at a group vel of c_g = 9/20)
 
-    elif model_kw == 'ks':
+    if model_kw == 'ks':
         A = k ** 2 - k ** 4
 
     return A
@@ -78,23 +78,28 @@ def fourier_forcing(V, k, x, model_kw, nonlinear=True):
         out = 1j * np.zeros(2 * N, dtype=float)
         out[N:] = fft(spatial_forcing)
 
-    elif model_kw == 'bbm':
+    if model_kw == 'bbm':
 
         p = 1.
 
         out = -6. * float(nonlinear) * (1. / (p + 1.)) * 1j * k / (1. + k ** 2) * (fft(np.real(ifft(V)) ** (p + 1)))
 
-    elif model_kw == 'ks':
+    if model_kw == 'ks':
 
         p = 1.
 
         out = -float(nonlinear) * (1. / (p + 1.)) * 1j * k * (fft(np.real(ifft(V)) ** (p + 1)))
 
-    elif model_kw == 'kdv' or 'kawahara' or 'shore_kdv':
+    if model_kw == 'kdv' or 'kawahara' or 'shore_kdv':
 
         p = 1.
 
         out = -6. * float(nonlinear) * (1. / (p + 1.)) * 1j * k * (fft(np.real(ifft(V)) ** (p + 1)))
+
+    if model_kw == 'gardner':
+
+        out = 6. * float(nonlinear) * (1j * k) * (
+                    0.5 * fft(np.real(ifft(V)) ** 2) - (1. / 3.) * fft(np.real(ifft(V)) ** 3))
 
     return out
 

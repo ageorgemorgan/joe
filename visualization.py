@@ -29,18 +29,20 @@ from numpy.fft import fft, fftfreq, fftshift
 # create Hovmoeller plot of a scalar field u
 
 
-def hov_plot(x, t, u, fieldname, dpi=100, show_figure=True, save_figure=False, picname="", cmap=cmo.haline, usetex=True):
+def hov_plot(x, t, u, fieldname, umin=None, umax=None, dpi=100, show_figure=True, save_figure=False, picname="", cmap=cmo.haline, usetex=True):
 
     plt.rcParams["font.family"] = "serif"
 
     try:
         plt.rc('text', usetex=usetex)
 
-    except RuntimeError: # catch a user error thinking they have tex when they don't
+    except RuntimeError:  # catch a user error thinking they have tex when they don't
         usetex = False
 
-    umin = np.amin(u)
-    umax = np.amax(u)
+    if umin is None:
+        umin = np.amin(u)
+    if umax is None:
+        umax = np.amax(u)
     levels = np.linspace(umin, umax, num=300)
 
     CF = plt.contourf(x, t, u, cmap=cmap, levels=levels)

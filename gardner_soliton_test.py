@@ -1,7 +1,8 @@
 import numpy as np
-from numpy.fft import fft, ifft
 
-from joe_main_lib import simulation, model, initial_state, do_refinement_study
+from joe_main_lib import simulation, initial_state, do_refinement_study
+from models import builtin_model
+
 
 # get stgrid
 length, T, N, dt = 100., 20., 2 ** 10, 3e-4
@@ -9,17 +10,7 @@ stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 
 
 # get model
-def symbol(k):
-    return 1j * k ** 3
-
-
-def fourier_forcing(V, k, x, nonlinear=True):
-    out = 6. * float(nonlinear) * (1j * k) * (0.5 * fft(np.real(ifft(V)) ** 2) - (1. / 3.) * fft(np.real(ifft(V)) ** 3))
-    return out
-
-
-my_model = model('gardner', 1, symbol, fourier_forcing, nonlinear=True)
-
+my_model = builtin_model('gardner', nonlinear=True)
 
 # get initial state
 
@@ -43,11 +34,11 @@ my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=200
 
 # run it
 method_kw = 'etdrk4'
-my_sim.load_or_run(method_kw=method_kw, print_runtime=True, save=True)
+my_sim.load_or_run(method_kw=method_kw, print_runtime=True, save=False)
 
 # produce plots and movies
-my_sim.hov_plot(colormap='cmo.haline', fieldname='u', show_figure=True, save_figure=True, usetex=True)
-my_sim.save_movie(dpi=200, fps=200, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
+my_sim.hov_plot(cmap='cmo.haline', fieldname='u', show_figure=True, save_figure=False, usetex=True)
+#my_sim.save_movie(dpi=200, fps=200, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
 
 # report error in first and second moments, which should both be zero on paper
 my_sim.get_fm()

@@ -174,7 +174,7 @@ class simulation:
                 pass
 
     # create a Hovmoeller plot (filled contour plot in space-time) of the simulation.
-    def hov_plot(self, dpi=100, colormap='cmo.haline', fieldname='u', usetex=True, show_figure=True, save_figure=False):
+    def hov_plot(self, umin=None, umax=None, dpi=100, cmap='cmo.haline', fieldname='u', usetex=True, show_figure=True, save_figure=False):
         nsteps = int(self.T / self.dt)
         times = np.linspace(0., self.T, num=1 + int(nsteps / self.ndump), endpoint=True)
 
@@ -197,8 +197,8 @@ class simulation:
         u_end = clip_spongeless(u_end, self.sfrac)
 
         with spinner('Rendering Hovmoeller plot...'):
-            hov_plot(x_end, times, u_end, fieldname=fieldname, dpi=dpi, show_figure=show_figure, save_figure=save_figure,
-                     picname=self.picname, cmap=colormap, usetex=usetex)
+            hov_plot(x_end, times, u_end, fieldname=fieldname, umin=umin, umax=umax, dpi=dpi, show_figure=show_figure, save_figure=save_figure,
+                     picname=self.picname, cmap=cmap, usetex=usetex)
 
     # save a movie of the evolution of our solution.
     def save_movie(self, fps=200, fieldname='u', usetex=True, fieldcolor='xkcd:ocean green', dpi=100):

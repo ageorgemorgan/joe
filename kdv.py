@@ -31,7 +31,7 @@ my_sim = simulation(stgrid, my_model, my_initial_state, bc='sponge_layer', spong
 my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=True)
 
 # produce plots and movies
-my_sim.hov_plot(colormap='cmo.haline', fieldname='u', show_figure=True, save_figure=True, usetex=True)
+my_sim.hov_plot(cmap='cmo.haline', fieldname='u', show_figure=True, save_figure=True, usetex=True)
 my_sim.save_movie(dpi=200, fps=100, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
 #my_sim.save_combomovie(dpi=200, fps=100, usetex=False, fieldcolor='xkcd:cerulean', speccolor='xkcd:dark magenta', fieldname='u')
 
