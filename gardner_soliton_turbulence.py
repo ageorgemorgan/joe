@@ -5,14 +5,16 @@ from joe_main_lib import simulation, initial_state
 from models import builtin_model
 from visualization import spinner
 
+from joblib import Parallel, delayed
+
 np.random.seed(32)
 
 # fix basic params
-num_samples = 50
+num_samples = 1
 num_waves = 30
 
 # get stgrid
-length, T, N, dt = 600., 50., 2 ** 13, 5e-5
+length, T, N, dt = 600., 200., 2 ** 13, 2e-5
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 
 # get model
@@ -66,6 +68,25 @@ def soliton_gas_ic(x, m):
 
     return out
 
+# define a function that takes in a sample number and does a sim
+def sample_st(sample):
+    ic_string = 'st_sample_' + str(sample)
+
+    my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
+
+    my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=int(1e5))
+    my_sim.load_or_run(print_runtime=False, verbose=False, save=True)
+
+    # my_sim.hov_plot(umin=-3., umax=3., dpi=600, usetex=True, save_figure=True, show_figure=False, cmap='cmo.thermal')
+    # after a lot of experimenting I really think the thermal colormap is the right way to go
+    # for Gardner, where the really thin antisolitons need to stand out as strongly as possible
+
+    my_sim.get_fm()
+    my_sim.get_sm()
+    fm_error = np.amax(my_sim.fm_error)
+    sm_error = np.amax(my_sim.sm_error)
+    return np.array([fm_error, sm_error])
+
 
 # initialize moment errors
 
@@ -75,6 +96,14 @@ sm_errors = np.zeros(num_samples, dtype=float)
 start = time.time()
 
 with spinner('Simulating Gardner soliton turbulence...'):
+    #"""
+    errors = Parallel(n_jobs=-1)(delayed(sample_st)(sample) for sample in range(0, num_samples))
+    errors = np.array(errors)
+    fm_errors = errors[:, 0]
+    sm_errors = errors[:, 1]
+    #"""
+
+    """
     for sample in range(0, num_samples):
         ic_string = 'st_sample_' + str(sample)
 
@@ -93,13 +122,19 @@ with spinner('Simulating Gardner soliton turbulence...'):
         sm_error = np.amax(my_sim.sm_error)
         fm_errors[sample] = fm_error
         sm_errors[sample] = sm_error
+    """
 
 end = time.time()
 runtime = end - start
 print('Runtime for Gardner soliton turbulence simulation = %.4f' % runtime + ' s')
 
-print(fm_errors)
-print(sm_errors)
+
+print(np.amax(fm_errors))
+print(np.amax(sm_errors))
+
+import matplotlib.pyplot as plt
+plt.plot(range(0, np.size(sm_errors)), sm_errors)
+plt.show()
 
 #my_sim.save_movie(dpi=200, fps=50, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
 
