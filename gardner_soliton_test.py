@@ -5,7 +5,7 @@ from models import builtin_model
 
 
 # get stgrid
-length, T, N, dt = 100., 20., 2 ** 10, 3e-4
+length, T, N, dt = 100., 20., 2 ** 10, 1e-3
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 
 

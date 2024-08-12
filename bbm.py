@@ -4,7 +4,7 @@ from joe_main_lib import simulation
 from models import builtin_model
 from initial_states import builtin_initial_state
 
-length, T, N, dt = 100., 50., 2**10, 1e-3
+length, T, N, dt = 100., 50., 2**10, 1e-2
 
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 my_model = builtin_model('bbm', nonlinear=True)

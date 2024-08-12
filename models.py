@@ -40,7 +40,7 @@ def get_symbol(k, model_kw):
     elif model_kw == 'ks':
         A = k ** 2 - k ** 4
 
-    elif model_kw == 'kdv' or 'gardner':
+    elif model_kw == 'kdv' or model_kw == 'gardner':
         A = 1j * k ** 3
 
     elif model_kw == 'shore_kdv':
@@ -52,6 +52,7 @@ def get_symbol(k, model_kw):
         # with the head of the wave train (at a group vel of c_g = 9/20)
 
     else:
+
         raise NameError("Invalid model keyword string.")
 
     return A
@@ -60,8 +61,6 @@ def get_symbol(k, model_kw):
 def fourier_forcing(V, k, x, model_kw, nonlinear=True):
     # Fourier transform of forcing term, acting on pair fncs V=(v_1, v_2)^T (concatenation)
     # on Fourier space. V has size 2N
-
-    #print(model_kw)
 
     if model_kw == 'phi4':
 
@@ -101,13 +100,14 @@ def fourier_forcing(V, k, x, model_kw, nonlinear=True):
         out = 6. * float(nonlinear) * (1j * k) * (
                     0.5 * fft(np.real(ifft(V)) ** 2) - (1. / 3.) * fft(np.real(ifft(V)) ** 3))
 
-    elif model_kw == 'kdv' or 'kawahara' or 'shore_kdv':
+    elif model_kw == 'kdv' or model_kw == 'kawahara' or model_kw == 'shore_kdv':
 
         p = 1.
 
         out = -6. * float(nonlinear) * (1. / (p + 1.)) * 1j * k * (fft(np.real(ifft(V)) ** (p + 1)))
 
     else:
+
         raise NameError("Invalid model keyword string.")
 
     return out
