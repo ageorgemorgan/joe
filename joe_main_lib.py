@@ -93,6 +93,7 @@ class simulation:
             self.nonlinear) + '_abslayer=' + str(self.absorbing_layer)
 
         self.filename = 'simdata' + my_string + '.pkl'
+        self.npyfilename = 'simdata' + my_string + '.npy'
         self.picname = 'hovplot' + my_string + '.png'
         self.moviename = 'movie' + my_string + '.mp4'
         self.combomoviename = 'combomovie' + my_string + '.mp4'
@@ -131,15 +132,24 @@ class simulation:
         # and the file is named properly, there's nothing to worry about. Said differently, we keep the full model attribute
         # of a simulation object around only as long as we need it.
 
-        # make a "sim" folder
         my_path = os.path.join("sim_archive")
 
-        # first, if the folder doesn't exist, make it
+        # if the archive folder doesn't exist, make it
         if not os.path.isdir(my_path):
             os.makedirs(my_path)
 
         with open('sim_archive/'+self.filename, 'wb') as outp:
             pickle.dump(self, outp, pickle.HIGHEST_PROTOCOL)
+
+    # sometimes saving the full .pkl can be too storage-intensive, so we must sacrifice convenience for hard disk space
+    def save_npy(self):
+
+        my_path = os.path.join("sim_archive")
+
+        if not os.path.isdir(my_path):
+            os.makedirs(my_path)
+
+        np.save('sim_archive/' + self.npyfilename, self.Udata)
 
     # if we know for sure the sim has been done, we can just load it. Since time-stepping only fills the Udata attribute
     # to the simulation object, "loading" a saved sim just means
@@ -151,8 +161,12 @@ class simulation:
             loaded_sim = pickle.load(inp)
             self.Udata = loaded_sim.Udata
 
+    def load_npy(self):
+
+        return np.load('sim_archive/' + self.npyfilename)
+
     # now put everything together: load if possible, but run if you gotta
-    def load_or_run(self, method_kw='etdrk4', print_runtime=True, save=True, verbose=True):
+    def load_or_run(self, method_kw='etdrk4', print_runtime=True, save_pkl=True, save_npy=False, verbose=True):
 
         try:
             self.load()
@@ -168,8 +182,13 @@ class simulation:
                 pass
             self.run_sim(method_kw=method_kw, print_runtime=print_runtime)
 
-            if save:
+            if save_pkl:
                 self.save()
+            else:
+                pass
+
+            if save_npy:
+                self.save_npy()
             else:
                 pass
 
@@ -300,14 +319,14 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etd
             rough_st_grid = {'length':length, 'T':T, 'N':N, 'dt':dts[0]}
             rough_sim = simulation(rough_st_grid, model, initial_state, bc=bc, sponge_params=sponge_params)
 
-            rough_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
+            rough_sim.load_or_run(method_kw=method_kw, save_pkl=True, print_runtime=False, verbose=False)
 
             for dt in dts:
 
                 fine_st_grid = {'length': length, 'T': T, 'N': N, 'dt': 0.5*dt}
                 fine_sim = simulation(fine_st_grid, model, initial_state, bc=bc, sponge_params=sponge_params)
 
-                fine_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
+                fine_sim.load_or_run(method_kw=method_kw, save_pkl=True, print_runtime=False, verbose=False)
 
                 rough_Udata = rough_sim.Udata
 
@@ -439,7 +458,7 @@ def do_refinement_study_alt(model, initial_state, length, T, Ns, dts, benchmark_
 
     cnt = 0
 
-    benchmark_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
+    benchmark_sim.load_or_run(method_kw=method_kw, save_pkl=True, print_runtime=False, verbose=False)
 
     #start = time.time()
     with spinner('Performing refinement study...'):
@@ -452,7 +471,7 @@ def do_refinement_study_alt(model, initial_state, length, T, Ns, dts, benchmark_
                 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
                 rough_sim = simulation(stgrid, model, initial_state, bc=bc, sponge_params=sponge_params)
 
-                rough_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
+                rough_sim.load_or_run(method_kw=method_kw, save_pkl=True, print_runtime=False, verbose=False)
 
                 rough_Udata = rough_sim.Udata
 

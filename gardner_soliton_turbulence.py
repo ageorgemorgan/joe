@@ -75,7 +75,7 @@ def sample_st(sample):
     my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
 
     my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=int(1e5))
-    my_sim.load_or_run(print_runtime=False, verbose=False, save=True)
+    my_sim.load_or_run(print_runtime=False, verbose=False, save_npy=True, save_pkl=False)
 
     # my_sim.hov_plot(umin=-3., umax=3., dpi=600, usetex=True, save_figure=True, show_figure=False, cmap='cmo.thermal')
     # after a lot of experimenting I really think the thermal colormap is the right way to go

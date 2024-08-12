@@ -12,7 +12,7 @@ my_initial_state = builtin_initial_state('kdv_soliton')
 
 my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=20)
 
-my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=True)
+my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save_pkl=False, save_npy=False)
 
 # produce plots and movies
 my_sim.hov_plot(cmap='cmo.haline', fieldname='u', show_figure=True, save_figure=True, usetex=True)

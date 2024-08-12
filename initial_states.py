@@ -42,6 +42,7 @@ def initial_state(x, initial_state_kw):
         out = kdv_soliton(x, c=c)
 
     elif initial_state_kw == 'kdv_multisoliton':
+
         c0 = 3.2
 
         c1 = 2.5

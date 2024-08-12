@@ -34,7 +34,7 @@ my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=200
 
 # run it
 method_kw = 'etdrk4'
-my_sim.load_or_run(method_kw=method_kw, print_runtime=True, save=False)
+my_sim.load_or_run(method_kw=method_kw, print_runtime=True, save_pkl=False, save_npy=False)
 
 # produce plots and movies
 my_sim.hov_plot(cmap='cmo.haline', fieldname='u', show_figure=True, save_figure=False, usetex=True)
