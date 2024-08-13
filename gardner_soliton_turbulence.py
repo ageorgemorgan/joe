@@ -10,10 +10,10 @@ from joblib import Parallel, delayed
 #np.random.seed(32)
 
 # fix basic params
-num_samples = 20
+num_samples = 50
 num_waves = 30
 
-ndump=500
+ndump = 500
 
 # get stgrid
 length, T, N, dt = 600., 50., 2 ** 13, 2e-5
@@ -142,7 +142,7 @@ import matplotlib.pyplot as plt
 
 from numpy.fft import fft
 
-"""
+#"""
 # code for computing higher moments of the ensemble
 
 def get_higher_moments(u,fm,sm):
@@ -161,8 +161,14 @@ def get_higher_moments(u,fm,sm):
 
     return skew, kurt
 
+from scipy.signal import argrelmin, argrelmax # for amplitude hist and cdf
+
 skew_store = np.zeros((num_samples, num_timesteps), dtype=float)
 kurt_store = np.zeros((num_samples, num_timesteps), dtype=float)
+max_storage = np.zeros((num_samples, num_timesteps), dtype=float)
+min_storage = np.zeros((num_samples, num_timesteps), dtype=float)
+pos_amp = []
+neg_amp = []
 
 for sample in range(0, num_samples):
 
@@ -171,6 +177,9 @@ for sample in range(0, num_samples):
     my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=ndump)
     my_sim.load()
 
+    u = my_sim.Udata
+
+    # skew and kurtosis
     my_sim.get_fm()
     fm = my_sim.fm[0] #TODO: better to put in "actual" or imperfect first/second moments into higher moment computations? Barely matters
     #print(fm)
@@ -182,34 +191,249 @@ for sample in range(0, num_samples):
     skew_store[sample, :] = skew
     kurt_store[sample, :] = kurt
 
-plt.plot(tt, np.mean(skew_store, axis=0))
-plt.show()
-
-plt.plot(tt, np.mean(kurt_store, axis=0))
-plt.show()
-"""
-
-# code for producing pic of amplitude asymmetry over time
-max_storage = np.zeros((num_samples, num_timesteps), dtype=float)
-min_storage = np.zeros((num_samples, num_timesteps), dtype=float)
-
-for sample in range(0, num_samples):
-
-    ic_string = 'st_sample_' + str(sample)
-    my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
-    my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=ndump)
-    my_sim.load()
-
-    umax = np.amax(my_sim.Udata, axis=1)
-    umin = np.amin(my_sim.Udata, axis=1)
+    # +/- amplitude asymmetry plot
+    umax = np.amax(u, axis=1)
+    umin = np.amin(u, axis=1)
 
     max_storage[sample] = umax
     min_storage[sample] = umin
 
-plt.plot(tt, np.max(max_storage, axis=0), label='Max', color='xkcd:dark magenta', linewidth=2, linestyle='dashed')
-plt.plot(tt, np.min(min_storage, axis=0), label='Min', color='xkcd:emerald', linewidth=2)
+    # amplitude histograms and CDF
+    mixing_time = 0.25 * T
+
+    mixing_index = int(mixing_time / (ndump * dt))
+
+    # only count stuff after mixing time
+    u = u[mixing_index:, :]
+
+    delta_pos = 2e0  # threshold: ignore + waves below this amplitude
+    delta_min = -1e-1  # same but for - waves
+
+    pos_part = u[u >= delta_pos]
+    max = argrelmax(pos_part, axis=0)
+    pos_amp.extend(pos_part[max])
+
+    neg_part = u[u <= delta_min]
+    min = argrelmin(neg_part, axis=0)
+    neg_amp.extend(neg_part[min])
+
+###############################################################
+############# ALL THE PLOTTING STUFF ##########################
+###############################################################
+import os
+
+# add the folder "visuals" to our path... more on this below
+my_path = os.path.join("visuals")
+
+# first, if the folder doesn't exist, make it
+if not os.path.isdir(my_path):
+    os.makedirs(my_path)
+
+plt.rcParams["font.family"] = "serif"
+dpi = 600
+
+try:
+    plt.rc('text', usetex=True)
+    usetex = True
+
+except RuntimeError:  # catch a user error thinking they have tex when they don't
+    usetex = False
+
+# plot skew and kurtosis averaged over the ensemble
+fig = plt.figure()
+plt.plot(tt, np.mean(skew_store, axis=0), linewidth=2, color='xkcd:pumpkin')
+fig.set_size_inches(8, 6)
+plt.tick_params(axis='x', which='both', top=False, color='k')
+plt.xticks(fontsize=20, rotation=0, color='k')
+plt.tick_params(axis='y', which='both', right=False, color='k')
+plt.yticks(fontsize=20, rotation=0, color='k')
+
+if usetex:
+    plt.xlabel(r"$t$", fontsize=22, color='k')
+else:
+    plt.xlabel(r"t", fontsize=22, color='k')
+
+plt.ylabel(r"Skewness", fontsize=22, color='k')
+plt.xlim([0,T])
+plt.tight_layout()
+picname = 'gardner_st_skew_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
+plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+plt.clf()
+
+fig = plt.figure()
+plt.plot(tt, np.mean(kurt_store, axis=0), linewidth=2, color='xkcd:pinky purple')
+fig.set_size_inches(8, 6)
+plt.tick_params(axis='x', which='both', top=False, color='k')
+plt.xticks(fontsize=20, rotation=0, color='k')
+plt.tick_params(axis='y', which='both', right=False, color='k')
+plt.yticks(fontsize=20, rotation=0, color='k')
+
+if usetex:
+    plt.xlabel(r"$t$", fontsize=22, color='k')
+else:
+    plt.xlabel(r"t", fontsize=22, color='k')
+
+plt.ylabel(r"Kurtosis", fontsize=22, color='k')
+plt.xlim([0, T])
+plt.tight_layout()
+picname = 'gardner_st_kurt_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
+plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+plt.clf()
+
+# Plot +/- amplitudes (max/min over ensemble resp) to illustrate asymmetry between polarities
+fig = plt.figure()
+plt.plot(tt, np.max(max_storage, axis=0), label='Max', color='xkcd:deep pink', linewidth=2, linestyle='dotted')
+plt.plot(tt, np.min(min_storage, axis=0), label='Min', color='xkcd:teal green', linewidth=2)
 # note: using mean over samples rather than max also gives meaningful information, perhaps worth including.
-plt.legend()
+fig.set_size_inches(8, 6)
+plt.tick_params(axis='x', which='both', top=False, color='k')
+plt.xticks(fontsize=20, rotation=0, color='k')
+plt.tick_params(axis='y', which='both', right=False, color='k')
+plt.yticks(fontsize=20, rotation=0, color='k')
+
+if usetex:
+    plt.xlabel(r"$t$", fontsize=22, color='k')
+else:
+    plt.xlabel(r"t", fontsize=22, color='k')
+
+plt.ylabel(r"Min/Max Amplitudes", fontsize=22, color='k')
+plt.legend(fontsize=22, loc='best')
+plt.xlim([0, T])
+plt.ylim([-6, 4])
+plt.tight_layout()
+picname = 'gardner_st_Amps_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
+plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+plt.clf()
+
+
+# plot amplitude histograms
+fig = plt.figure()
+plt.hist(pos_amp, color='xkcd:deep pink')
+fig.set_size_inches(8, 6)
+plt.tick_params(axis='x', which='both', top=False, color='k')
+plt.xticks(fontsize=20, rotation=0, color='k')
+plt.tick_params(axis='y', which='both', right=False, color='k')
+plt.yticks(fontsize=20, rotation=0, color='k')
+
+if usetex:
+    plt.xlabel(r"$A_{+}$", fontsize=22, color='k')
+else:
+    plt.xlabel(r"A_{+}", fontsize=22, color='k')
+
+plt.ylabel(r"Number of Instances", fontsize=22, color='k')
+plt.xlim([2,4])
+plt.tight_layout()
+picname = 'gardner_st_hist+_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
+plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+plt.clf()
+
+fig = plt.figure()
+plt.hist(neg_amp, color='xkcd:teal green')
+fig.set_size_inches(8, 6)
+plt.tick_params(axis='x', which='both', top=False, color='k')
+plt.xticks(fontsize=20, rotation=0, color='k')
+plt.tick_params(axis='y', which='both', right=False, color='k')
+plt.yticks(fontsize=20, rotation=0, color='k')
+
+if usetex:
+    plt.xlabel(r"$A_{-}$", fontsize=22, color='k')
+else:
+    plt.xlabel(r"A_{-}", fontsize=22, color='k')
+
+plt.ylabel(r"Number of Instances", fontsize=22, color='k')
+plt.xlim([-6,-0.1])
+plt.tight_layout()
+picname = 'gardner_st_hist-_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
+plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+plt.clf()
+
+# Plot amplitude CDFs
+def unif_cdf(x, a=-1, b=1.):
+    out = np.zeros_like(x, dtype=float)
+    out[x>a] = (x[x>a] - a)/(b-a)
+    out[x>=b] = 1.
+    return out
+
+from scipy.stats import ecdf
+
+pos_cdf = ecdf(pos_amp)
+fig, ax = plt.subplots()
+pos_cdf.cdf.plot(ax)
+xx = np.linspace(2,4, num=600)
+plt.plot(xx, pos_cdf.cdf.evaluate(xx), label='Observed', color='xkcd:deep pink', linewidth=3)
+ax.plot(xx, unif_cdf(xx, a=2.3, b=3), label='Uniform', linestyle='dashed', color='xkcd:blueberry', linewidth=2)
+fig.set_size_inches(8, 6)
+plt.tick_params(axis='x', which='both', top=False, color='k')
+plt.xticks(fontsize=20, rotation=0, color='k')
+plt.tick_params(axis='y', which='both', right=False, color='k')
+plt.yticks(fontsize=20, rotation=0, color='k')
+plt.legend(fontsize=22, loc='upper left')
+if usetex:
+    plt.xlabel(r"$A_{+}$", fontsize=22, color='k')
+    plt.ylabel(r"$F\left(A_{+}\right)$", fontsize=22, color='k')
+else:
+    plt.xlabel(r"A_{+}", fontsize=22, color='k')
+    plt.ylabel(r"F(A_{+})", fontsize=22, color='k')
+plt.xlim([2,4])
+plt.ylim([-0.02,1.02])
+plt.tight_layout()
+picname = 'gardner_st_cdf+_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
+plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+plt.clf()
+
+
+neg_cdf = ecdf(neg_amp)
+fig, ax = plt.subplots()
+xx = np.linspace(-6,0, num=600)
+plt.plot(xx, neg_cdf.cdf.evaluate(xx), label='Observed', color='xkcd:teal green', linewidth=3)
+ax.plot(xx, unif_cdf(xx, a=-3., b=-0.1), label='Uniform', linestyle='dashed', color='xkcd:blueberry', linewidth=2)
+fig.set_size_inches(8, 6)
+plt.tick_params(axis='x', which='both', top=False, color='k')
+plt.xticks(fontsize=20, rotation=0, color='k')
+plt.tick_params(axis='y', which='both', right=False, color='k')
+plt.yticks(fontsize=20, rotation=0, color='k')
+plt.legend(fontsize=22, loc='upper left')
+if usetex:
+    plt.xlabel(r"$A_{-}$", fontsize=22, color='k')
+    plt.ylabel(r"$F\left(A_{-}\right)$", fontsize=22, color='k')
+else:
+    plt.xlabel(r"A_{-}", fontsize=22, color='k')
+    plt.ylabel(r"F(A_{-})", fontsize=22, color='k')
+plt.xlim([-6,-0.1])
+plt.ylim([-0.02,1.02])
+plt.tight_layout()
+picname = 'gardner_st_cdf-_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
+plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+plt.clf()
+
+"""
+uu = u[-1,:]
+plt.plot(my_sim.x, uu)
+
+    
+pos_part = uu[u[-1,:]>delta] # threshold to avoid false local maxes/exclude very small waves
+max = argrelmax(pos_part) # local maximizers (up to threshold)
+amp = pos_part[max] # actual + wave amplitudes
+
+# draw for validation
+x_plt = []
+for a in amp:
+    x_plt.append(np.where(uu == a))
+x_plt = -0.5*length+(length/N)*np.array(x_plt)
+
+plt.scatter(x_plt, amp, marker='o', color='xkcd:deep pink')
+
+neg_part = uu[u[-1, :] < -delta]
+min = argrelmin(neg_part) # local minimizers (up to threshold)
+amp = neg_part[min]  # actual - wave amplitudes
+
+# draw for validation
+x_plt = []
+for a in amp:
+    x_plt.append(np.where(uu == a))
+x_plt = -0.5*length+(length/N)*np.array(x_plt)
+
+plt.scatter(x_plt, amp, marker='v', color='xkcd:teal green')
+    
 plt.show()
-
-
+"""
