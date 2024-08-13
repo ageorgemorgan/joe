@@ -7,14 +7,16 @@ from visualization import spinner
 
 from joblib import Parallel, delayed
 
-np.random.seed(32)
+#np.random.seed(32)
 
 # fix basic params
-num_samples = 1
+num_samples = 20
 num_waves = 30
 
+ndump=500
+
 # get stgrid
-length, T, N, dt = 600., 200., 2 ** 13, 2e-5
+length, T, N, dt = 600., 50., 2 ** 13, 2e-5
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 
 # get model
@@ -74,10 +76,10 @@ def sample_st(sample):
 
     my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
 
-    my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=int(1e5))
-    my_sim.load_or_run(print_runtime=False, verbose=False, save_npy=True, save_pkl=False)
+    my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=ndump)
+    my_sim.load_or_run(print_runtime=False, verbose=False, save_npy=False, save_pkl=True)
 
-    # my_sim.hov_plot(umin=-3., umax=3., dpi=600, usetex=True, save_figure=True, show_figure=False, cmap='cmo.thermal')
+    #my_sim.hov_plot(umin=-3., umax=3., dpi=600, usetex=True, save_figure=True, show_figure=False, cmap='cmo.thermal')
     # after a lot of experimenting I really think the thermal colormap is the right way to go
     # for Gardner, where the really thin antisolitons need to stand out as strongly as possible
 
@@ -89,7 +91,6 @@ def sample_st(sample):
 
 
 # initialize moment errors
-
 fm_errors = np.zeros(num_samples, dtype=float)
 sm_errors = np.zeros(num_samples, dtype=float)
 
@@ -97,7 +98,7 @@ start = time.time()
 
 with spinner('Simulating Gardner soliton turbulence...'):
     #"""
-    errors = Parallel(n_jobs=-1)(delayed(sample_st)(sample) for sample in range(0, num_samples))
+    errors = Parallel(n_jobs=-2)(delayed(sample_st)(sample) for sample in range(0, num_samples))
     errors = np.array(errors)
     fm_errors = errors[:, 0]
     sm_errors = errors[:, 1]
@@ -132,10 +133,83 @@ print('Runtime for Gardner soliton turbulence simulation = %.4f' % runtime + ' s
 print(np.amax(fm_errors))
 print(np.amax(sm_errors))
 
+num_timesteps = 1+int(T/(dt*ndump))
+tt = ndump*dt*np.arange(0, num_timesteps)
+
 import matplotlib.pyplot as plt
-plt.plot(range(0, np.size(sm_errors)), sm_errors)
+#plt.plot(range(0, np.size(sm_errors)), sm_errors)
+#plt.show()
+
+from numpy.fft import fft
+
+"""
+# code for computing higher moments of the ensemble
+
+def get_higher_moments(u,fm,sm):
+
+    #fmfm = np.tile(fm, [N, 1]).T
+
+    v = (u-fm)**3
+
+    skew = (1. / N) * np.real(fft(v, axis=1)[:, 0])
+    skew /= sm**1.5
+
+    v = (u-fm)**4
+
+    kurt = (1. / N) * np.real(fft(v, axis=1)[:, 0])
+    kurt /= sm**2
+
+    return skew, kurt
+
+skew_store = np.zeros((num_samples, num_timesteps), dtype=float)
+kurt_store = np.zeros((num_samples, num_timesteps), dtype=float)
+
+for sample in range(0, num_samples):
+
+    ic_string = 'st_sample_' + str(sample)
+    my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
+    my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=ndump)
+    my_sim.load()
+
+    my_sim.get_fm()
+    fm = my_sim.fm[0] #TODO: better to put in "actual" or imperfect first/second moments into higher moment computations? Barely matters
+    #print(fm)
+    my_sim.get_sm()
+    sm = my_sim.sm[0]
+    #print(sm)
+
+    skew, kurt = get_higher_moments(my_sim.Udata, fm, sm)
+    skew_store[sample, :] = skew
+    kurt_store[sample, :] = kurt
+
+plt.plot(tt, np.mean(skew_store, axis=0))
 plt.show()
 
-#my_sim.save_movie(dpi=200, fps=50, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
+plt.plot(tt, np.mean(kurt_store, axis=0))
+plt.show()
+"""
 
-# plotting ICs TODO wheel this into the sim object at some point
+# code for producing pic of amplitude asymmetry over time
+max_storage = np.zeros((num_samples, num_timesteps), dtype=float)
+min_storage = np.zeros((num_samples, num_timesteps), dtype=float)
+
+for sample in range(0, num_samples):
+
+    ic_string = 'st_sample_' + str(sample)
+    my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
+    my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=ndump)
+    my_sim.load()
+
+    umax = np.amax(my_sim.Udata, axis=1)
+    umin = np.amin(my_sim.Udata, axis=1)
+
+    max_storage[sample] = umax
+    min_storage[sample] = umin
+
+plt.plot(tt, np.max(max_storage, axis=0), label='Max', color='xkcd:dark magenta', linewidth=2, linestyle='dashed')
+plt.plot(tt, np.min(min_storage, axis=0), label='Min', color='xkcd:emerald', linewidth=2)
+# note: using mean over samples rather than max also gives meaningful information, perhaps worth including.
+plt.legend()
+plt.show()
+
+

@@ -247,10 +247,11 @@ class simulation:
     # obtain first moment of the system
     def get_fm(self):
 
-        length = self.length
+        N = self.N
         u = self.Udata
 
-        fm = (1./length)*np.real(fft(u, axis=1)[:, 0]) # use that the zeroth Fourier coeff is proportional to the mean
+        fm = (1./N)*np.real(fft(u, axis=1)[:, 0])  # use that the zeroth Fourier coeff is proportional to the mean,
+        # you also use "dx = length/N"
         fm_error = np.abs(fm[1:]-fm[0])
 
         self.fm = fm
@@ -269,15 +270,12 @@ class simulation:
         fm = self.fm
 
         # compute the spatial L2 norm of u using Parseval's identity.
-        # I'm pretty sure the normalization 1/N^2 is the correct one here
-        # (I have two different hand-wavy arguments for why) but still something to watch out
-        # for when performing experiments on KdV, Gardner, etc.
-        v = np.sum(np.absolute(fft(u, axis=1)) ** 2, axis=1)
-        sm = v/(self.N**2) - fm**2
+        #v = np.sum(np.absolute(fft(u, axis=1)) ** 2, axis=1)
+        #sm = v/(length*self.N) - fm**2
 
         # I also tried this simpler code below, and it turns out Parseval tracks the sm slightly better!
-        #sm = (1./length)*np.real(fft(u**2, axis=1)[:, 0]) # use that the zeroth Fourier coeff is proportional to the mean
-        #sm -= fm**2
+        sm = (1./self.N)*np.real(fft(u**2, axis=1)[:, 0]) # use that the zeroth Fourier coeff is proportional to the mean
+        sm -= fm**2
 
         sm_error = np.abs(sm[1:]-sm[0])
 
