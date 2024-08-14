@@ -1,13 +1,22 @@
-import numpy as np
+# joe code for reproducing the experiments and (most) statistical results from a paper of Didenkulova
+# https://www.sciencedirect.com/science/article/abs/pii/S0167278918305657
+
+# TODO: the post-processing needs to be cleaned up a little bit here and there! There's more repetition than is OK
+#  when it comes to plotting etc, see what can be moved over to "visualization" or perhaps put in a separate analysis
+#  script
+
+import os
 import time
+
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy.fft import fft
 
 from joe_main_lib import simulation, initial_state
 from models import builtin_model
 from visualization import spinner
 
 from joblib import Parallel, delayed
-
-#np.random.seed(32)
 
 # fix basic params
 num_samples = 50
@@ -16,7 +25,7 @@ num_waves = 30
 ndump = 500
 
 # get stgrid
-length, T, N, dt = 600., 50., 2 ** 13, 2e-5
+length, T, N, dt = 600., 200., 2 ** 13, 2e-5
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 
 # get model
@@ -97,38 +106,16 @@ sm_errors = np.zeros(num_samples, dtype=float)
 start = time.time()
 
 with spinner('Simulating Gardner soliton turbulence...'):
-    #"""
-    errors = Parallel(n_jobs=-2)(delayed(sample_st)(sample) for sample in range(0, num_samples))
+    errors = Parallel(n_jobs=-1)(delayed(sample_st)(sample) for sample in range(1, num_samples+1))
+    # depending on your machine, n_jobs or the number of batches you split your ensemble into may
+    # need to be altered!
     errors = np.array(errors)
     fm_errors = errors[:, 0]
     sm_errors = errors[:, 1]
-    #"""
-
-    """
-    for sample in range(0, num_samples):
-        ic_string = 'st_sample_' + str(sample)
-
-        my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
-
-        my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=400)
-        my_sim.load_or_run(print_runtime=False, verbose=False, save=True)
-
-        # my_sim.hov_plot(umin=-3., umax=3., dpi=600, usetex=True, save_figure=True, show_figure=False, cmap='cmo.thermal')
-        # after a lot of experimenting I really think the thermal colormap is the right way to go
-        # for Gardner, where the really thin antisolitons need to stand out as strongly as possible
-
-        my_sim.get_fm()
-        my_sim.get_sm()
-        fm_error = np.amax(my_sim.fm_error)
-        sm_error = np.amax(my_sim.sm_error)
-        fm_errors[sample] = fm_error
-        sm_errors[sample] = sm_error
-    """
 
 end = time.time()
 runtime = end - start
 print('Runtime for Gardner soliton turbulence simulation = %.4f' % runtime + ' s')
-
 
 print(np.amax(fm_errors))
 print(np.amax(sm_errors))
@@ -136,13 +123,6 @@ print(np.amax(sm_errors))
 num_timesteps = 1+int(T/(dt*ndump))
 tt = ndump*dt*np.arange(0, num_timesteps)
 
-import matplotlib.pyplot as plt
-#plt.plot(range(0, np.size(sm_errors)), sm_errors)
-#plt.show()
-
-from numpy.fft import fft
-
-#"""
 # code for computing higher moments of the ensemble
 
 def get_higher_moments(u,fm,sm):
@@ -170,7 +150,7 @@ min_storage = np.zeros((num_samples, num_timesteps), dtype=float)
 pos_amp = []
 neg_amp = []
 
-for sample in range(0, num_samples):
+for sample in range(1, num_samples+1):
 
     ic_string = 'st_sample_' + str(sample)
     my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
@@ -182,21 +162,19 @@ for sample in range(0, num_samples):
     # skew and kurtosis
     my_sim.get_fm()
     fm = my_sim.fm[0] #TODO: better to put in "actual" or imperfect first/second moments into higher moment computations? Barely matters
-    #print(fm)
     my_sim.get_sm()
     sm = my_sim.sm[0]
-    #print(sm)
 
     skew, kurt = get_higher_moments(my_sim.Udata, fm, sm)
-    skew_store[sample, :] = skew
-    kurt_store[sample, :] = kurt
+    skew_store[sample-1, :] = skew
+    kurt_store[sample-1, :] = kurt
 
     # +/- amplitude asymmetry plot
     umax = np.amax(u, axis=1)
     umin = np.amin(u, axis=1)
 
-    max_storage[sample] = umax
-    min_storage[sample] = umin
+    max_storage[sample-1] = umax
+    min_storage[sample-1] = umin
 
     # amplitude histograms and CDF
     mixing_time = 0.25 * T
@@ -220,7 +198,6 @@ for sample in range(0, num_samples):
 ###############################################################
 ############# ALL THE PLOTTING STUFF ##########################
 ###############################################################
-import os
 
 # add the folder "visuals" to our path... more on this below
 my_path = os.path.join("visuals")
