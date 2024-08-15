@@ -286,8 +286,8 @@ class simulation:
 # a function that performs a refinement study based on Richardson extrapolation for error estimation. Very
 # useful for quickly checking accuracy. It's here because it doesn't have a better home right now, and it
 # *almost* takes simulation objects in as input.
-def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etdrk4', bc='periodic', sponge_params=None, show_figure=True, save_figure=False, usetex=True,
-                        fit_min=3, fit_max=7):
+def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etdrk4', bc='periodic', sponge_params=None,
+                        show_figure=True, save_figure=False, usetex=True, fit_min=3, fit_max=7):
 
     plt.rcParams["font.family"] = "serif"
 
@@ -332,11 +332,19 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etd
 
                 # use fine sim and rough sim at last time step to get Richardson error estimate
 
-                ord = 4.
+                if fine_sim.t_ord == 1:
 
-                diff = clip_spongeless(rough_Udata[-1, :]-fine_Udata[-1, :], fine_sim.sfrac)
+                    diff = clip_spongeless(rough_Udata[-1, :] - fine_Udata[-1, :], fine_sim.sfrac)
 
-                errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(diff))
+                elif fine_sim.t_ord == 2:
+
+                    diff = clip_spongeless(rough_Udata[0, -1, :] - fine_Udata[0, -1, :], fine_sim.sfrac)
+
+                else:
+
+                    raise ValueError('Order of temporal derivatives must be 1 or 2')
+
+                errors[k, cnt] = (1. / ((2 ** 4) - 1)) * np.amax(np.abs(diff))
 
                 rough_sim = fine_sim  # redefine for efficiency... only works bcz we refine dt in powers of 1/2
 

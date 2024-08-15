@@ -40,7 +40,7 @@ def get_greeks_first_order(N, dt, z):
 
 
 def get_greeks_second_order(length, N, dt, A):
-    M = 2 ** 5
+    M = 2 ** 6
     theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
 
     # radius of contour = largest eigenvalue of linear part with a bit of wiggle room
@@ -389,6 +389,9 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
     t_ord = model.t_ord
 
+    if t_ord == 2 and method_kw != 'etdrk4':
+        raise ValueError('Only ETDRK4 time-stepping is currently supported for second-order equations.')
+
     initial_state = sim.initial_state
 
     nonlinear = sim.nonlinear
@@ -399,7 +402,13 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
         sponge_params = sim.sponge_params
 
-        splitting_method_kw = sponge_params['splitting_method_kw']
+        if t_ord == 1:
+
+            splitting_method_kw = sponge_params['splitting_method_kw']
+
+        else:
+
+            splitting_method_kw = 'na' # Rayleigh damping for second order means no splitting required
 
     else:
 
@@ -434,10 +443,9 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
         # if we're second-order in time and using a sponge layer, damping can be realized simply
         # by modifying the forcing term ie. damping can be dealt with explicitly!
-        # TODO: bring this up to speed with sponge_params dict
         if t_ord == 2 and absorbing_layer:
 
-            out += rayleigh_damping(V, x, length,  delta=0.25 * length)
+            out += rayleigh_damping(V, x, length, sponge_params)
 
         return out
 

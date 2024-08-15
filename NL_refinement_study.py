@@ -105,7 +105,16 @@ for k in np.arange(0, num_Ns):
 
         ord = 4.
 
-        errors[k, cnt] = (1./(2**(ord-1)))*np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
+        if fine_sim.t_ord == 1:
+
+            errors[k, cnt] = (1./(2**(ord-1)))*np.amax(np.abs(rough_Udata[-1, :] - fine_Udata[-1, :]))
+
+        elif fine_sim.t_ord == 2:
+
+            errors[k, cnt] = (1. / (2 ** (ord - 1))) * np.amax(np.abs(rough_Udata[0, -1, :] - fine_Udata[0, -1, :]))
+
+        else:
+            raise ValueError('Order of temporal derivatives must be 1 or 2')
 
         rough_sim = fine_sim  # redefine for efficiency... only works bcz we refine dt in powers of 1/2
 

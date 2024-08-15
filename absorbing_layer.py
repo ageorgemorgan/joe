@@ -6,6 +6,7 @@ from numpy.fft import fft, ifft, fftfreq
 # create all the stuff we need to implement the absorbing boundary layer
 
 # first, create a function that gives the damping coefficient a la Lu/Trogdon 2023.
+# TODO: should this be made to work on both sides of the domain rather than just one?
 def damping_coeff_lt(x, sponge_params):
     amp = 1.
 
@@ -21,6 +22,7 @@ def damping_coeff_lt(x, sponge_params):
 
 
 # create a function that gives the damping coefficient a la Bronski 1998.
+# TODO: update this! needs to play nicely with sponge params.
 def damping_coeff_bronski(x, length, delta=0.1):
     # left endpoint
     lep = -0.5 * length
@@ -42,7 +44,7 @@ def damping_coeff_bronski(x, length, delta=0.1):
 
 # create the Rayleigh damping term that can be added to the forcing
 # syntax is inputs is the same as that for fourier_forcing
-def rayleigh_damping(V, x, length, delta=0.1):
+def rayleigh_damping(V, x, length, sponge_params):
     if int(0.5 * V.size) == x.size:
 
         pass
@@ -58,7 +60,8 @@ def rayleigh_damping(V, x, length, delta=0.1):
     v = np.real(ifft(V[N:]))  # only ifft last N-1 entries of V because of storage conventions
 
     out = 1j * np.zeros(2 * N, dtype=float)
-    beta = damping_coeff_bronski(x, length, delta=delta)
+    #beta = damping_coeff_bronski(x, length, delta=0.1)
+    beta = damping_coeff_lt(x, sponge_params)+damping_coeff_lt(-x, sponge_params)
     out[N:] = fft(-1. * beta * v)
 
     return out
