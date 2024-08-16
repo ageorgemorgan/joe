@@ -1,6 +1,6 @@
 import numpy as np
 
-from joe_main_lib import simulation, do_refinement_study, do_refinement_study_alt
+from joe_main_lib import simulation, do_refinement_study
 from models import builtin_model
 from initial_states import builtin_initial_state
 
@@ -8,7 +8,7 @@ length, T, N, dt = 400.,150., 2**10, 1e-2
 
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 my_model = builtin_model('phi4', nonlinear=True)
-my_initial_state = builtin_initial_state('gaussian_odd')
+my_initial_state = builtin_initial_state('internal_mode')
 
 # we need a sponge layer here, which requires parameter tuning to get right.
 

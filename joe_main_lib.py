@@ -4,6 +4,7 @@ import os
 import numpy as np
 from numpy.fft import fft
 import matplotlib.pyplot as plt
+from scipy.stats import trapezoid
 
 from time_stepper import do_time_stepping
 from initial_states import initial_state
@@ -250,8 +251,10 @@ class simulation:
         N = self.N
         u = self.Udata
 
-        fm = (1./N)*np.real(fft(u, axis=1)[:, 0])  # use that the zeroth Fourier coeff is proportional to the mean,
-        # you also use "dx = length/N"
+        fm = (1./N)*np.real(fft(u, axis=1)[:, 0])  # use that the zeroth Fourier coeff is proportional to the mean
+        # note here ^ that there is no self.length because the length from the dx gets cancelled from the 1/L
+        # that arises via averaging
+        #fm  = trapezoid(u, dx=1./N, axis=1)
         fm_error = np.abs(fm[1:]-fm[0])
 
         self.fm = fm
@@ -259,6 +262,8 @@ class simulation:
 
     # obtain second moment
     def get_sm(self):
+
+        from scipy.integrate import trapezoid
 
         length = self.length
         u = self.Udata
@@ -269,12 +274,8 @@ class simulation:
 
         fm = self.fm
 
-        # compute the spatial L2 norm of u using Parseval's identity.
-        #v = np.sum(np.absolute(fft(u, axis=1)) ** 2, axis=1)
-        #sm = v/(length*self.N) - fm**2
-
-        # I also tried this simpler code below, and it turns out Parseval tracks the sm slightly better!
         sm = (1./self.N)*np.real(fft(u**2, axis=1)[:, 0]) # use that the zeroth Fourier coeff is proportional to the mean
+        #sm = trapezoid(u**2, dx=1./self.N, axis=1)
         sm -= fm**2
 
         sm_error = np.abs(sm[1:]-sm[0])

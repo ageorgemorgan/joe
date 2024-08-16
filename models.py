@@ -3,6 +3,7 @@ import numpy as np
 from numpy.fft import fft, ifft
 
 import joe_main_lib
+from joe_main_lib import model
 
 
 # Aux functions needed for special cases...
@@ -30,6 +31,10 @@ def get_symbol(k, model_kw):
 
     if model_kw == 'phi4':
         A = -(k ** 2 + 2. * np.ones_like(k))
+
+    elif model_kw =='sinegordon':
+
+        A = -k**2
 
     elif model_kw == 'bbm':
         A = 1j * (k ** 3) / (1. + k ** 2)  # -1j * k / (1. + k ** 2)
@@ -83,6 +88,27 @@ def fourier_forcing(V, k, x, model_kw, nonlinear=True):
         out = 1j * np.zeros(2 * N, dtype=float)
         out[N:] = fft(spatial_forcing)
 
+    elif model_kw == 'sinegordon':
+
+        if int(0.5 * V.size) == x.size:
+
+            pass
+
+        else:
+
+            raise TypeError("The array V must be twice the length of the array x.")
+
+        N = int(0.5 * np.size(V))
+
+        V = np.reshape(V, (2 * N,))
+
+        u = np.real(ifft(V[0:N]))  # only ifft first N entries of V because of storage conventions
+
+        spatial_forcing = -float(nonlinear)*np.sin(u)
+
+        out = 1j * np.zeros(2 * N, dtype=float)
+        out[N:] = fft(spatial_forcing)
+
     elif model_kw == 'bbm':
 
         p = 1.
@@ -118,7 +144,7 @@ def builtin_model(model_kw, nonlinear=True):
     def my_symbol(k):
         return get_symbol(k, model_kw)
 
-    if model_kw == 'phi4':
+    if model_kw == 'phi4' or model_kw == 'sinegordon':
 
         t_ord = 2
 

@@ -4,15 +4,49 @@ import joe_main_lib
 
 
 def kdv_soliton(x, c=1.):
+    if c <= 0:
+        raise ValueError('KdV soliton speed must be strictly positive.')
     return 0.5*c*(np.cosh(0.5 * np.sqrt(c) * x) ** -2)
 
 
 def gardner_soliton(x, c=1., p=1.):
-    return c/(-1.+p*np.sqrt(1.+c)*np.cosh(np.sqrt(c) * x))
+    if c <= 0:
+        raise ValueError('Focusing Gardner soliton speed must be strictly positive.')
+    out = np.zeros_like(x, dtype=float)
+    xmax = 180
+    out[abs(x) > xmax] = 0.
+    out[abs(x) <= xmax] = c / (-1. + p * np.sqrt(1. + c) * np.cosh(np.sqrt(c) * x[abs(x) <= xmax]))
+    return out
 
 
 def bbm_solitary_wave(x, c=1.):
+    if c <= 0 and c >= -1:
+        raise ValueError('BBM soliton speed must be strictly positive, or strictly less than -1.')
     return 0.5*c*(np.cosh(0.5 * np.sqrt(c/(1.+c)) * x) ** -2)
+
+def sinegordon_soliton(x, c=0., p=1.):
+    if np.abs(c) >= 1:
+        raise ValueError('Sine-Gordon soliton speed must be in the interval (-1,1).')
+    out = np.zeros_like(x, dtype=float)
+    arg = p*x/np.sqrt(1.-c**2)
+    xmax = 1.8e2
+    out[arg > xmax] = 2.*np.pi
+    out[arg < -xmax] = 0.
+    out[np.abs(arg)<= xmax] = 4.*np.arctan(np.exp(arg[np.abs(arg)<= xmax]))
+    return out
+
+def sinegordon_soliton_speed(x, c=0., p=1.): # speed is at t=0
+    if np.abs(c) >= 1:
+        raise ValueError('Sine-Gordon soliton speed must be in the interval (-1,1).')
+    out = np.zeros_like(x, dtype=float)
+    gamma = 1./np.sqrt(1.-c**2)
+    arg = p*x*gamma
+    xmax = 1.8e2
+    out[arg > xmax] = 0.
+    out[arg < -xmax] = 0.
+    aa = arg[np.abs(arg)<= xmax]
+    out[np.abs(arg)<= xmax] = -(c*4.*p*gamma)*(np.exp(aa)/(1.+np.exp(2.*aa)))
+    return out
 
 
 def initial_state(x, initial_state_kw):
@@ -29,7 +63,7 @@ def initial_state(x, initial_state_kw):
 
     elif initial_state_kw == 'gaussian_even':
 
-        out = 6.*np.exp(-x**2)
+        out = 12.*np.exp(-x**2)
 
     elif initial_state_kw == 'gaussian_even_alt':
 
@@ -109,6 +143,18 @@ def initial_state(x, initial_state_kw):
     elif initial_state_kw == 'bbm_weird_wavepacket':
 
         out = (0.1*np.cos(20.*x) + np.cos(0.2*x))*np.exp(-x**2)
+
+    elif initial_state_kw == 'sinegordon_soliton_interaction':
+
+        out = np.zeros((2,np.shape(x)[0]), dtype=float)
+        out[0,:] = sinegordon_soliton(x+20, c=0.9, p=1) - sinegordon_soliton(x-20, c=-0.9, p=1)
+        out[1,:] = sinegordon_soliton_speed(x+20, c=0.9, p=1) - sinegordon_soliton_speed(x-20, c=-0.9, p=1)
+
+    elif initial_state_kw == 'sinegordon_soliton_interaction_alt':
+
+        out = np.zeros((2,np.shape(x)[0]), dtype=float)
+        out[0,:] = sinegordon_soliton(x+20, c=0.9, p=1) - sinegordon_soliton(x-20, c=0., p=1)
+        out[1,:] = sinegordon_soliton_speed(x+20, c=0.9, p=1)
 
     else:
 

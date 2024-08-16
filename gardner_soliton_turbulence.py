@@ -106,7 +106,7 @@ sm_errors = np.zeros(num_samples, dtype=float)
 start = time.time()
 
 with spinner('Simulating Gardner soliton turbulence...'):
-    errors = Parallel(n_jobs=-1)(delayed(sample_st)(sample) for sample in range(1, num_samples+1))
+    errors = Parallel(n_jobs=2)(delayed(sample_st)(sample) for sample in range(1, num_samples+1))
     # depending on your machine, n_jobs or the number of batches you split your ensemble into may
     # need to be altered!
     errors = np.array(errors)
