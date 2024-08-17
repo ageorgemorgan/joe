@@ -29,7 +29,7 @@ def V0(x):
 # if model is second order in time, instead obtain the spatial operator for the first order system as a block matrix
 def get_symbol(k, model_kw):
 
-    if model_kw == 'phi4':
+    if model_kw == 'phi4pert':
         A = -(k ** 2 + 2. * np.ones_like(k))
 
     elif model_kw =='sinegordon':
@@ -67,7 +67,7 @@ def fourier_forcing(V, k, x, model_kw, nonlinear=True):
     # Fourier transform of forcing term, acting on pair fncs V=(v_1, v_2)^T (concatenation)
     # on Fourier space. V has size 2N
 
-    if model_kw == 'phi4':
+    if model_kw == 'phi4pert':
 
         if int(0.5 * V.size) == x.size:
 
@@ -144,7 +144,7 @@ def builtin_model(model_kw, nonlinear=True):
     def my_symbol(k):
         return get_symbol(k, model_kw)
 
-    if model_kw == 'phi4' or model_kw == 'sinegordon':
+    if model_kw == 'phi4pert' or model_kw == 'sinegordon':
 
         t_ord = 2
 

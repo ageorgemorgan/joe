@@ -63,7 +63,7 @@ def initial_state(x, initial_state_kw):
 
     elif initial_state_kw == 'gaussian_even':
 
-        out = 12.*np.exp(-x**2)
+        out = 6.*np.exp(-x**2)
 
     elif initial_state_kw == 'gaussian_even_alt':
 

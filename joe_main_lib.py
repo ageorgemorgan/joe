@@ -245,6 +245,21 @@ class simulation:
             save_combomovie(u,  x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, fps=fps, fieldcolor=fieldcolor,
                             speccolor=speccolor, ndump=self.ndump, filename=self.combomoviename, periodic=not self.absorbing_layer, usetex=usetex, dpi=dpi)
 
+    # func that uses FFT to accurately integrate over spatial domain.
+    # TODO: test this, and integrate this mode of integration into moment and energy components for cleanliness
+    """
+    # Returns \int u(x,t) dx as a sampled fnc of time
+    def integrate(sim):
+
+        if sim.t_ord ==2:
+           u = sim.Udata[0,...]
+        else:
+           u = sim.Udata
+
+        out = (sim.length/sim.N) * np.real(fft(u, axis=1)[:, 0]) # be careful about sponge layers when doing length here! 
+        return out
+    """
+
     # obtain first moment of the system
     def get_fm(self):
 
@@ -288,7 +303,7 @@ class simulation:
 # useful for quickly checking accuracy. It's here because it doesn't have a better home right now, and it
 # *almost* takes simulation objects in as input.
 def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etdrk4', bc='periodic', sponge_params=None,
-                        show_figure=True, save_figure=False, usetex=True, fit_min=3, fit_max=7):
+                        show_figure=True, save_figure=False, usetex=True, dpi=400, fit_min=3, fit_max=7):
 
     plt.rcParams["font.family"] = "serif"
 
@@ -418,7 +433,7 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etd
                      + method_kw + '_nonlinear=' + str(model.nonlinear) + '_abslayer=' + str(absorbing_layer))
 
         picname = 'refinement_study' + my_string + '.png'
-        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=400)
+        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
 
     else:
 

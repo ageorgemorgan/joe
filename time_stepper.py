@@ -487,7 +487,16 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
         # make data storage array
         Udata = np.zeros([2, 1 + int(nsteps / ndump), N], dtype=float)
-        Udata[:, 0, :] = Uinit
+
+        try:
+
+            Udata[0, 0, :] = Uinit[0, :]
+            Udata[1, 0, :] = Uinit[1, :]
+
+        except: # if no initial speed is provided in second order case, default to assuming it's zero.
+
+            Udata[0, 0, :] = Uinit
+            pass
 
     elif t_ord == 1:
 
