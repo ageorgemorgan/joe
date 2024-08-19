@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from time_stepper import do_time_stepping
 from initial_states import initial_state
-from visualization import hov_plot, save_movie, save_combomovie, spinner, plot_refinement_study
+from visualization import hov_plot, save_movie, save_combomovie, spinner, plot_refinement_study, nice_plot
 from absorbing_layer import clip_spongeless
 
 # helper function for integration in space. Uses FFT to accurately integrate over spatial domain: accuracy vastly
@@ -101,6 +101,7 @@ class simulation:
             self.nonlinear) + '_abslayer=' + str(self.absorbing_layer)
 
         self.filename = 'simdata' + my_string + '.pkl'
+        self.ic_picname = 'ic_plot' + my_string + '.png'
         self.picname = 'hovplot' + my_string + '.png'
         self.moviename = 'movie' + my_string + '.mp4'
         self.combomoviename = 'combomovie' + my_string + '.mp4'
@@ -179,6 +180,46 @@ class simulation:
                 self.save()
             else:
                 pass
+
+    # plot the initial state
+    def plot_initial_condition(self, custom_ylim = None, dpi=100, color='xkcd:cerulean', fieldname='u', usetex=True,
+                           show_figure=True, save_figure=False):
+
+        x = clip_spongeless(self.x, self.sfrac)
+
+        if self.t_ord == 1:
+            u = self.initial_state
+
+        elif self.t_ord == 2:
+            u = self.initial_state[0,:]
+
+        else:
+            raise ValueError('t_ord must be 1 or 2.')
+
+        u = clip_spongeless(u, self.sfrac)
+
+        if usetex:
+
+            try:
+                ylabel = r'$u(x,t=0)$'.replace('u', str(fieldname))
+
+                nice_plot(x, u, r'$x$', ylabel, custom_ylim=custom_ylim,
+                          show_figure=show_figure, save_figure=save_figure, picname=self.ic_picname,
+                          linestyle='solid',
+                          color=color, usetex=True, dpi=dpi)
+
+            except RuntimeError:  # catch a user error thinking they have tex when they don't
+                usetex = False
+
+        else:
+
+            ylabel = r'u(x,t=0)'.replace('u', str(fieldname))
+
+            nice_plot(x, u, r'x', ylabel, custom_ylim=custom_ylim, show_figure=show_figure,
+                      save_figure=save_figure, picname=self.ic_picname,
+                      linestyle='solid',
+                      color=color, usetex=False, dpi=dpi)
+
 
     # create a Hovmoeller plot (filled contour plot in space-time) of the simulation.
     def hov_plot(self, umin=None, umax=None, dpi=100, cmap='cmo.haline', fieldname='u', usetex=True, show_figure=True, save_figure=False):
@@ -266,7 +307,6 @@ class simulation:
 
         self.sm = sm
         self.sm_error = sm_error
-
 
 # a function that performs a refinement study based on Richardson extrapolation for error estimation. Very
 # useful for quickly checking accuracy. It's here because it doesn't have a better home right now, and it

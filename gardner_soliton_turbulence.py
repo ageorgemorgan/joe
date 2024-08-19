@@ -85,10 +85,6 @@ def sample_st(sample):
     my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=ndump)
     my_sim.load_or_run(print_runtime=False, verbose=False, save=True)
 
-    #my_sim.hov_plot(umin=-3., umax=3., dpi=600, usetex=True, save_figure=True, show_figure=False, cmap='cmo.thermal')
-    # after a lot of experimenting I really think the thermal colormap is the right way to go
-    # for Gardner, where the really thin antisolitons need to stand out as strongly as possible
-
     my_sim.get_fm()
     my_sim.get_sm()
     fm_error = np.amax(my_sim.fm_error)
@@ -159,6 +155,16 @@ for sample in range(1, num_samples+1):
     my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
     my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=ndump)
     my_sim.load()
+
+    """
+    # if desired, save an example initial state plot and Hovmoeller plot for one sample
+    if sample == 1:
+        my_sim.plot_initial_condition(color='xkcd:cerulean', usetex=True, show_figure=False, save_figure=True)
+
+        my_sim.hov_plot(umin=-3., umax=3., dpi=600, usetex=True, save_figure=True, show_figure=False, cmap='cmo.thermal')
+        # after a lot of experimenting I really think the thermal colormap is the right way to go
+        # for Gardner, where the really thin antisolitons need to stand out as strongly as possible
+    """
 
     u = my_sim.Udata
 

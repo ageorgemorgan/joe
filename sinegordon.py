@@ -10,6 +10,8 @@ my_initial_state = builtin_initial_state('sinegordon_soliton_interaction') #sine
 
 my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=20)
 
+my_sim.plot_initial_condition(color='xkcd:deep magenta', usetex=True, show_figure=True, save_figure=True)
+
 my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=False)
 
 # produce plots and movies
