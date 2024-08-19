@@ -1,7 +1,7 @@
 # joe
 A library for solving partial differential equations with Fourier spectral discretization in space and high-order exponential time-stepping. 
 
-![hovplot_length=600 0_T=50 0_N=8192 0_dt=0 000050_modelkw=gardner_ICkw=soliton_gas_nonlinear=True_abslayer=False](https://github.com/user-attachments/assets/3811bb8c-e8d0-468e-a77a-56f643ebaa78)
+file:///home/adammorgan/Documents/Comp%20Projects/joe/visuals/hovplot_length=100.5_T=150.0_N=128.0_dt=0.015625_modelkw=ks_ICkw=gaussian_even_alt_nonlinear=True_abslayer=False.png
 
 FEATURES
 
