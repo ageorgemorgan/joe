@@ -4,12 +4,19 @@ import os
 import numpy as np
 from numpy.fft import fft
 import matplotlib.pyplot as plt
-from scipy.stats import trapezoid
 
 from time_stepper import do_time_stepping
 from initial_states import initial_state
-from visualization import hov_plot, save_movie, save_combomovie, spinner
+from visualization import hov_plot, save_movie, save_combomovie, spinner, plot_refinement_study
 from absorbing_layer import clip_spongeless
+
+# helper function for integration in space. Uses FFT to accurately integrate over spatial domain: accuracy vastly
+# beats trapezoidal rule.
+# u = array storing node values of field to be integrated (last dimension of the array is spatial)
+# length = length of domain
+# N = number of samples of u we take (= number of grid pts)
+def integrate(u, length, N):
+    return (length/N) * np.real(fft(u, axis=-1)[..., 0])
 
 # a class for models. Note how the init takes in two callables for the symbol and forcing terms: to avoid making the
 # weird no-no of having callable attributes, we use a trick from
@@ -94,7 +101,6 @@ class simulation:
             self.nonlinear) + '_abslayer=' + str(self.absorbing_layer)
 
         self.filename = 'simdata' + my_string + '.pkl'
-        self.npyfilename = 'simdata' + my_string + '.npy'
         self.picname = 'hovplot' + my_string + '.png'
         self.moviename = 'movie' + my_string + '.mp4'
         self.combomoviename = 'combomovie' + my_string + '.mp4'
@@ -142,16 +148,6 @@ class simulation:
         with open('sim_archive/'+self.filename, 'wb') as outp:
             pickle.dump(self, outp, pickle.HIGHEST_PROTOCOL)
 
-    # sometimes saving the full .pkl can be too storage-intensive, so we must sacrifice convenience for hard disk space
-    def save_npy(self):
-
-        my_path = os.path.join("sim_archive")
-
-        if not os.path.isdir(my_path):
-            os.makedirs(my_path)
-
-        np.save('sim_archive/' + self.npyfilename, self.Udata)
-
     # if we know for sure the sim has been done, we can just load it. Since time-stepping only fills the Udata attribute
     # to the simulation object, "loading" a saved sim just means
     # 1) loading the pickle and
@@ -162,12 +158,8 @@ class simulation:
             loaded_sim = pickle.load(inp)
             self.Udata = loaded_sim.Udata
 
-    def load_npy(self):
-
-        return np.load('sim_archive/' + self.npyfilename)
-
     # now put everything together: load if possible, but run if you gotta
-    def load_or_run(self, method_kw='etdrk4', print_runtime=True, save_pkl=True, save_npy=False, verbose=True):
+    def load_or_run(self, method_kw='etdrk4', print_runtime=True, save=True, verbose=True):
 
         try:
             self.load()
@@ -183,13 +175,8 @@ class simulation:
                 pass
             self.run_sim(method_kw=method_kw, print_runtime=print_runtime)
 
-            if save_pkl:
+            if save:
                 self.save()
-            else:
-                pass
-
-            if save_npy:
-                self.save_npy()
             else:
                 pass
 
@@ -245,31 +232,15 @@ class simulation:
             save_combomovie(u,  x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, fps=fps, fieldcolor=fieldcolor,
                             speccolor=speccolor, ndump=self.ndump, filename=self.combomoviename, periodic=not self.absorbing_layer, usetex=usetex, dpi=dpi)
 
-    # func that uses FFT to accurately integrate over spatial domain.
-    # TODO: test this, and integrate this mode of integration into moment and energy components for cleanliness
-    """
-    # Returns \int u(x,t) dx as a sampled fnc of time
-    def integrate(sim):
-
-        if sim.t_ord ==2:
-           u = sim.Udata[0,...]
-        else:
-           u = sim.Udata
-
-        out = (sim.length/sim.N) * np.real(fft(u, axis=1)[:, 0]) # be careful about sponge layers when doing length here! 
-        return out
-    """
-
     # obtain first moment of the system
     def get_fm(self):
 
+        length = self.length
         N = self.N
         u = self.Udata
 
-        fm = (1./N)*np.real(fft(u, axis=1)[:, 0])  # use that the zeroth Fourier coeff is proportional to the mean
-        # note here ^ that there is no self.length because the length from the dx gets cancelled from the 1/L
-        # that arises via averaging
-        #fm  = trapezoid(u, dx=1./N, axis=1)
+        fm = (1./length) * integrate(u, length, N) # take mean
+
         fm_error = np.abs(fm[1:]-fm[0])
 
         self.fm = fm
@@ -278,9 +249,8 @@ class simulation:
     # obtain second moment
     def get_sm(self):
 
-        from scipy.integrate import trapezoid
-
         length = self.length
+        N = self.N
         u = self.Udata
 
         if self.fm.any() is None:
@@ -289,8 +259,7 @@ class simulation:
 
         fm = self.fm
 
-        sm = (1./self.N)*np.real(fft(u**2, axis=1)[:, 0]) # use that the zeroth Fourier coeff is proportional to the mean
-        #sm = trapezoid(u**2, dx=1./self.N, axis=1)
+        sm = (1./length) * integrate(u**2, length, N)
         sm -= fm**2
 
         sm_error = np.abs(sm[1:]-sm[0])
@@ -333,14 +302,14 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etd
             rough_st_grid = {'length':length, 'T':T, 'N':N, 'dt':dts[0]}
             rough_sim = simulation(rough_st_grid, model, initial_state, bc=bc, sponge_params=sponge_params)
 
-            rough_sim.load_or_run(method_kw=method_kw, save_pkl=True, print_runtime=False, verbose=False)
+            rough_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
 
             for dt in dts:
 
                 fine_st_grid = {'length': length, 'T': T, 'N': N, 'dt': 0.5*dt}
                 fine_sim = simulation(fine_st_grid, model, initial_state, bc=bc, sponge_params=sponge_params)
 
-                fine_sim.load_or_run(method_kw=method_kw, save_pkl=True, print_runtime=False, verbose=False)
+                fine_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
 
                 rough_Udata = rough_sim.Udata
 
@@ -372,82 +341,9 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etd
     #runtime = end - start
     #print('Runtime for accuracy tests = %.4f' % runtime + ' s')
 
-    # now we produce a plot of the errors
-    fig, ax = plt.subplots()
-
-    dts = 0.5 * dts
-
-    # define the cycler
-    my_cycler = (
-                plt.cycler(color=['xkcd:slate', 'xkcd:raspberry', 'xkcd:goldenrod', 'xkcd:deep green'])
-                + plt.cycler(lw=[3.5, 3, 2.5, 2])
-                + plt.cycler(linestyle=['dotted', 'dashed', 'solid', 'dashdot'])
-                + plt.cycler(marker=['v', '*', 'o', 'P'])
-                + plt.cycler(markersize=[8, 12, 8, 8])
-    )
-
-    ax.set_prop_cycle(my_cycler)
-
-    for m in range(0, num_Ns):
-        if usetex:
-            plt.loglog(dts, errors[m, :], label=r'$N = z$'.replace('z', str(Ns[m])))
-        # ^ an awesome trick from
-        # https://stackoverflow.com/questions/33786332/matplotlib-using-variables-in-latex-expressions
-        # was used to get the labels working as above
-        else:
-            plt.loglog(dts, errors[m, :], label='N = z'.replace('z', str(Ns[m])))
-
-    ax.legend(fontsize=16)
-
-    if usetex:
-        plt.xlabel(r"$\Delta t$", fontsize=26, color='k')
-        plt.ylabel(r"Absolute Error", fontsize=26, color='k')
-    else:
-        plt.xlabel("Δt", fontsize=26, color='k')
-        plt.ylabel("Absolute Error", fontsize=26, color='k')
-
-    plt.tick_params(axis='x', which='both', top='off', color='k')
-    plt.xticks(fontsize=16, rotation=0, color='k')
-    plt.tick_params(axis='y', which='both', right='off', color='k')
-    plt.yticks(fontsize=16, rotation=0, color='k')
-
-    plt.tight_layout()
-
-    if save_figure is True:
-
-        # add the folder "visuals" to our path
-        my_path = os.path.join("visuals")
-
-        # first, if the folder doesn't exist, make it
-        if not os.path.isdir(my_path):
-            os.makedirs(my_path)
-
-        # and now we can save the fig
-        if bc == 'sponge_layer':
-            absorbing_layer = True
-        elif bc == 'periodic':
-            absorbing_layer = False
-
-        my_string = ('_length=%.1f_T=%.1f' % (
-        length, T) + '_modelkw=' + model.model_kw + '_ICkw=' + initial_state.initial_state_kw + '_method_kw='
-                     + method_kw + '_nonlinear=' + str(model.nonlinear) + '_abslayer=' + str(absorbing_layer))
-
-        picname = 'refinement_study' + my_string + '.png'
-        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
-
-    else:
-
-        pass
-
-    if show_figure is True:
-
-        plt.show()
-
-    else:
-
-        pass
-
-    plt.close()
+    # now we produce a plot of the errors using an awkward but functioning purpose-built plotting fnc
+    plot_refinement_study(model, initial_state, length, T, Ns, dts, errors, method_kw=method_kw, bc=bc,
+                        show_figure=show_figure, save_figure=save_figure, usetex=usetex, dpi=dpi)
 
     # estimate the slope of particular error curves if you want. Needs a bit of by-hand tweaking (controlled by the
     # inputs fit_min, fit_max) bcz for small enough dt we can get level-off or rounding error domination in the error
@@ -480,7 +376,7 @@ def do_refinement_study_alt(model, initial_state, length, T, Ns, dts, benchmark_
 
     cnt = 0
 
-    benchmark_sim.load_or_run(method_kw=method_kw, save_pkl=True, print_runtime=False, verbose=False)
+    benchmark_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
 
     #start = time.time()
     with spinner('Performing refinement study...'):
@@ -493,7 +389,7 @@ def do_refinement_study_alt(model, initial_state, length, T, Ns, dts, benchmark_
                 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
                 rough_sim = simulation(stgrid, model, initial_state, bc=bc, sponge_params=sponge_params)
 
-                rough_sim.load_or_run(method_kw=method_kw, save_pkl=True, print_runtime=False, verbose=False)
+                rough_sim.load_or_run(method_kw=method_kw, save=True, print_runtime=False, verbose=False)
 
                 rough_Udata = rough_sim.Udata
 

@@ -33,7 +33,7 @@ my_initial_state = initial_state('soliton_gas', lambda x: soliton_gas_ic(x, m))
 
 my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=200)
 
-my_sim.load_or_run(print_runtime=True, save_pkl=True)
+my_sim.load_or_run(print_runtime=True, save=True)
 my_sim.hov_plot(dpi=600, usetex=True, save_figure=True, show_figure=True)
 #my_sim.save_movie(dpi=200, fps=200, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
 

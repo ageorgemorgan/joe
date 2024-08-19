@@ -13,7 +13,7 @@ from absorbing_layer import damping_coeff_lt, rayleigh_damping
 # PDE we're considering insofar as is possible.
 
 
-# First, a function for computing all of the Greeks ("weights" for exponential quadrature).
+# First, a function for computing all the Greeks ("weights" for exponential quadrature).
 # We do this by Pythonizing the code from Kassam and Trefethen 2005 (do Cauchy integrals).
 
 def get_greeks_first_order(N, dt, z):
@@ -44,8 +44,9 @@ def get_greeks_second_order(length, N, dt, A):
     theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
 
     # radius of contour = largest eigenvalue of linear part with a bit of wiggle room
-    max_freq = np.pi * N / length
-    rad = 1.2 * dt * np.sqrt(max_freq ** 2 + 2.)
+    # a bit of analysis shows the largest eigval is sqrt(A(k_max)) where k_max
+    # is the largest positive frequency allowed.
+    rad = 1.2 * dt * np.sqrt(np.amax(np.abs(A)))
     r = rad * np.exp(1j * theta)
 
     id_matrix = sparse.eye(2 * N, dtype=float)

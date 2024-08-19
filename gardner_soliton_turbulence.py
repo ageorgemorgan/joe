@@ -1,22 +1,21 @@
 # joe code for reproducing the experiments and (most) statistical results from a paper of Didenkulova
 # https://www.sciencedirect.com/science/article/abs/pii/S0167278918305657
 
-# TODO: the post-processing needs to be cleaned up a little bit here and there! There's more repetition than is OK
-#  when it comes to plotting etc, see what can be moved over to "visualization" or perhaps put in a separate analysis
-#  script
-
-import os
 import time
 
 import numpy as np
-import matplotlib.pyplot as plt
-from numpy.fft import fft
+from scipy.signal import argrelmin, argrelmax # for postprocessing: amplitude hist and cdf
+from scipy.stats import ecdf # again for postprocessing
 
-from joe_main_lib import simulation, initial_state
+from joe_main_lib import simulation, initial_state, integrate
 from models import builtin_model
-from visualization import spinner
+from visualization import spinner, nice_plot, nice_multiplot, nice_hist
 
 from joblib import Parallel, delayed
+
+##############################################################################################
+########################## STAGE 1: SIMULATION OF THE ENSEMBLE ###############################
+##############################################################################################
 
 # fix basic params
 num_samples = 50
@@ -31,7 +30,6 @@ stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 # get model
 my_model = builtin_model('gardner', nonlinear=True)
 
-
 # get initial state
 # note that, for large domains, cosh(x near endpts) may encounter overflow, so it's good to just manually set
 # the tails of the wave to zero to avoid these concerns (see also the great discussion here
@@ -43,7 +41,6 @@ def gardner_soliton(x, c=1., p=1.):
     out[abs(x) > xmax] = 0.
     out[abs(x) <= xmax] = c / (-1. + p * np.sqrt(1. + c) * np.cosh(np.sqrt(c) * x[abs(x) <= xmax]))
     return out
-
 
 def soliton_gas_ic(x, m):
     out = 0.
@@ -86,7 +83,7 @@ def sample_st(sample):
     my_initial_state = initial_state(ic_string, lambda x: soliton_gas_ic(x, num_waves))
 
     my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=ndump)
-    my_sim.load_or_run(print_runtime=False, verbose=False, save_npy=False, save_pkl=True)
+    my_sim.load_or_run(print_runtime=False, verbose=False, save=True)
 
     #my_sim.hov_plot(umin=-3., umax=3., dpi=600, usetex=True, save_figure=True, show_figure=False, cmap='cmo.thermal')
     # after a lot of experimenting I really think the thermal colormap is the right way to go
@@ -97,11 +94,6 @@ def sample_st(sample):
     fm_error = np.amax(my_sim.fm_error)
     sm_error = np.amax(my_sim.sm_error)
     return np.array([fm_error, sm_error])
-
-
-# initialize moment errors
-fm_errors = np.zeros(num_samples, dtype=float)
-sm_errors = np.zeros(num_samples, dtype=float)
 
 start = time.time()
 
@@ -117,32 +109,43 @@ end = time.time()
 runtime = end - start
 print('Runtime for Gardner soliton turbulence simulation = %.4f' % runtime + ' s')
 
-print(np.amax(fm_errors))
-print(np.amax(sm_errors))
+print('Maximum error in first moment over ensemble = ', np.amax(fm_errors))
+print('Maximum error in second moment over ensemble = ', np.amax(sm_errors))
+
+##############################################################################################
+########################## STAGE 2: PREP FOR POSTPROCESSING (HELPER FNCS ETC.) ###############
+##############################################################################################
 
 num_timesteps = 1+int(T/(dt*ndump))
 tt = ndump*dt*np.arange(0, num_timesteps)
 
-# code for computing higher moments of the ensemble
-
+# code for computing higher moments given field and its first two moments
 def get_higher_moments(u,fm,sm):
-
-    #fmfm = np.tile(fm, [N, 1]).T
 
     v = (u-fm)**3
 
-    skew = (1. / N) * np.real(fft(v, axis=1)[:, 0])
+    skew = (1./length)*integrate(v, length, N)
     skew /= sm**1.5
 
     v = (u-fm)**4
 
-    kurt = (1. / N) * np.real(fft(v, axis=1)[:, 0])
+    kurt = (1./length)*integrate(v, length, N)
     kurt /= sm**2
 
     return skew, kurt
 
-from scipy.signal import argrelmin, argrelmax # for amplitude hist and cdf
+# code for computing CDF of unif distribution on [a,b]
+def unif_cdf(x, a=-1, b=1.):
+    out = np.zeros_like(x, dtype=float)
+    out[x>a] = (x[x>a] - a)/(b-a)
+    out[x>=b] = 1.
+    return out
 
+##############################################################################################
+########################## STAGE 3: POSTPROCESSING ###########################################
+##############################################################################################
+
+# init storage
 skew_store = np.zeros((num_samples, num_timesteps), dtype=float)
 kurt_store = np.zeros((num_samples, num_timesteps), dtype=float)
 max_storage = np.zeros((num_samples, num_timesteps), dtype=float)
@@ -159,9 +162,10 @@ for sample in range(1, num_samples+1):
 
     u = my_sim.Udata
 
-    # skew and kurtosis
+    # moments
     my_sim.get_fm()
-    fm = my_sim.fm[0] #TODO: better to put in "actual" or imperfect first/second moments into higher moment computations? Barely matters
+    fm = my_sim.fm[0] #TODO: better to put in "actual" or imperfect first/second moments
+                      # into higher moment computations? Honestly the precision of the moments is so good it barely matters
     my_sim.get_sm()
     sm = my_sim.sm[0]
 
@@ -177,6 +181,9 @@ for sample in range(1, num_samples+1):
     min_storage[sample-1] = umin
 
     # amplitude histograms and CDF
+
+    # need to set a "mixing time" after which we assume the "gas" is well-mixed and we're OK to start doing some data
+    # analysis. Honestly 0.25*T could even be a bit large!
     mixing_time = 0.25 * T
 
     mixing_index = int(mixing_time / (ndump * dt))
@@ -195,195 +202,75 @@ for sample in range(1, num_samples+1):
     min = argrelmin(neg_part, axis=0)
     neg_amp.extend(neg_part[min])
 
-###############################################################
-############# ALL THE PLOTTING STUFF ##########################
-###############################################################
+##############################################################################################
+########################## STAGE 4: PRODUCE POSTPROCESSING PLOTS #############################
+##############################################################################################
 
-# add the folder "visuals" to our path... more on this below
-my_path = os.path.join("visuals")
-
-# first, if the folder doesn't exist, make it
-if not os.path.isdir(my_path):
-    os.makedirs(my_path)
-
-plt.rcParams["font.family"] = "serif"
 dpi = 600
 
-try:
-    plt.rc('text', usetex=True)
-    usetex = True
-
-except RuntimeError:  # catch a user error thinking they have tex when they don't
-    usetex = False
-
-# plot skew and kurtosis averaged over the ensemble
-fig = plt.figure()
-plt.plot(tt, np.mean(skew_store, axis=0), linewidth=2, color='xkcd:pumpkin')
-fig.set_size_inches(8, 6)
-plt.tick_params(axis='x', which='both', top=False, color='k')
-plt.xticks(fontsize=20, rotation=0, color='k')
-plt.tick_params(axis='y', which='both', right=False, color='k')
-plt.yticks(fontsize=20, rotation=0, color='k')
-
-if usetex:
-    plt.xlabel(r"$t$", fontsize=22, color='k')
-else:
-    plt.xlabel(r"t", fontsize=22, color='k')
-
-plt.ylabel(r"Skewness", fontsize=22, color='k')
-plt.xlim([0,T])
-plt.tight_layout()
+# Plot skew and kurtosis averaged over the ensemble
 picname = 'gardner_st_skew_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
-plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
-plt.clf()
+nice_plot(tt, np.mean(skew_store, axis=0), r"$t$", r"Skewness", custom_ylim=None,
+          dpi=dpi,show_figure=False, save_figure=True, picname=picname, linestyle='solid', color='xkcd:pumpkin',
+          usetex=True)
 
-fig = plt.figure()
-plt.plot(tt, np.mean(kurt_store, axis=0), linewidth=2, color='xkcd:pinky purple')
-fig.set_size_inches(8, 6)
-plt.tick_params(axis='x', which='both', top=False, color='k')
-plt.xticks(fontsize=20, rotation=0, color='k')
-plt.tick_params(axis='y', which='both', right=False, color='k')
-plt.yticks(fontsize=20, rotation=0, color='k')
-
-if usetex:
-    plt.xlabel(r"$t$", fontsize=22, color='k')
-else:
-    plt.xlabel(r"t", fontsize=22, color='k')
-
-plt.ylabel(r"Kurtosis", fontsize=22, color='k')
-plt.xlim([0, T])
-plt.tight_layout()
 picname = 'gardner_st_kurt_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
-plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
-plt.clf()
+nice_plot(tt, np.mean(kurt_store, axis=0), r"$t$", r"Kurtosis", custom_ylim=None, dpi=dpi,
+          show_figure=False, save_figure=True, picname=picname, linestyle='solid',
+          color='xkcd:pinky purple', usetex=True)
 
 # Plot +/- amplitudes (max/min over ensemble resp) to illustrate asymmetry between polarities
-fig = plt.figure()
-plt.plot(tt, np.max(max_storage, axis=0), label='Max', color='xkcd:deep pink', linewidth=2, linestyle='dotted')
-plt.plot(tt, np.min(min_storage, axis=0), label='Min', color='xkcd:teal green', linewidth=2)
-# note: using mean over samples rather than max also gives meaningful information, perhaps worth including.
-fig.set_size_inches(8, 6)
-plt.tick_params(axis='x', which='both', top=False, color='k')
-plt.xticks(fontsize=20, rotation=0, color='k')
-plt.tick_params(axis='y', which='both', right=False, color='k')
-plt.yticks(fontsize=20, rotation=0, color='k')
-
-if usetex:
-    plt.xlabel(r"$t$", fontsize=22, color='k')
-else:
-    plt.xlabel(r"t", fontsize=22, color='k')
-
-plt.ylabel(r"Min/Max Amplitudes", fontsize=22, color='k')
-plt.legend(fontsize=22, loc='best')
-plt.xlim([0, T])
-plt.ylim([-6, 4])
-plt.tight_layout()
 picname = 'gardner_st_Amps_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
-plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
-plt.clf()
+nice_multiplot([tt,tt], [np.max(max_storage, axis=0), np.min(min_storage, axis=0)],
+               r"$t$", r"Min/Max Amplitudes",
+               curvelabels = ['Max', 'Min'],
+               linestyles = ['dotted', 'dashed'], colors = ['xkcd:deep pink', 'xkcd:teal green'], linewidths = [2, 2],
+               custom_ylim=[-6,4], dpi = dpi, show_figure = False, save_figure = True, picname = picname, usetex=True)
 
+# Plot histograms of amplitudes
 
-# plot amplitude histograms
-fig = plt.figure()
-plt.hist(pos_amp, color='xkcd:deep pink')
-fig.set_size_inches(8, 6)
-plt.tick_params(axis='x', which='both', top=False, color='k')
-plt.xticks(fontsize=20, rotation=0, color='k')
-plt.tick_params(axis='y', which='both', right=False, color='k')
-plt.yticks(fontsize=20, rotation=0, color='k')
-
-if usetex:
-    plt.xlabel(r"$A_{+}$", fontsize=22, color='k')
-else:
-    plt.xlabel(r"A_{+}", fontsize=22, color='k')
-
-plt.ylabel(r"Number of Instances", fontsize=22, color='k')
-plt.xlim([2,4])
-plt.tight_layout()
+# + amplitudes
 picname = 'gardner_st_hist+_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
-plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
-plt.clf()
+nice_hist(pos_amp, r'$A_{+}$', dpi=dpi, show_figure=False, save_figure=True, picname=picname,
+              color='xkcd:deep pink', usetex=True)
 
-fig = plt.figure()
-plt.hist(neg_amp, color='xkcd:teal green')
-fig.set_size_inches(8, 6)
-plt.tick_params(axis='x', which='both', top=False, color='k')
-plt.xticks(fontsize=20, rotation=0, color='k')
-plt.tick_params(axis='y', which='both', right=False, color='k')
-plt.yticks(fontsize=20, rotation=0, color='k')
-
-if usetex:
-    plt.xlabel(r"$A_{-}$", fontsize=22, color='k')
-else:
-    plt.xlabel(r"A_{-}", fontsize=22, color='k')
-
-plt.ylabel(r"Number of Instances", fontsize=22, color='k')
-plt.xlim([-6,-0.1])
-plt.tight_layout()
+# - amplitudes
 picname = 'gardner_st_hist-_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
-plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
-plt.clf()
+nice_hist(neg_amp, r'$A_{-}$', dpi=dpi, show_figure=False, save_figure=True, picname=picname,
+              color='xkcd:teal green', usetex=True)
 
 # Plot amplitude CDFs
-def unif_cdf(x, a=-1, b=1.):
-    out = np.zeros_like(x, dtype=float)
-    out[x>a] = (x[x>a] - a)/(b-a)
-    out[x>=b] = 1.
-    return out
 
-from scipy.stats import ecdf
-
+# + amplitudes
 pos_cdf = ecdf(pos_amp)
-fig, ax = plt.subplots()
-pos_cdf.cdf.plot(ax)
 xx = np.linspace(2,4, num=600)
-plt.plot(xx, pos_cdf.cdf.evaluate(xx), label='Observed', color='xkcd:deep pink', linewidth=3)
-ax.plot(xx, unif_cdf(xx, a=2.3, b=3), label='Uniform', linestyle='dashed', color='xkcd:blueberry', linewidth=2)
-fig.set_size_inches(8, 6)
-plt.tick_params(axis='x', which='both', top=False, color='k')
-plt.xticks(fontsize=20, rotation=0, color='k')
-plt.tick_params(axis='y', which='both', right=False, color='k')
-plt.yticks(fontsize=20, rotation=0, color='k')
-plt.legend(fontsize=22, loc='upper left')
-if usetex:
-    plt.xlabel(r"$A_{+}$", fontsize=22, color='k')
-    plt.ylabel(r"$F\left(A_{+}\right)$", fontsize=22, color='k')
-else:
-    plt.xlabel(r"A_{+}", fontsize=22, color='k')
-    plt.ylabel(r"F(A_{+})", fontsize=22, color='k')
-plt.xlim([2,4])
-plt.ylim([-0.02,1.02])
-plt.tight_layout()
+
 picname = 'gardner_st_cdf+_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
-plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
-plt.clf()
+nice_multiplot([xx,xx], [pos_cdf.cdf.evaluate(xx), unif_cdf(xx, a=2.3, b=3)],
+               r"$A_{+}$", r"$F\left(A_{+}\right)$",
+               curvelabels = ['Observed', 'Uniform'],
+               linestyles = ['solid', 'dashed'], colors = ['xkcd:deep pink', 'xkcd:blueberry'],
+               linewidths = [3, 2], custom_ylim=[-0.02,1.02],
+               dpi = dpi, show_figure = False, save_figure = True, picname = picname, usetex=True)
 
-
+# - amplitudes
 neg_cdf = ecdf(neg_amp)
-fig, ax = plt.subplots()
 xx = np.linspace(-6,0, num=600)
-plt.plot(xx, neg_cdf.cdf.evaluate(xx), label='Observed', color='xkcd:teal green', linewidth=3)
-ax.plot(xx, unif_cdf(xx, a=-3., b=-0.1), label='Uniform', linestyle='dashed', color='xkcd:blueberry', linewidth=2)
-fig.set_size_inches(8, 6)
-plt.tick_params(axis='x', which='both', top=False, color='k')
-plt.xticks(fontsize=20, rotation=0, color='k')
-plt.tick_params(axis='y', which='both', right=False, color='k')
-plt.yticks(fontsize=20, rotation=0, color='k')
-plt.legend(fontsize=22, loc='upper left')
-if usetex:
-    plt.xlabel(r"$A_{-}$", fontsize=22, color='k')
-    plt.ylabel(r"$F\left(A_{-}\right)$", fontsize=22, color='k')
-else:
-    plt.xlabel(r"A_{-}", fontsize=22, color='k')
-    plt.ylabel(r"F(A_{-})", fontsize=22, color='k')
-plt.xlim([-6,-0.1])
-plt.ylim([-0.02,1.02])
-plt.tight_layout()
+
 picname = 'gardner_st_cdf-_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
-plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
-plt.clf()
+nice_multiplot([xx,xx], [neg_cdf.cdf.evaluate(xx), unif_cdf(xx, a=-3., b=-0.1)],
+               r"$A_{-}$", r"$F\left(A_{-}\right)$",
+               curvelabels = ['Observed', 'Uniform'],
+               linestyles = ['solid', 'dashed'], colors = ['xkcd:teal green', 'xkcd:blueberry'],
+               linewidths = [3, 2], custom_ylim=[-0.02,1.02],
+               dpi = dpi, show_figure = False, save_figure = True, picname = picname, usetex=True)
 
 """
+#####################################################################################
+##### Old code for checking to see if argrelmax/argrelmin are working correctly #####
+#####################################################################################
+
+import matplotlib.pyplot as plt
 uu = u[-1,:]
 plt.plot(my_sim.x, uu)
 

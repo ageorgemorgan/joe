@@ -1,8 +1,9 @@
 import numpy as np
 
-from joe_main_lib import simulation
+from joe_main_lib import simulation, integrate
 from models import builtin_model
 from initial_states import builtin_initial_state
+from visualization import nice_multiplot
 
 length, T, N, dt = 240.,2e4, 2**9, 1e-2
 
@@ -22,17 +23,13 @@ sponge_params = {'l_endpt': l_endpt, 'r_endpt': r_endpt,
 
 my_sim = simulation(stgrid, my_model, my_initial_state, bc='sponge_layer', sponge_params=sponge_params, ndump=20)
 
-my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save_pkl=True)
+my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=True)
 
 # do data analysis on the amplitudes
 
 # helper funcs first
 
 from absorbing_layer import clip_spongeless
-
-from scipy.fftpack import fft
-
-from scipy.integrate import simpson
 
 def internal_mode(x):
 
@@ -55,7 +52,7 @@ def L2prod(u1, u2, length=length, N=N):
 
         raise TypeError("Arrays u1, u2 must have the same length")
 
-    return (length/N) * np.real(fft(u1*u2, axis=0)[0])
+    return integrate(u1*u2, length, N) #(length/N) * np.real(fft(u1*u2, axis=0)[0])
 
 
 # take in a simulation object (where the run has already been completed) and computes the amplitude of the internal mode
@@ -64,11 +61,13 @@ def amplitude(sim):
 
     sfrac = sim.sponge_params['spongeless_frac']
 
+    slength, sN = sfrac*sim.length, sfrac*sim.N
+
     x = clip_spongeless(sim.x, sfrac)
 
     im = internal_mode(x)
 
-    downstairs = L2prod(im, im, sfrac*sim.length, sfrac*sim.N)
+    downstairs = L2prod(im, im, slength, sN)
 
     u = clip_spongeless(sim.Udata[0, :, :], sfrac)
 
@@ -78,15 +77,14 @@ def amplitude(sim):
 
     for n in np.arange(0, Nt):
 
-        amplitude[n] = L2prod(u[n,:], im, sfrac*sim.length, sfrac*sim.N)/downstairs
+        amplitude[n] = L2prod(u[n,:], im, slength, sN)/downstairs
 
     return amplitude
 
 # now do the actual curve-fitting stuff
 
 from scipy.optimize import curve_fit
-from scipy.signal import argrelmax, argrelmin
-import matplotlib.pyplot as plt
+from scipy.signal import argrelmax
 
 nsteps = int(T / (my_sim.ndump*dt))
 t = np.linspace(0, T, num=1 + nsteps, endpoint=True)
@@ -117,6 +115,18 @@ A_my_model = modelcurve(t, *params_opt)
 print('Optimal model parameters = ', params_opt)
 print('Estimated error in parameters = ', np.sqrt(np.diag(params_cov)))
 
+picname = 'phi4pert_amplitude_fit_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
+
+# and plot the results
+nice_multiplot([t,t,t], [A_simulated, A_my_model, -A_my_model], r"$t$", r"$a(t)$",
+               curvelabels = ['Computed', 'Empirical Fit', None],
+               linestyles = ['solid', 'dashed', 'dashed'], colors = ['xkcd:teal', 'xkcd:pumpkin', 'xkcd:pumpkin'],
+               linewidths = [0.8, 2.2, 2.2],
+               dpi = 100, show_figure = True,
+               save_figure = True, picname = picname, usetex = True)
+
+# you may also wish to compare to the Delort-Masmoudi bound with the following code...
+
 """
 # fit Delort-Masmoudi decay curve if desired
 def DM_modelcurve(t, A):
@@ -134,54 +144,11 @@ print(np.sqrt(np.diag(DM_params_cov)))  # estimated errors in parameter values
 # but generally I find the following empirical Delort-Masmoudi decay curve is much better asymptotically:
 A_DM = params_opt[0]*(params_opt[1]**params_opt[2]) * 0.1 * ((1. + 0.01*t) ** -0.5)
 
-# and plot the results
-# add the folder "visuals" to our path... more on this below
-import os
-my_path = os.path.join("visuals")
+picname = 'phi4pert_DM_comparison_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
 
-# first, if the folder doesn't exist, make it
-if not os.path.isdir(my_path):
-    os.makedirs(my_path)
-
-plt.rcParams["font.family"] = "serif"
-
-try:
-    plt.rc('text', usetex=True)
-    usetex = True
-
-except RuntimeError:  # catch a user error thinking they have tex when they don't
-    usetex = False
-
-
-fig, ax = plt.subplots()
-
-plt.plot(t, A_simulated, color='xkcd:teal', label='Computed', linewidth=0.8)
-#plt.scatter(t_train, A_train, marker='o', color='xkcd:deep pink') # this is really just here to debug
-
-plt.plot(t, A_my_model, '--', color='xkcd:pumpkin', label='Envelope Fit', linewidth=2.2)
-plt.plot(t, -A_my_model, '--', color='xkcd:pumpkin', linewidth=2.2)
-
-#plt.plot(t, A_DM, '-', color='xkcd:slate', linewidth=2.2, label='Empirical DM Bound')
-#plt.plot(t, -A_DM, '-', color='xkcd:slate', linewidth=2.2)
-
-plt.xlim([0,2e4])
-#plt.ylim([0., 0.8])
-
-ax.legend(fontsize=14)
-
-plt.xlabel(r"$t$", fontsize=22, color='k')
-plt.ylabel(r"$a(t)$", fontsize=22, color='k')
-
-plt.tick_params(axis='x', which='both', top='off', color='k')
-plt.xticks(fontsize=14, rotation=0, color='k')
-plt.tick_params(axis='y', which='both', right='off', color='k')
-plt.yticks(fontsize=14, rotation=0, color='k')
-
-plt.tight_layout()
-
-dpi = 800
-picname = 'phi4pert_amplitude_fit_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
-#picname = 'phi4pert_DM_fit_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
-plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
-
-plt.clf()
+nice_multiplot([t,t], [A_my_model, A_DM], r"$t$", r"$a(t)$",
+               curvelabels = ['Empirical Fit', 'Empirical DM Bound'],
+               linestyles = ['dashed', 'solid'], colors = ['xkcd:pumpkin', 'xkcd:slate'],
+               linewidths = [2.2, 2.2], custom_ylim=[0, 0.88],
+               dpi = 100, show_figure = True,
+               save_figure = True, picname = picname, usetex = True)

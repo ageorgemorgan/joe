@@ -28,7 +28,7 @@ sponge_params = {'l_endpt': l_endpt, 'r_endpt': r_endpt,
 
 my_sim = simulation(stgrid, my_model, my_initial_state, bc='sponge_layer', sponge_params=sponge_params, ndump=20)
 
-my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save_pkl=True)
+my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=True)
 
 # produce plots and movies
 my_sim.hov_plot(cmap='cmo.haline', fieldname='u', show_figure=True, save_figure=True, usetex=True)
