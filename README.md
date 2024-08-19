@@ -1,6 +1,8 @@
 # joe
 A library for solving partial differential equations with Fourier spectral discretization in space and high-order exponential time-stepping. 
 
+![hovplot_length=600 0_T=50 0_N=8192 0_dt=0 000050_modelkw=gardner_ICkw=soliton_gas_nonlinear=True_abslayer=False](https://github.com/user-attachments/assets/3811bb8c-e8d0-468e-a77a-56f643ebaa78)
+
 FEATURES
 
 -Fast, accurate numerical solutions of first and second order in time partial differential equations (PDEs) for real scalar fields defined on an interval
