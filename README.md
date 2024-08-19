@@ -31,3 +31,5 @@ FUTURE DIRECTIONS
 -Add functionality for fields defined on 2D domains 
 
 -Allow for higher-order-derivatives in time (ie. Timoshenko beam equations)
+
+![hovplot_length=600 0_T=100 0_N=4096 0_dt=0 000500_modelkw=kdv_ICkw=soliton_gas_nonlinear=True_abslayer=False](https://github.com/user-attachments/assets/6c8d7699-5c70-4dff-97c0-20286d3788cf)
