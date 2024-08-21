@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from time_stepper import do_time_stepping
 from initial_states import initial_state
 from visualization import hov_plot, save_movie, save_combomovie, spinner, plot_refinement_study, nice_plot
-from absorbing_layer import clip_spongeless
+from sponge_layer import clip_spongeless
 
 # helper function for integration (of real part of fnc) in space. Uses FFT to accurately integrate over spatial domain:
 # accuracy vastly beats trapezoidal rule.
@@ -79,9 +79,9 @@ class simulation:
         self.complex = model.complex
 
         if bc == 'sponge_layer':
-            self.absorbing_layer = True
+            self.sponge_layer = True
         elif bc == 'periodic':
-            self.absorbing_layer = False
+            self.sponge_layer = False
         else:
             raise ValueError('User-defined BC string not accepted. Valid BC strings: periodic, sponge_layer')
 
@@ -100,7 +100,7 @@ class simulation:
 
         my_string = '_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N,
                                                                        self.dt) + '_modelkw=' + self.model_kw + '_ICkw=' + self.initial_state_kw + '_nonlinear=' + str(
-            self.nonlinear) + '_abslayer=' + str(self.absorbing_layer)
+            self.nonlinear) + '_sponge_layer=' + str(self.sponge_layer)
 
         self.filename = 'simdata' + my_string + '.pkl'
         self.ic_picname = 'ic_plot' + my_string + '.png'
@@ -163,9 +163,30 @@ class simulation:
     # 2) adding the Udata attribute to our new sim
     def load(self):
 
-        with open('sim_archive/' + self.filename, 'rb') as inp:
-            loaded_sim = pickle.load(inp)
-            self.Udata = loaded_sim.Udata
+        try:
+
+            with open('sim_archive/' + self.filename, 'rb') as inp:
+                loaded_sim = pickle.load(inp)
+                self.Udata = loaded_sim.Udata
+
+        # due to old filenaming conventions where sometimes what is now the boolean "sponge_layer" was called
+        # "absorbing_layer" or "abslayer", we want to allow the possibility of loading old files.
+        # TODO: This is only for Adam George Morgan and should be deprecated in future releases/ once the relevant
+        #  papers are published
+
+        except:
+
+            old_string = ('_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (self.length, self.T, self.N,
+                                                                self.dt) + '_modelkw=' + self.model_kw + '_ICkw=' +
+                            self.initial_state_kw + '_nonlinear=' + str(self.nonlinear) + '_abslayer='
+                            + str(self.sponge_layer))
+
+            old_filename = 'simdata' + old_string + '.pkl'
+
+            with open('sim_archive/' + old_filename, 'rb') as inp:
+                loaded_sim = pickle.load(inp)
+                self.Udata = loaded_sim.Udata
+
 
     # now put everything together: load if possible, but run if you gotta
     def load_or_run(self, method_kw='etdrk4', print_runtime=True, save=True, verbose=True):
@@ -355,7 +376,7 @@ class simulation:
             if not self.complex:
                 save_movie(u, x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
                            fieldname=fieldname, fps=fps, ndump=self.ndump, filename=self.moviename,
-                           periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
+                           periodic=not self.sponge_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
 
             else:
 
@@ -371,11 +392,11 @@ class simulation:
 
                 save_movie(np.real(u), x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
                            fieldname=real_fieldname, fps=fps, ndump=self.ndump, filename=self.realmoviename,
-                           periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
+                           periodic=not self.sponge_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
 
                 save_movie(np.imag(u), x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
                            fieldname=imag_fieldname, fps=fps, ndump=self.ndump, filename=self.imagmoviename,
-                           periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
+                           periodic=not self.sponge_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
 
 
     # save a movie the modulus
@@ -404,7 +425,7 @@ class simulation:
 
             save_movie(u, x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
                             fieldname=mod_fieldname, fps=fps, ndump=self.ndump, filename=self.modmoviename,
-                            periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
+                            periodic=not self.sponge_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
 
     # save a movie of the evolution of our perturbation AND a nested movie of its power spectrum
     def save_combomovie(self, fps=200, fieldname='u', fieldcolor='xkcd:ocean green', speccolor='xkcd:dark orange', usetex=True, dpi=100):
@@ -422,7 +443,7 @@ class simulation:
                 save_combomovie(u,  x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
                                 fieldname=fieldname, fps=fps, fieldcolor=fieldcolor,
                                 speccolor=speccolor, ndump=self.ndump, filename=self.combomoviename,
-                                periodic=not self.absorbing_layer, usetex=usetex, dpi=dpi)
+                                periodic=not self.sponge_layer, usetex=usetex, dpi=dpi)
 
             # for a complex field just plot the modulus and the power spectrum
             else:
@@ -440,7 +461,7 @@ class simulation:
                 save_combomovie(u, x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
                                 fieldname=mod_fieldname, fps=fps, fieldcolor=fieldcolor,
                                 speccolor=speccolor, ndump=self.ndump, filename=self.combomoviename,
-                                periodic=not self.absorbing_layer, usetex=usetex, dpi=dpi)
+                                periodic=not self.sponge_layer, usetex=usetex, dpi=dpi)
 
     # obtain first moment of the system
     def get_fm(self):
@@ -670,13 +691,13 @@ def do_refinement_study_alt(model, initial_state, length, T, Ns, dts, benchmark_
 
         # and now we can save the fig
         if bc == 'sponge_layer':
-            absorbing_layer = True
+            sponge_layer = True
         elif bc == 'periodic':
-            absorbing_layer = False
+            sponge_layer = False
 
         my_string = ('_length=%.1f_T=%.1f' % (
         length, T) + '_modelkw=' + model.model_kw + '_ICkw=' + initial_state.initial_state_kw + '_method_kw='
-                     + method_kw + '_nonlinear=' + str(model.nonlinear) + '_abslayer=' + str(absorbing_layer))
+                     + method_kw + '_nonlinear=' + str(model.nonlinear) + '_abslayer=' + str(sponge_layer))
 
         picname = 'refinement_study' + my_string + '.png'
         plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=400)

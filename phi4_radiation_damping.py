@@ -29,7 +29,7 @@ my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=True)
 
 # helper funcs first
 
-from absorbing_layer import clip_spongeless
+from sponge_layer import clip_spongeless
 
 def internal_mode(x):
 

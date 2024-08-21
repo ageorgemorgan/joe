@@ -2,7 +2,7 @@ from joe_main_lib import simulation, do_refinement_study
 from models import builtin_model
 from initial_states import builtin_initial_state
 
-length, T, N, dt = 100.,40., 2**9, 1e-2
+length, T, N, dt = 100.,50., 2**9, 1e-2
 
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 my_model = builtin_model('sinegordon', nonlinear=True)
@@ -12,7 +12,7 @@ my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=20)
 
 my_sim.plot_initial_condition(color='xkcd:deep magenta', usetex=True, show_figure=True, save_figure=True)
 
-my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=False)
+my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=True)
 
 # produce plots and movies
 my_sim.hov_plot(cmap='cmo.dense', fieldname='u', show_figure=True, save_figure=True, usetex=True)

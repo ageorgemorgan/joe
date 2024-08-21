@@ -61,9 +61,11 @@ my_sim.hov_plot_modulus(show_figure=True, save_figure=True, usetex=True, cmap='R
 #my_sim.save_movie_modulus(fps=100, usetex=False, fieldcolor='xkcd:barney purple')
 #my_sim.save_combomovie(fps=100, usetex=False, fieldcolor='xkcd:barney purple')
 
+"""
 nmin, nmax = 2, 12
 Ns = np.array([2**8, 2**9, 2**10])
 dts = np.flip(np.logspace(-nmax, -nmin, num=nmax-nmin+1, base=2.))
 
 do_refinement_study(my_model, my_initial_state, length, T, Ns, dts, bc='periodic', method_kw='etdrk4',
                     show_figure=True, save_figure=True, usetex=True, fit_min=3, fit_max=9)
+"""

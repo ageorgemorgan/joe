@@ -6,10 +6,8 @@ from numpy.fft import fft, ifft, fftfreq
 from scipy import sparse
 from scipy.sparse import linalg, diags
 
-from absorbing_layer import damping_coeff_lt, rayleigh_damping
+from sponge_layer import damping_coeff_lt, rayleigh_damping
 
-
-# TODO: adapt sponge layer stuff to work with complex-valued solutions!!!!
 
 # The intention here is to make the code independent of the particular
 # PDE we're considering insofar as is possible.
@@ -72,6 +70,9 @@ def get_greeks_second_order(length, N, dt, A):
         f2 += dt * zIA * ((2. + z + np.exp(z) * (-2. + z)) / (z ** 2))
         f3 += dt * zIA * ((-4. - 3. * z - z ** 2 + np.exp(z) * (4. - z)) / (z ** 2))
 
+    # TODO: I think the "real" below may eventually cause issues, but then again
+    #  I don't think there are any interesting complex-valued second order eqns...maybe come back to this!
+    #  Perhaps it's worth trying for, say, the zero-magnetic field abelian Higgs equations?
     Q = sparse.csc_matrix(np.real(Q / M))
     f1 = sparse.csc_matrix(np.real(f1 / M))
     f2 = sparse.csc_matrix(np.real(f2 / M))
@@ -405,9 +406,9 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
     nonlinear = sim.nonlinear
 
-    absorbing_layer = sim.absorbing_layer
+    sponge_layer = sim.sponge_layer
 
-    if absorbing_layer:
+    if sponge_layer:
 
         sponge_params = sim.sponge_params
 
@@ -452,7 +453,7 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
         # if we're second-order in time and using a sponge layer, damping can be realized simply
         # by modifying the forcing term ie. damping can be dealt with explicitly!
-        if t_ord == 2 and absorbing_layer:
+        if t_ord == 2 and sponge_layer:
 
             out += rayleigh_damping(V, x, length, sponge_params)
 
@@ -473,7 +474,7 @@ def do_time_stepping(sim, method_kw='etdrk4'):
         my_timestepper.save_aux()
 
     # now assemble the stuff needed for damping
-    if absorbing_layer and t_ord == 1:
+    if sponge_layer and t_ord == 1:
         damping_mat = assemble_damping_mat(N, length, x, dt, sponge_params)
     else:
         pass
@@ -532,7 +533,7 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
         Va = my_timestepper.do_time_step(V, forcing)
 
-        if absorbing_layer and t_ord == 1:
+        if sponge_layer and t_ord == 1:
 
             if splitting_method_kw == 'naive':
 
