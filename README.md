@@ -1,6 +1,8 @@
 # joe
 A library for solving partial differential equations with Fourier spectral discretization in space and high-order exponential time-stepping. 
 
+file:///home/adammorgan/Documents/Comp%20Projects/joe/visuals/hovplot_length=100.5_T=150.0_N=128.0_dt=0.015625_modelkw=ks_ICkw=gaussian_even_alt_nonlinear=True_abslayer=False.png
+
 FEATURES
 
 -Fast, accurate numerical solutions of first and second order in time partial differential equations (PDEs) for real- or complex-valued scalar fields defined on an interval
@@ -27,3 +29,6 @@ FUTURE DIRECTIONS
 -Add functionality for fields defined on 2D domains 
 
 -Allow for higher-order-derivatives in time (ie. Timoshenko beam equations)
+
+![hovplot_mod_length=100 0_T=100 0_N=256 0_dt=0 010000_modelkw=focusing_nls_ICkw=nls_soliton_nonlinear=True_abslayer=False](https://github.com/user-attachments/assets/63d2b949-2198-4c5f-ae37-a318df5d3bf7)
+
