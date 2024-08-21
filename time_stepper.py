@@ -211,7 +211,7 @@ def do_ifrk4_step(V, propagator, propagator2, forcing, dt):
     return out
 
 
-def assemble_damping_mat(N, length, x, dt, sponge_params):
+def assemble_damping_mat(N, length, x, dt, sponge_params, complex = False):
     # By "damping mat", we mean the matrix to be inverted at each time step in the damping stage.
     # Currently only backward Euler inversion is implemented.
     # TODO: try out Crank-Nicolson as well, perform cost v. accuracy analysis?
@@ -223,11 +223,17 @@ def assemble_damping_mat(N, length, x, dt, sponge_params):
     def mv(v):
         # NOTE: v is given ON THE FOURIER SIDE!!!!
 
-        damping_coeff = damping_coeff_lt(x, sponge_params) + damping_coeff_lt(-x, sponge_params)
+        damping_coeff = damping_coeff_lt(x, sponge_params) #+ damping_coeff_lt(-x, sponge_params)
 
         damping_coeff *= sponge_params['damping_amplitude']
 
-        mv_out = v - dt * (-1j * k) * fft(damping_coeff * np.real(ifft((-1j * k) * v)))
+        if not complex:
+
+            mv_out = v - dt * (-1j * k) * fft(damping_coeff * np.real(ifft((-1j * k) * v)))
+
+        else:
+
+            mv_out = v - dt * (-1j * k) * fft(damping_coeff * ifft((-1j * k) * v))
 
         return mv_out
 
@@ -544,7 +550,13 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
             if cnt % int(sponge_params['expdamp_freq']) == 0:
 
-                U = np.real(ifft(V))
+                if not sim.complex:
+
+                    U = np.real(ifft(V))
+
+                else:
+
+                    U = ifft(V)
 
                 U *= 1. - 1. * damping_coeff_lt(-x, sponge_params) - 1. * damping_coeff_lt(x, sponge_params)
 
