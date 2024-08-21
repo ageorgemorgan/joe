@@ -24,12 +24,13 @@ def integrate(u, length, N):
 # and instead make the "callable attributes" !dicts! with callable entries. This dirty trick is all under the hood
 # in the model class, so when defining and using a model object the user doesn't need to care.
 class model:
-    def __init__(self, model_kw, t_ord, symbol, fourier_forcing, nonlinear=True):
+    def __init__(self, model_kw, t_ord, symbol, fourier_forcing, nonlinear=True, complex=False):
         self.model_kw = model_kw
         self.t_ord = t_ord  # an integer
         self.symbol = {'symbol': symbol}  # callable
         self.fourier_forcing = {'fourier_forcing': fourier_forcing}  # callable
         self.nonlinear = nonlinear
+        self.complex = complex
 
         # this defines a model PDE with the name 'model_kw' in the Fourier-space form
 
@@ -75,6 +76,7 @@ class simulation:
         self.initial_state_kw = initial_state.initial_state_kw
         self.nonlinear = model.nonlinear
         self.sponge_params = sponge_params
+        self.complex = model.complex
 
         if bc == 'sponge_layer':
             self.absorbing_layer = True
@@ -103,7 +105,13 @@ class simulation:
         self.filename = 'simdata' + my_string + '.pkl'
         self.ic_picname = 'ic_plot' + my_string + '.png'
         self.picname = 'hovplot' + my_string + '.png'
+        self.realpicname = 'hovplot_real' + my_string + '.png'
+        self.imagpicname = 'hovplot_imag' + my_string + '.png'
+        self.modpicname = 'hovplot_mod' + my_string + '.png'
         self.moviename = 'movie' + my_string + '.mp4'
+        self.realmoviename = 'movie_real' + my_string + '.mp4'
+        self.imagmoviename = 'movie_imag' + my_string + '.mp4'
+        self.modmoviename = 'movie_mod' + my_string + '.mp4'
         self.combomoviename = 'combomovie' + my_string + '.mp4'
         self.Udata = None  # the Udata will be called later!
         self.fm = None
@@ -232,11 +240,19 @@ class simulation:
         elif self.t_ord == 2:
             u = self.Udata[0, :, :]
 
+        else:
+            raise ValueError('t_ord can only be 1 or 2.')
+
         # add right endpoint to prevent a stripe from appearing in the pics
         x_end = np.append(self.x, 0.5 * self.length)
         x_end = clip_spongeless(x_end, self.sfrac)
 
-        u_end = np.zeros((1+int(self.T/(self.ndump*self.dt)), self.N+1), dtype=float)
+        if self.complex:
+            u_end = 1j*np.zeros((1 + int(self.T / (self.ndump * self.dt)), self.N + 1), dtype=float)
+
+        else:
+
+            u_end = np.zeros((1 + int(self.T / (self.ndump * self.dt)), self.N + 1), dtype=float)
 
         u_end[:, 0:self.N] = np.copy(u)
 
@@ -245,8 +261,82 @@ class simulation:
         u_end = clip_spongeless(u_end, self.sfrac)
 
         with spinner('Rendering Hovmoeller plot...'):
-            hov_plot(x_end, times, u_end, fieldname=fieldname, umin=umin, umax=umax, dpi=dpi, show_figure=show_figure, save_figure=save_figure,
-                     picname=self.picname, cmap=cmap, usetex=usetex)
+
+            # if the field is real, nothing to do
+            if not self.complex:
+
+                hov_plot(x_end, times, u_end, fieldname=fieldname, umin=umin, umax=umax, dpi=dpi, show_figure=show_figure, save_figure=save_figure,
+                         picname=self.picname, cmap=cmap, usetex=usetex)
+
+            # if the field is complex, we want to split it into its real and imaginary parts and plot these
+            else:
+
+                if usetex:
+
+                    real_fieldname = r'\mathrm{Re}\left(u\right)'.replace('u', str(fieldname))
+                    imag_fieldname = r'\mathrm{Im}\left(u\right)'.replace('u', str(fieldname))
+
+                else:
+
+                    real_fieldname = r'Re(u)'.replace('u', str(fieldname))
+                    imag_fieldname = r'Im(u)'.replace('u', str(fieldname))
+
+                hov_plot(x_end, times, np.real(u_end), fieldname=real_fieldname, umin=umin, umax=umax, dpi=dpi,
+                         show_figure=show_figure, save_figure=save_figure,
+                         picname=self.realpicname, cmap=cmap, usetex=usetex)
+
+                hov_plot(x_end, times, np.imag(u_end), fieldname=imag_fieldname, umin=umin, umax=umax, dpi=dpi,
+                         show_figure=show_figure, save_figure=save_figure,
+                         picname= self.imagpicname, cmap=cmap, usetex=usetex)
+
+
+    # as above, but just with the modulus of the soln
+    def hov_plot_modulus(self, umin=None, umax=None, dpi=100, cmap='cmo.haline', fieldname='u', usetex=True, show_figure=True, save_figure=False):
+        nsteps = int(self.T / self.dt)
+        times = np.linspace(0., self.T, num=1 + int(nsteps / self.ndump), endpoint=True)
+
+        if self.t_ord == 1:
+            u = self.Udata
+
+        elif self.t_ord == 2:
+            u = self.Udata[0, :, :]
+
+        else:
+            raise ValueError('t_ord can only be 1 or 2.')
+
+        # add right endpoint to prevent a stripe from appearing in the pics
+        x_end = np.append(self.x, 0.5 * self.length)
+        x_end = clip_spongeless(x_end, self.sfrac)
+
+        if self.complex:
+
+            u_end = 1j*np.zeros((1 + int(self.T / (self.ndump * self.dt)), self.N + 1), dtype=float)
+
+        else:
+
+            u_end = np.zeros((1 + int(self.T / (self.ndump * self.dt)), self.N + 1), dtype=float)
+
+        u_end[:, 0:self.N] = np.copy(u)
+
+        u_end[:, -1] = np.copy(u[:, 0])
+
+        u_end = clip_spongeless(u_end, self.sfrac)
+
+        u_end = np.absolute(u_end)
+
+        with spinner('Rendering Hovmoeller plot of modulus...'):
+
+            if usetex:
+
+                mod_fieldname = r'\left|u\right|'.replace('u', str(fieldname))
+
+            else:
+
+                mod_fieldname = r'|u|'.replace('u', str(fieldname))
+
+            hov_plot(x_end, times, u_end, fieldname=mod_fieldname, umin=umin, umax=umax, dpi=dpi, show_figure=show_figure, save_figure=save_figure,
+                         picname=self.modpicname, cmap=cmap, usetex=usetex)
+
 
     # save a movie of the evolution of our solution.
     def save_movie(self, fps=200, fieldname='u', usetex=True, fieldcolor='xkcd:ocean green', dpi=100):
@@ -257,11 +347,67 @@ class simulation:
         elif self.t_ord == 2:
             u = clip_spongeless(self.Udata[0, :, :], self.sfrac)
 
+        else:
+            pass
+
         with spinner('Rendering movie...'):
-            save_movie(u, x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt, fieldname=fieldname, fps=fps, ndump=self.ndump, filename=self.moviename,
-                       periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
+
+            if not self.complex:
+                save_movie(u, x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
+                           fieldname=fieldname, fps=fps, ndump=self.ndump, filename=self.moviename,
+                           periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
+
+            else:
+
+                if usetex:
+
+                    real_fieldname = r'\mathrm{Re}\left(u\right)'.replace('u', str(fieldname))
+                    imag_fieldname = r'\mathrm{Im}\left(u\right)'.replace('u', str(fieldname))
+
+                else:
+
+                    real_fieldname = r'Re(u)'.replace('u', str(fieldname))
+                    imag_fieldname = r'Im(u)'.replace('u', str(fieldname))
+
+                save_movie(np.real(u), x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
+                           fieldname=real_fieldname, fps=fps, ndump=self.ndump, filename=self.realmoviename,
+                           periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
+
+                save_movie(np.imag(u), x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
+                           fieldname=imag_fieldname, fps=fps, ndump=self.ndump, filename=self.imagmoviename,
+                           periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
+
+
+    # save a movie the modulus
+    def save_movie_modulus(self, fps=200, fieldname='u', usetex=True, fieldcolor='xkcd:ocean green', dpi=100):
+
+        if self.t_ord == 1:
+            u = clip_spongeless(self.Udata, self.sfrac)
+
+        elif self.t_ord == 2:
+            u = clip_spongeless(self.Udata[0, :, :], self.sfrac)
+
+        else:
+            pass
+
+        u = np.absolute(u)
+
+        with spinner('Rendering movie of modulus...'):
+
+            if usetex:
+
+                mod_fieldname = r'\left|u\right|'.replace('u', str(fieldname))
+
+            else:
+
+                mod_fieldname = r'|u|'.replace('u', str(fieldname))
+
+            save_movie(u, x=clip_spongeless(self.x, self.sfrac), length=self.length, dt=self.dt,
+                            fieldname=mod_fieldname, fps=fps, ndump=self.ndump, filename=self.modmoviename,
+                            periodic=not self.absorbing_layer, usetex=usetex, fieldcolor=fieldcolor, dpi=dpi)
 
     # save a movie of the evolution of our perturbation AND a nested movie of its power spectrum
+    # TODO: adapt so this works for complex-valued fields as well!
     def save_combomovie(self, fps=200, fieldname='u', fieldcolor='xkcd:ocean green', speccolor='xkcd:dark orange', usetex=True, dpi=100):
         if self.t_ord == 1:
             u = clip_spongeless(self.Udata, self.sfrac)

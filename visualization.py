@@ -408,8 +408,24 @@ def save_movie(u, x, length, dt, fieldname, ndump, filename, fps=200, periodic=T
 
     fig = plt.figure()
 
-    umin = 1.05 * np.amin(u)
-    umax = 1.05 * np.amax(u)
+    umin = np.amin(u)
+    umax = np.amax(u)
+
+    if umin < 0:
+
+        umin *= 1.05
+
+    else:
+
+        umin *=0.95
+
+    if umax > 0:
+
+        umax *= 1.05
+
+    else:
+
+        umax *= 0.95
 
     #from scipy.integrate import simps
 

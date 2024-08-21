@@ -36,8 +36,8 @@ def get_symbol(k, model_kw):
 
         A = -k**2
 
-    elif model_kw == 'bbm':
-        A = 1j * (k ** 3) / (1. + k ** 2)  # -1j * k / (1. + k ** 2)
+    elif model_kw == 'bbm' or model_kw == 'gardner-bbm':
+        A = 1j * (k ** 3) / (1. + k ** 2)
 
     elif model_kw == 'bbm_lab':
         A = -1j * k / (1. + k ** 2)
@@ -124,6 +124,11 @@ def fourier_forcing(V, k, x, model_kw, nonlinear=True):
     elif model_kw == 'gardner':
 
         out = 6. * float(nonlinear) * (1j * k) * (
+                    0.5 * fft(np.real(ifft(V)) ** 2) - (1. / 3.) * fft(np.real(ifft(V)) ** 3))
+
+    elif model_kw == 'gardner-bbm':
+
+        out =  6. * float(nonlinear) * ((1j * k)/(1. + k**2)) * (
                     0.5 * fft(np.real(ifft(V)) ** 2) - (1. / 3.) * fft(np.real(ifft(V)) ** 3))
 
     elif model_kw == 'kdv' or model_kw == 'kawahara' or model_kw == 'shore_kdv':

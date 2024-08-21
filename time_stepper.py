@@ -9,6 +9,8 @@ from scipy.sparse import linalg, diags
 from absorbing_layer import damping_coeff_lt, rayleigh_damping
 
 
+# TODO: adapt sponge layer stuff to work with complex-valued solutions!!!!
+
 # The intention here is to make the code independent of the particular
 # PDE we're considering insofar as is possible.
 
@@ -107,7 +109,7 @@ def get_R2(N, dt, z):
     out = dt * np.mean((np.exp(z0) - 1. - z0) / (z0 ** 2), 0) # note how we take mean over a certain axis
     # """
 
-    return out  # just kill any error that arose
+    return out
 
 
 def do_etdrk1_step(V, propagator, forcing, Q1):
@@ -504,8 +506,19 @@ def do_time_stepping(sim, method_kw='etdrk4'):
         V = fft(Uinit)
 
         # make data storage array
-        Udata = np.zeros([1 + int(nsteps / ndump), N], dtype=float)
+        if sim.complex:
+
+            Udata = 1j*np.zeros([1 + int(nsteps / ndump), N], dtype=float)
+
+        else:
+
+            Udata = np.zeros([1 + int(nsteps / ndump), N], dtype=float)
+
         Udata[0, :] = Uinit
+
+    else:
+
+        raise ValueError('t_ord must be equal to 1 or 2!')
 
     cnt = 0.  # counter
 
@@ -548,12 +561,25 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
             if t_ord == 2:
 
-                Udata[0, int(n / ndump), :] = np.real(ifft(V[0:N]))
-                Udata[1, int(n / ndump), :] = np.real(ifft(V[N:]))
+                if sim.complex:
+
+                    Udata[0, int(n / ndump), :] = ifft(V[0:N])
+                    Udata[1, int(n / ndump), :] = ifft(V[N:])
+
+                else:
+
+                    Udata[0, int(n / ndump), :] = np.real(ifft(V[0:N]))
+                    Udata[1, int(n / ndump), :] = np.real(ifft(V[N:]))
 
             else:
 
-                Udata[int(n / ndump), :] = np.real(ifft(V))
+                if sim.complex:
+
+                    Udata[int(n / ndump), :] = ifft(V)
+
+                else:
+
+                    Udata[int(n / ndump), :] = np.real(ifft(V))
 
         else:
 

@@ -108,6 +108,9 @@ print('Runtime for Gardner soliton turbulence simulation = %.4f' % runtime + ' s
 print('Maximum error in first moment over ensemble = ', np.amax(fm_errors))
 print('Maximum error in second moment over ensemble = ', np.amax(sm_errors))
 
+import sys
+sys.exit()
+
 ##############################################################################################
 ########################## STAGE 2: PREP FOR POSTPROCESSING (HELPER FNCS ETC.) ###############
 ##############################################################################################
