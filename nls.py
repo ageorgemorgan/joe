@@ -2,7 +2,7 @@ import numpy as np
 
 from scipy.fftpack import fft, ifft
 
-from joe_main_lib import model, simulation, initial_state
+from joe_main_lib import model, simulation, initial_state, do_refinement_study
 
 g = 1.
 
@@ -38,7 +38,7 @@ def nls_soliton(x,a=1., c=1.):
 my_initial_state = initial_state('nls_soliton', nls_soliton)
 #initial_state('plane_wave', plane_wave) #
 
-length, T, N, dt = 400., 300., 2**10, 1e-2
+length, T, N, dt = 400., 400., 2**10, 1e-2
 stgrid = {'length':length, 'T':T, 'N':N, 'dt':dt}
 
 l_endpt = -length * 0.5
@@ -50,11 +50,20 @@ sponge_params = {'l_endpt': l_endpt, 'r_endpt': r_endpt,
                  'splitting_method_kw': 'naive',
                  'spongeless_frac': .5}  # this is the fraction of the middle of the spatial domain to keep in the plots
 
-my_sim = simulation(stgrid, my_model, my_initial_state, bc='sponge_layer', sponge_params=sponge_params, ndump=20)
+#my_sim = simulation(stgrid, my_model, my_initial_state, bc='sponge_layer', sponge_params=sponge_params, ndump=20)
+my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=20)
 
-my_sim.load_or_run(method_kw='etdrk4', save=False)
+my_sim.load_or_run(method_kw='etdrk4', save=True)
 
 #my_sim.hov_plot(show_figure=False, save_figure=True, usetex=False, cmap='plasma')
 my_sim.hov_plot_modulus(show_figure=True, save_figure=True, usetex=True, cmap='RdPu')
 #my_sim.save_movie(fps=100, usetex=False, fieldcolor='xkcd:heliotrope')
-my_sim.save_movie_modulus(fps=100, usetex=False, fieldcolor='xkcd:barney purple')
+#my_sim.save_movie_modulus(fps=100, usetex=False, fieldcolor='xkcd:barney purple')
+#my_sim.save_combomovie(fps=100, usetex=False, fieldcolor='xkcd:barney purple')
+
+nmin, nmax = 2, 12
+Ns = np.array([2**8, 2**9, 2**10])
+dts = np.flip(np.logspace(-nmax, -nmin, num=nmax-nmin+1, base=2.))
+
+do_refinement_study(my_model, my_initial_state, length, T, Ns, dts, bc='periodic', method_kw='etdrk4',
+                    show_figure=True, save_figure=True, usetex=True, fit_min=3, fit_max=9)
