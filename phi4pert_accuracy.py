@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.fft import fft, ifft, fftfreq
 
-from joe_main_lib import integrate, simulation, do_refinement_study
+from joe import integrate, simulation, do_refinement_study
 from models import K0, V0, builtin_model
 from initial_states import builtin_initial_state
 from visualization import nice_plot

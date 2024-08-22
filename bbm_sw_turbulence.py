@@ -3,7 +3,7 @@ np.random.seed(32)
 
 from scipy.fftpack import fft, ifft, fftfreq
 
-from joe_main_lib import simulation, model, initial_state, integrate
+from joe import simulation, model, initial_state, integrate
 from visualization import nice_plot
 
 def sample_one_phase(length):

@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from joe_main_lib import simulation, do_refinement_study, do_refinement_study_alt
+from joe import simulation, do_refinement_study, do_refinement_study_alt
 from models import builtin_model
 from initial_states import builtin_initial_state
 

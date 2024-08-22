@@ -2,7 +2,7 @@ import numpy as np
 
 from scipy.fftpack import fft, ifft
 
-from joe_main_lib import model, simulation, initial_state, do_refinement_study
+from joe import model, simulation, initial_state, do_refinement_study
 
 g = 1.
 

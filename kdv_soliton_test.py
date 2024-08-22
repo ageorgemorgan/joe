@@ -1,6 +1,6 @@
 import numpy as np
 
-from joe_main_lib import simulation
+from joe import simulation
 from models import builtin_model
 from initial_states import builtin_initial_state
 

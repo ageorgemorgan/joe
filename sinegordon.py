@@ -1,4 +1,4 @@
-from joe_main_lib import simulation, do_refinement_study
+from joe import simulation, do_refinement_study
 from models import builtin_model
 from initial_states import builtin_initial_state
 

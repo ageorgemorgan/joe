@@ -7,7 +7,7 @@ import numpy as np
 from scipy.signal import argrelmin, argrelmax # for postprocessing: amplitude hist and cdf
 from scipy.stats import ecdf # again for postprocessing
 
-from joe_main_lib import simulation, initial_state, integrate
+from joe import simulation, initial_state, integrate
 from models import builtin_model
 from visualization import spinner, nice_plot, nice_multiplot, nice_hist
 

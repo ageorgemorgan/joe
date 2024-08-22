@@ -1,4 +1,4 @@
-from joe_main_lib import model, initial_state, simulation
+from joe import model, initial_state, simulation
 
 from models import builtin_model
 

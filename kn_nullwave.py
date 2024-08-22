@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.fftpack import fft, ifft
 
-from joe_main_lib import simulation, model, initial_state
+from joe import simulation, model, initial_state
 from models import builtin_model
 from initial_states import builtin_initial_state, sinegordon_soliton
 

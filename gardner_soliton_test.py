@@ -1,6 +1,6 @@
 import numpy as np
 
-from joe_main_lib import simulation, initial_state, do_refinement_study
+from joe import simulation, initial_state, do_refinement_study
 from models import builtin_model
 
 

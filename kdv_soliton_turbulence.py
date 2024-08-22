@@ -2,7 +2,7 @@ import numpy as np
 
 np.random.seed(32)
 
-from joe_main_lib import simulation, initial_state
+from joe import simulation, initial_state
 from models import builtin_model
 
 

@@ -1,6 +1,6 @@
 import numpy as np
 
-from joe_main_lib import simulation, integrate
+from joe import simulation, integrate
 from models import builtin_model
 from initial_states import builtin_initial_state
 from visualization import nice_multiplot

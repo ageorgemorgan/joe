@@ -1,6 +1,6 @@
 import numpy as np
 
-import joe_main_lib
+import joe
 
 
 def kdv_soliton(x, c=1.):
@@ -169,6 +169,6 @@ def builtin_initial_state(initial_state_kw):
     def my_initial_state_func(x):
         return initial_state(x, initial_state_kw)
 
-    out = joe_main_lib.initial_state(initial_state_kw, my_initial_state_func)
+    out = joe.initial_state(initial_state_kw, my_initial_state_func)
 
     return out
