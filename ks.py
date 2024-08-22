@@ -6,7 +6,7 @@ from joe_main_lib import simulation, do_refinement_study
 from models import builtin_model
 from initial_states import builtin_initial_state
 
-length, T, N, dt = 32.*np.pi, 151., 2**7, 2**-6
+length, T, N, dt = 32.*np.pi, 150., 2**7, 2**-6
 stgrid = {'length':length, 'T':T, 'N':N, 'dt':dt}
 my_model = builtin_model('ks', nonlinear=True)
 my_initial_state = builtin_initial_state('ks_chaos')

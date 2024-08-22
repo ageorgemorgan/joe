@@ -148,13 +148,13 @@ class simulation:
         # and the file is named properly, there's nothing to worry about. Said differently, we keep the full model attribute
         # of a simulation object around only as long as we need it.
 
-        my_path = os.path.join("sim_archive")
+        my_path = os.path.join("joe_sim_archive")
 
         # if the archive folder doesn't exist, make it
         if not os.path.isdir(my_path):
             os.makedirs(my_path)
 
-        with open('sim_archive/'+self.filename, 'wb') as outp:
+        with open('joe_sim_archive/'+self.filename, 'wb') as outp:
             pickle.dump(self, outp, pickle.HIGHEST_PROTOCOL)
 
     # if we know for sure the sim has been done, we can just load it. Since time-stepping only fills the Udata attribute
@@ -165,7 +165,7 @@ class simulation:
 
         try:
 
-            with open('sim_archive/' + self.filename, 'rb') as inp:
+            with open('joe_sim_archive/' + self.filename, 'rb') as inp:
                 loaded_sim = pickle.load(inp)
                 self.Udata = loaded_sim.Udata
 
@@ -183,7 +183,7 @@ class simulation:
 
             old_filename = 'simdata' + old_string + '.pkl'
 
-            with open('sim_archive/' + old_filename, 'rb') as inp:
+            with open('joe_sim_archive/' + old_filename, 'rb') as inp:
                 loaded_sim = pickle.load(inp)
                 self.Udata = loaded_sim.Udata
 
@@ -682,8 +682,8 @@ def do_refinement_study_alt(model, initial_state, length, T, Ns, dts, benchmark_
 
     if save_figure is True:
 
-        # add the folder "visuals" to our path
-        my_path = os.path.join("visuals")
+        # add the folder "joe_visuals" to our path
+        my_path = os.path.join("joe_visuals")
 
         # first, if the folder doesn't exist, make it
         if not os.path.isdir(my_path):
@@ -700,7 +700,7 @@ def do_refinement_study_alt(model, initial_state, length, T, Ns, dts, benchmark_
                      + method_kw + '_nonlinear=' + str(model.nonlinear) + '_abslayer=' + str(sponge_layer))
 
         picname = 'refinement_study' + my_string + '.png'
-        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=400)
+        plt.savefig('joe_visuals/' + picname, bbox_inches='tight', dpi=400)
 
     else:
 

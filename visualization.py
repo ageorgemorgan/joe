@@ -88,15 +88,15 @@ def hov_plot(x, t, u, fieldname, umin=None, umax=None, dpi=100, show_figure=True
 
     if save_figure is True:
 
-        # add the folder "visuals" to our path... more on this below
-        my_path = os.path.join("visuals")
+        # add the folder "joe_visuals" to our path... more on this below
+        my_path = os.path.join("joe_visuals")
 
         # first, if the folder doesn't exist, make it
         if not os.path.isdir(my_path):
             os.makedirs(my_path)
 
         # and save the fig
-        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+        plt.savefig('joe_visuals/' + picname, bbox_inches='tight', dpi=dpi)
 
     else:
 
@@ -152,15 +152,15 @@ def nice_plot(x, y, xlabel, ylabel, dpi=100, custom_ylim=None, show_figure=True,
 
     if save_figure is True:
 
-        # add the folder "visuals" to our path... more on this below
-        my_path = os.path.join("visuals")
+        # add the folder "joe_visuals" to our path... more on this below
+        my_path = os.path.join("joe_visuals")
 
         # first, if the folder doesn't exist, make it
         if not os.path.isdir(my_path):
             os.makedirs(my_path)
 
         # and save the fig
-        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+        plt.savefig('joe_visuals/' + picname, bbox_inches='tight', dpi=dpi)
 
     else:
 
@@ -225,15 +225,15 @@ def nice_multiplot(xs, ys, xlabel, ylabel, curvelabels, linestyles, colors, line
 
     if save_figure is True:
 
-        # add the folder "visuals" to our path... more on this below
-        my_path = os.path.join("visuals")
+        # add the folder "joe_visuals" to our path... more on this below
+        my_path = os.path.join("joe_visuals")
 
         # first, if the folder doesn't exist, make it
         if not os.path.isdir(my_path):
             os.makedirs(my_path)
 
         # and save the fig
-        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+        plt.savefig('joe_visuals/' + picname, bbox_inches='tight', dpi=dpi)
 
     else:
 
@@ -277,15 +277,15 @@ def nice_hist(data, xlabel, dpi=100, show_figure=True, save_figure=False, picnam
 
     if save_figure is True:
 
-        # add the folder "visuals" to our path... more on this below
-        my_path = os.path.join("visuals")
+        # add the folder "joe_visuals" to our path... more on this below
+        my_path = os.path.join("joe_visuals")
 
         # first, if the folder doesn't exist, make it
         if not os.path.isdir(my_path):
             os.makedirs(my_path)
 
         # and save the fig
-        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+        plt.savefig('joe_visuals/' + picname, bbox_inches='tight', dpi=dpi)
 
     else:
 
@@ -358,8 +358,8 @@ def plot_refinement_study(model, initial_state, length, T, Ns, dts, errors, meth
 
     if save_figure is True:
 
-        # add the folder "visuals" to our path
-        my_path = os.path.join("visuals")
+        # add the folder "joe_visuals" to our path
+        my_path = os.path.join("joe_visuals")
 
         # first, if the folder doesn't exist, make it
         if not os.path.isdir(my_path):
@@ -376,7 +376,7 @@ def plot_refinement_study(model, initial_state, length, T, Ns, dts, errors, meth
                      + method_kw + '_nonlinear=' + str(model.nonlinear) + '_abslayer=' + str(absorbing_layer))
 
         picname = 'refinement_study' + my_string + '.png'
-        plt.savefig('visuals/' + picname, bbox_inches='tight', dpi=dpi)
+        plt.savefig('joe_visuals/' + picname, bbox_inches='tight', dpi=dpi)
 
     else:
 
@@ -523,7 +523,7 @@ def save_movie(u, x, length, dt, fieldname, ndump, filename, fps=200, periodic=T
         """
         if i%400==0 or i == 800 or i==1000:
 
-            plt.savefig('visuals/' + 'frame=%.1f' %i + '.png', bbox_inches='tight', dpi=600)
+            plt.savefig('joe_visuals/' + 'frame=%.1f' %i + '.png', bbox_inches='tight', dpi=600)
 
         else:
 
@@ -536,16 +536,16 @@ def save_movie(u, x, length, dt, fieldname, ndump, filename, fps=200, periodic=T
 
     anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
 
-    #plt.savefig('visuals/' + 'frame'+ '.png', bbox_inches='tight', dpi=100)
+    #plt.savefig('joe_visuals/' + 'frame'+ '.png', bbox_inches='tight', dpi=100)
 
-    # add the folder "visuals" to our path... more on this below
-    my_path = os.path.join("visuals")
+    # add the folder "joe_visuals" to our path... more on this below
+    my_path = os.path.join("joe_visuals")
 
     # first, if the folder doesn't exist, make it
     if not os.path.isdir(my_path):
         os.makedirs(my_path)
 
-    anim.save('visuals/' + filename, writer='ffmpeg', fps=fps, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    anim.save('joe_visuals/' + filename, writer='ffmpeg', fps=fps, extra_args=['-vcodec', 'libx264'], dpi=dpi)
 
     plt.close()
 
@@ -687,13 +687,13 @@ def save_combomovie(u, x, length, dt, ndump, filename, fieldname,
 
     anim = animation.FuncAnimation(fig, animate, np.shape(u)[0], blit=False)
 
-    # add the folder "visuals" to our path... more on this below
-    my_path = os.path.join("visuals")
+    # add the folder "joe_visuals" to our path... more on this below
+    my_path = os.path.join("joe_visuals")
 
     # first, if the folder doesn't exist, make it
     if not os.path.isdir(my_path):
         os.makedirs(my_path)
 
-    anim.save('visuals/' + filename, fps=fps, extra_args=['-vcodec', 'libx264'], dpi=dpi)
+    anim.save('joe_visuals/' + filename, fps=fps, extra_args=['-vcodec', 'libx264'], dpi=dpi)
 
     plt.close()

@@ -325,19 +325,19 @@ class timestepper:
 
     def save_aux(self):
 
-        # add the folder "timestepper_aux" to our path... more on this below
-        my_path = os.path.join("timestepper_aux")
+        # add the folder "joe_timestepper_aux" to our path... more on this below
+        my_path = os.path.join("joe_timestepper_aux")
 
         # first, if the folder doesn't exist, make it
         if not os.path.isdir(my_path):
             os.makedirs(my_path)
 
-        with open('timestepper_aux/'+self.auxfilename, 'wb') as outp:
+        with open('joe_timestepper_aux/'+self.auxfilename, 'wb') as outp:
             pickle.dump(self.aux, outp, pickle.HIGHEST_PROTOCOL)
 
     def load_aux(self):
 
-        with open('timestepper_aux/'+self.auxfilename, 'rb') as inp:
+        with open('joe_timestepper_aux/'+self.auxfilename, 'rb') as inp:
             self.aux = pickle.load(inp)
 
     def do_time_step(self, V, forcing):
