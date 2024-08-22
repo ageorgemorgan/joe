@@ -1,9 +1,10 @@
 import numpy as np
 
-from joe import simulation, integrate
+from joe import simulation
 from models import builtin_model
 from initial_states import builtin_initial_state
 from visualization import nice_multiplot
+from utils import integrate
 
 length, T, N, dt = 240.,2e4, 2**9, 1e-2
 

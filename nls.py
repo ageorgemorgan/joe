@@ -50,10 +50,10 @@ sponge_params = {'l_endpt': l_endpt, 'r_endpt': r_endpt,
                  'splitting_method_kw': 'naive',
                  'spongeless_frac': .5}  # this is the fraction of the middle of the spatial domain to keep in the plots
 
-#my_sim = simulation(stgrid, my_model, my_initial_state, bc='sponge_layer', sponge_params=sponge_params, ndump=20)
-my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=20)
+my_sim = simulation(stgrid, my_model, my_initial_state, bc='sponge_layer', sponge_params=sponge_params, ndump=20)
+#my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=20)
 
-my_sim.load_or_run(method_kw='etdrk4', save=True)
+my_sim.load_or_run(method_kw='etdrk4', save=False)
 
 #my_sim.hov_plot(show_figure=False, save_figure=True, usetex=False, cmap='plasma')
 my_sim.hov_plot_modulus(show_figure=True, save_figure=True, usetex=True, cmap='RdPu')

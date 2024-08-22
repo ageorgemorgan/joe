@@ -1,10 +1,11 @@
 import numpy as np
 np.random.seed(32)
 
-from scipy.fftpack import fft, ifft, fftfreq
+from scipy.fft import rfft, irfft, rfftfreq
 
-from joe import simulation, model, initial_state, integrate
+from joe import simulation, model, initial_state
 from visualization import nice_plot
+from utils import integrate
 
 def sample_one_phase(length):
     return np.random.uniform(low=-0.5 * length, high=0.5 * length)
@@ -52,7 +53,7 @@ def my_symbol(k):
 def my_fourier_forcing(V,k,x,nonlinear=True):
     p = 1.
 
-    out = -S * float(nonlinear) * (1. / (p + 1.)) * 1j * k / (1. + delta*k ** 2) * (fft(np.real(ifft(V)) ** (p + 1)))
+    out = -S * float(nonlinear) * (1. / (p + 1.)) * (1j * k / (1. + delta*k ** 2) )*  rfft(irfft(V) ** (p + 1))
 
     return out
 
@@ -85,7 +86,7 @@ def soliton_gas_ic(x,m,length):
 
 # params are set to be at 1/4 of what DP2014 had in terms of spatial grid, so we have 1/4 of the solitons
 # as well
-length, T, N, dt = 2.*1395., 3.5e4, 2**13, 4e-3
+length, T, N, dt = 2.*1395., 2., 2**13, 4e-3
 m = 50 # number of solitons in the gas
 
 ndump = int(1./dt)
@@ -98,8 +99,8 @@ my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=ndu
 
 #my_sim.plot_initial_condition(show_figure=True, save_figure=False)
 
-my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=True)
-#my_sim.hov_plot(cmap = 'cmo.haline', usetex=True, save_figure=True, show_figure=False)
+my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=False)
+my_sim.hov_plot(cmap = 'cmo.haline', usetex=True, save_figure=False, show_figure=True)
 #my_sim.save_movie(dpi=200, fps=200, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
 
 
@@ -111,9 +112,9 @@ print(fm_error)
 # compute the BBM energy (Sobolev H^1 norm)
 def energy(u):
     # get wavenumbers for the grid of S^1 with N samples
-    k = 2. * np.pi * N * fftfreq(N) / length
+    k = 2. * np.pi * N * rfftfreq(N) / length
 
-    spring = np.real(ifft(1j * k * fft(u))) ** 2
+    spring = irfft(1j * k * rfft(u)) ** 2
 
     out = integrate(u**2 + delta*spring, length, N)
 
@@ -125,8 +126,8 @@ Udata = my_sim.Udata
 E = energy(Udata)
 E_error = E-E[0]
 E_error_rel = E_error/E[0]
-print(np.amax(np.abs(E_error)))
-print(np.amax(np.abs(E_error_rel)))
+print('Max absolute error in energy = ', np.amax(np.abs(E_error)))
+print('Max relative error in energy =', np.amax(np.abs(E_error_rel)))
 
 # draw the figure
 dpi = 400

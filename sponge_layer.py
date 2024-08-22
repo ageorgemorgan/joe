@@ -1,6 +1,6 @@
 import numpy as np
 
-from numpy.fft import fft, ifft, fftfreq
+from utils import my_fft, my_ifft
 
 # create all the stuff we need to implement the sponge layer (absorbing layer/segment near bdry where
 # artifical damping turns on)
@@ -44,25 +44,35 @@ def damping_coeff_bronski(x, length, delta=0.1):
 
 # create the Rayleigh damping term that can be added to the forcing
 # syntax is inputs is the same as that for fourier_forcing
-def rayleigh_damping(V, x, length, sponge_params):
-    if int(0.5 * V.size) == x.size:
+def rayleigh_damping(V, x, length, sponge_params, complex=False):
+
+    N = x.size
+
+    if int(V.size - 2) == N or int(0.5*V.size) == N:
 
         pass
 
     else:
 
-        raise TypeError("The array V must be twice the length of the array x")
+        raise TypeError("The array V must be 2+(size of the array x) if our soln is real, "
+                        "or 2*(size of the array x) if our soln is complex."
+                        " Size of V = ", int(V.size), "size of x = ", x.size)
 
-    N = int(0.5 * np.size(V))
+    if complex:
 
-    V = np.reshape(V, (2 * N,))
+        NN = N
 
-    v = np.real(ifft(V[N:]))  # only ifft last N-1 entries of V because of storage conventions
+    else:
 
-    out = 1j * np.zeros(2 * N, dtype=float)
-    #beta = damping_coeff_bronski(x, length, delta=0.1)
+        NN = int(0.5*N)+1
+
+    V = np.reshape(V, (2*NN))
+
+    v = my_ifft(V[NN:], complex=complex)  # only ifft last NN entries of V because of storage conventions
+
     beta = damping_coeff_lt(x, sponge_params)+damping_coeff_lt(-x, sponge_params)
-    out[N:] = fft(-1. * beta * v)
+    out = 1j * np.zeros(int(2*NN), dtype=float)
+    out[NN:] = my_fft(-1. * beta * v, complex=complex)
 
     return out
 

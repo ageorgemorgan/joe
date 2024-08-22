@@ -1,10 +1,11 @@
 import numpy as np
-from numpy.fft import fft, ifft, fftfreq
+from scipy.fft import rfft, irfft, rfftfreq
 
-from joe import integrate, simulation, do_refinement_study
+from joe import simulation, do_refinement_study
 from models import K0, V0, builtin_model
 from initial_states import builtin_initial_state
 from visualization import nice_plot
+from utils import integrate
 
 # first prescribe all the simulation parameters etc.
 length, T, N, dt = 240.,100., 2**9, 1e-2
@@ -31,9 +32,9 @@ def energy(u, ut):
     kin = ut ** 2
 
     # get wavenumbers for the grid of S^1 with N samples
-    k = 2. * np.pi * N * fftfreq(N) / length
+    k = 2. * np.pi * N * rfftfreq(N) / length
 
-    spring = np.real(ifft(1j * k * fft(u))) ** 2
+    spring = irfft(1j * k * rfft(u)) ** 2
 
     potential = (2. + V0(x)) * (u ** 2) + 1.*(2. * K0(x) * u ** 3 + 0.5 * u ** 4)
 

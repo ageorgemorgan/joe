@@ -12,7 +12,7 @@ my_model = builtin_model('ks', nonlinear=True)
 my_initial_state = builtin_initial_state('ks_chaos')
 my_sim = simulation(stgrid, my_model, my_initial_state, bc='periodic', ndump=10)
 
-my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=True)
+my_sim.load_or_run(method_kw='etdrk4', print_runtime=True, save=False)
 
 # produce plots and movies
 my_sim.hov_plot(cmap='cmo.solar', fieldname='u', show_figure=True, save_figure=True, usetex=True)

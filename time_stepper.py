@@ -2,16 +2,16 @@ import pickle
 import os
 
 import numpy as np
-from numpy.fft import fft, ifft, fftfreq
+from scipy.fft import fftfreq, rfftfreq
 from scipy import sparse
-from scipy.sparse import linalg, diags
+from scipy.sparse import linalg
 
+from utils import my_fft, my_ifft
 from sponge_layer import damping_coeff_lt, rayleigh_damping
 
 
 # The intention here is to make the code independent of the particular
 # PDE we're considering insofar as is possible.
-
 
 # First, a function for computing all the Greeks ("weights" for exponential quadrature).
 # We do this by Pythonizing the code from Kassam and Trefethen 2005 (do Cauchy integrals).
@@ -216,7 +216,14 @@ def assemble_damping_mat(N, length, x, dt, sponge_params, complex = False):
     # By "damping mat", we mean the matrix to be inverted at each time step in the damping stage.
     # Currently only backward Euler inversion is implemented.
     # TODO: try out Crank-Nicolson as well, perform cost v. accuracy analysis?
-    k = 2 * np.pi * N * fftfreq(N) / length
+
+    if complex:
+
+        k = 2 * np.pi * N * fftfreq(N) / length
+
+    else:
+
+        k = 2 * np.pi * N * rfftfreq(N) / length
 
     # Deal w/ the damping mat as a scipy.sparse LinearOperator to avoid matrix mults!
     # This is an issue here bcz dealing with the matrix of the Fourier transform is a pain
@@ -228,17 +235,13 @@ def assemble_damping_mat(N, length, x, dt, sponge_params, complex = False):
 
         damping_coeff *= sponge_params['damping_amplitude']
 
-        if not complex:
-
-            mv_out = v - dt * (-1j * k) * fft(damping_coeff * np.real(ifft((-1j * k) * v)))
-
-        else:
-
-            mv_out = v - dt * (-1j * k) * fft(damping_coeff * ifft((-1j * k) * v))
+        mv_out = v - dt * (-1j * k) * my_fft(damping_coeff * my_ifft((-1j * k) * v, complex=complex), complex=complex)
 
         return mv_out
 
-    out = linalg.LinearOperator(shape=(N, N), matvec=mv)
+    NN = k.size
+
+    out = linalg.LinearOperator(shape=(NN, NN), matvec=mv)
 
     # TODO: apparently LinearOperators can't be pickled, but sparse matrices can? See if there is some other decent
     # way of saving LinearOperators
@@ -257,11 +260,12 @@ def do_diffusion_step(q, B):
 
 
 class timestepper:
-    def __init__(self, method_kw, sim, scale=1.):
+    def __init__(self, method_kw, sim, scale=1., complex=False):
         self.method_kw = method_kw
         self.sim = sim
         self.scale = scale
         self.t_ord = sim.model.t_ord
+        self.complex = complex
         self.aux = None
         dt_new = scale*sim.dt
         self.auxfilename = 'timestepper_auxfile_method_kw=' + self.method_kw + '_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (
@@ -280,7 +284,17 @@ class timestepper:
 
         dt = self.scale*sim.dt
 
-        k = 2. * np.pi * N * fftfreq(N) / length
+        if self.complex:
+
+            k = 2. * np.pi * N * fftfreq(N) / length
+
+            NN = N
+
+        else:
+
+            k = 2. * np.pi * N * rfftfreq(N) / length
+
+            NN = int(0.5*N +1) # only keep the real frequencies
 
         A = sim.model.get_symbol(k)
 
@@ -290,12 +304,12 @@ class timestepper:
 
         elif t_ord == 2:
 
-            A = sparse.diags([A, np.ones(N, dtype=float)], [-N, N], shape=[2 * N, 2 * N]).tocsc()
+            A = sparse.diags([A, np.ones(NN, dtype=float)], [-NN, NN], shape=[2 * NN, 2 * NN]).tocsc()
 
             propagator = linalg.expm(A.multiply(dt))
 
         if self.method_kw == 'etdrk1':
-            Q1 = get_Q1(N, dt, A)
+            Q1 = get_Q1(NN, dt, A)
 
             aux = dict([('Q1', Q1), ('propagator', propagator)])
 
@@ -303,13 +317,13 @@ class timestepper:
 
             if t_ord == 1:
 
-                [Q, f1, f2, f3] = get_greeks_first_order(N, dt, A)
+                [Q, f1, f2, f3] = get_greeks_first_order(NN, dt, A)
 
                 propagator2 = np.exp(0.5 * dt * A)
 
             elif t_ord == 2:
 
-                [Q, f1, f2, f3] = get_greeks_second_order(length, N, dt, A)
+                [Q, f1, f2, f3] = get_greeks_second_order(length, NN, dt, A)
 
                 propagator2 = linalg.expm(A.multiply(0.5*dt))
 
@@ -402,6 +416,8 @@ def do_time_stepping(sim, method_kw='etdrk4'):
     if t_ord == 2 and method_kw != 'etdrk4':
         raise ValueError('Only ETDRK4 time-stepping is currently supported for second-order equations.')
 
+    complex = sim.complex
+
     initial_state = sim.initial_state
 
     nonlinear = sim.nonlinear
@@ -424,13 +440,29 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
         splitting_method_kw = 'na'
 
+    # account for the difference between real and complex during storage
+
+    if complex:
+
+        NN = N
+
+    else:
+
+        NN = int(0.5*N)+1
+
     ndump = sim.ndump
 
     nsteps = int(T / dt)
 
     x = sim.x  # the endpoint = False flag is critical!
 
-    k = 2. * np.pi * N * fftfreq(N) / length
+    if complex:
+
+        k = 2. * np.pi * N * fftfreq(N) / length
+
+    else:
+
+        k = 2. * np.pi * N * rfftfreq(N) / length
 
     # determine the time-step scale factor "a" for splitting
     if splitting_method_kw == 'strang':
@@ -441,7 +473,7 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
         scale = 1.
 
-    my_timestepper = timestepper(method_kw, sim, scale=scale)
+    my_timestepper = timestepper(method_kw, sim, scale=scale, complex=complex)
 
     # preprocessing stage: assemble the aux quantities needed for time-stepping, and the forcing function
 
@@ -455,7 +487,7 @@ def do_time_stepping(sim, method_kw='etdrk4'):
         # by modifying the forcing term ie. damping can be dealt with explicitly!
         if t_ord == 2 and sponge_layer:
 
-            out += rayleigh_damping(V, x, length, sponge_params)
+            out += rayleigh_damping(V, x, length, sponge_params, complex=complex)
 
         return out
 
@@ -475,28 +507,36 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
     # now assemble the stuff needed for damping
     if sponge_layer and t_ord == 1:
-        damping_mat = assemble_damping_mat(N, length, x, dt, sponge_params)
+        damping_mat = assemble_damping_mat(N, length, x, dt, sponge_params, complex=complex)
     else:
         pass
 
+    # now set up the initial conditions
     Uinit = initial_state
 
     if t_ord == 2:
 
         try:
 
-            v1 = fft(Uinit[0, :])
-            v2 = fft(Uinit[1, :])
+            v1 = my_fft(Uinit[0, :], complex=complex)
+            v2 = my_fft(Uinit[1, :], complex=complex)
 
         except: # if no initial speed is provided in second order case, default to assuming it's zero.
 
-            v1 = fft(Uinit)
-            v2 = np.zeros_like(Uinit, dtype=float)
+            v1 = my_fft(Uinit, complex=complex)
+            v2 = 1j*np.zeros_like(v1, dtype=float)
 
         V = np.concatenate((v1, v2))
 
         # make data storage array
-        Udata = np.zeros([2, 1 + int(nsteps / ndump), N], dtype=float)
+
+        if complex:
+
+            Udata = 1j*np.zeros([2, 1 + int(nsteps / ndump), N], dtype=float)
+
+        else:
+
+            Udata = np.zeros([2, 1 + int(nsteps / ndump), N], dtype=float)
 
         try:
 
@@ -510,10 +550,10 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
     elif t_ord == 1:
 
-        V = fft(Uinit)
+        V = my_fft(Uinit, complex=complex)
 
         # make data storage array
-        if sim.complex:
+        if complex:
 
             Udata = 1j*np.zeros([1 + int(nsteps / ndump), N], dtype=float)
 
@@ -551,17 +591,11 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
             if cnt % int(sponge_params['expdamp_freq']) == 0:
 
-                if not sim.complex:
-
-                    U = np.real(ifft(V))
-
-                else:
-
-                    U = ifft(V)
+                U = my_ifft(V, complex=complex)
 
                 U *= 1. - 1. * damping_coeff_lt(-x, sponge_params) - 1. * damping_coeff_lt(x, sponge_params)
 
-                V = fft(U)
+                V = my_fft(U, complex=complex)
 
         else:
 
@@ -574,25 +608,12 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
             if t_ord == 2:
 
-                if sim.complex:
-
-                    Udata[0, int(n / ndump), :] = ifft(V[0:N])
-                    Udata[1, int(n / ndump), :] = ifft(V[N:])
-
-                else:
-
-                    Udata[0, int(n / ndump), :] = np.real(ifft(V[0:N]))
-                    Udata[1, int(n / ndump), :] = np.real(ifft(V[N:]))
+               Udata[0, int(n / ndump), :] = my_ifft(V[0:NN], complex=complex)
+               Udata[1, int(n / ndump), :] = my_ifft(V[NN:], complex=complex)
 
             else:
 
-                if sim.complex:
-
-                    Udata[int(n / ndump), :] = ifft(V)
-
-                else:
-
-                    Udata[int(n / ndump), :] = np.real(ifft(V))
+                Udata[int(n / ndump), :] = my_ifft(V, complex=complex)
 
         else:
 

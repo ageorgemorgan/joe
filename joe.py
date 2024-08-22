@@ -9,15 +9,7 @@ from time_stepper import do_time_stepping
 from initial_states import initial_state
 from visualization import hov_plot, save_movie, save_combomovie, spinner, plot_refinement_study, nice_plot
 from sponge_layer import clip_spongeless
-
-# helper function for integration (of real part of fnc) in space. Uses FFT to accurately integrate over spatial domain:
-# accuracy vastly beats trapezoidal rule.
-# u = array storing node values of field to be integrated (last dimension of the array is spatial)
-# length = length of domain
-# N = number of samples of u we take (= number of grid pts)
-def integrate(u, length, N):
-    return (length/N) * np.real(fft(u, axis=-1)[..., 0])
-
+from utils import integrate
 # a class for models. Note how the init takes in two callables for the symbol and forcing terms: to avoid making the
 # weird no-no of having callable attributes, we use a trick from
 # https://stackoverflow.com/questions/35321744/python-function-as-class-attribute-becomes-a-bound-method

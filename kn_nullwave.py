@@ -1,9 +1,8 @@
 import numpy as np
-from scipy.fftpack import fft, ifft
+from scipy.fft import rfft, irfft
 
 from joe import simulation, model, initial_state
-from models import builtin_model
-from initial_states import builtin_initial_state, sinegordon_soliton
+from initial_states import builtin_initial_state
 
 length, T, N, dt = 30., 30., 2**9, 1e-2
 
@@ -15,26 +14,30 @@ def symbol(k):
     return -k**2
 
 def fourier_forcing(V, k, x, nonlinear=True):
-    if int(0.5 * V.size) == x.size:
+    if int(V.size - 2) == x.size:
 
         pass
 
     else:
 
-        raise TypeError("The array V must be twice the length of the array x.")
+        raise TypeError("The array V must be 2+(size of the array x).")
 
-    N = int(0.5 * np.size(V))
+    N = int(V.size - 2)
 
-    V = np.reshape(V, (2 * N,))
+    V = np.reshape(V, (N + 2,))
 
-    ux = np.real(ifft(1j*k*V[0:N]))
+    NN = int(0.5 * N) + 1
 
-    v = np.real(ifft(V[N:2*N]))
+    u = irfft(V[0:NN])  # only ifft first N entries of V because of storage conventions
 
-    spatial_forcing = float(nonlinear)*(ux**2 - v**2)
+    ux = irfft(1j * k * V[0:NN])
 
-    out = 1j * np.zeros(2 * N, dtype=float)
-    out[N:] = fft(spatial_forcing)
+    v = irfft(V[NN:N+2])
+
+    spatial_forcing = float(nonlinear) * (ux ** 2 - v ** 2)
+
+    out = 1j * np.zeros(N + 2, dtype=float)
+    out[NN:] = rfft(spatial_forcing)
 
     return out
 

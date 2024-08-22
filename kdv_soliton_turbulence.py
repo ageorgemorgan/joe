@@ -10,7 +10,7 @@ def kdv_soliton(x, c=1.):
     return 0.5 * c * (np.cosh(0.5 * np.sqrt(c) * (x)) ** -2)
 
 
-length, T, N, dt = 600., 200., 2 ** 12, 1e-4
+length, T, N, dt = 600., 2., 2 ** 12, 1e-4
 m = 30  # number of solitons in the gas
 
 def soliton_gas_ic(x, m):
