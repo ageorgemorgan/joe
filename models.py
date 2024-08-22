@@ -2,7 +2,7 @@ import numpy as np
 
 from scipy.fft import fft, ifft, fftfreq, rfft, irfft, rfftfreq
 
-import joe
+from .joe import model
 
 # Aux functions needed for special cases...
 
@@ -158,6 +158,4 @@ def builtin_model(model_kw, nonlinear=True):
         def my_fourier_forcing(V, k, x, nonlinear):
             return fourier_forcing(V, k, x, model_kw, nonlinear)
 
-    out = joe.model(model_kw, t_ord, my_symbol, my_fourier_forcing, nonlinear=nonlinear)
-
-    return out
+    return model(model_kw, t_ord, my_symbol, my_fourier_forcing, nonlinear=nonlinear)

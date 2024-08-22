@@ -1,6 +1,6 @@
 import numpy as np
 
-import joe
+from .joe import initial_state
 
 
 def kdv_soliton(x, c=1.):
@@ -49,126 +49,90 @@ def sinegordon_soliton_speed(x, c=0., p=1.): # speed is at t=0
     return out
 
 
-def initial_state(x, initial_state_kw):
+def initial_state_func(x, initial_state_kw):
     amp = 0.1
     x0 = 0.
     k0 = 1.
     width = 1.
 
     if initial_state_kw == 'sine':
-
         k = 1.5
-
         out = 1.0*np.sin(k*x)
 
     elif initial_state_kw == 'gaussian_even':
-
         out = 6.*np.exp(-x**2)
 
     elif initial_state_kw == 'gaussian_even_alt':
-
         out = 1.3*np.exp(-x**2)
 
     elif initial_state_kw == 'kdv_soliton':
-
         c = 2.
-
         out = kdv_soliton(x, c=c)
 
     elif initial_state_kw == 'kdv_multisoliton':
-
         c0 = 3.2
-
         c1 = 2.5
-
         c2 = 1.
-
         out = kdv_soliton(x+80., c=c0) + kdv_soliton(x+50., c=c1) + kdv_soliton(x+10, c=c2)
 
     elif initial_state_kw == 'gardner_soliton':
-
         c = 3.
-
         p = 1.
-
         out = gardner_soliton(x, c=c, p=p)
 
     elif initial_state_kw == 'bbm_solitary_wave':
-
         c = 2.
-
         out = bbm_solitary_wave(x,c=c)
 
     elif initial_state_kw == 'bbm_multisolitary':
         c0 = 2.5
-
         c1 = 2.
-
         out = bbm_solitary_wave(x+80., c=c0) + bbm_solitary_wave(x+50., c=c1)
 
     elif initial_state_kw == 'gaussian_odd':
-
         out = amp * (np.sin(k0 * x)) * np.exp(-width * (x - x0) ** 2)
 
     elif initial_state_kw == 'gaussian_no_parity':
-
         out = amp * (0.7 * np.sin(k0 * x) + 0.3 * np.cos(x)) * np.exp(-width * (x - x0) ** 2)
 
     elif initial_state_kw == 'translational_mode':
-
         out = np.cosh(x / np.sqrt(2)) ** -2
 
     elif initial_state_kw == 'internal_mode':
-
         out = amp*np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2))) ** -2
 
     elif initial_state_kw == 'tritone':
-
         a = 1.2*np.sqrt(2.)  # this value gives the Getmanov tri-tone!
-
         out = a*np.sinh(x / np.sqrt(2)) * (np.cosh(x / np.sqrt(2))) ** -2
 
     elif initial_state_kw == 'trivial':
-
         pass
 
     elif initial_state_kw == '0_energy':
-
         out = -1. + 3. * np.tanh(x / np.sqrt(2)) ** 2
 
     elif initial_state_kw == 'ks_chaos':
-
         out = np.cos((x+16.*np.pi)/16.) * (1. + np.sin((x+16.*np.pi) / 16.))
 
     elif initial_state_kw == 'bbm_weird_wavepacket':
-
         out = (0.1*np.cos(20.*x) + np.cos(0.2*x))*np.exp(-x**2)
 
     elif initial_state_kw == 'sinegordon_soliton_interaction':
-
         out = np.zeros((2,np.shape(x)[0]), dtype=float)
         out[0,:] = sinegordon_soliton(x+20, c=0.9, p=1) - sinegordon_soliton(x-20, c=-0.9, p=1)
         out[1,:] = sinegordon_soliton_speed(x+20, c=0.9, p=1) - sinegordon_soliton_speed(x-20, c=-0.9, p=1)
 
     elif initial_state_kw == 'sinegordon_soliton_interaction_alt':
-
         out = np.zeros((2,np.shape(x)[0]), dtype=float)
         out[0,:] = sinegordon_soliton(x+20, c=0.9, p=1) - sinegordon_soliton(x-20, c=0., p=1)
         out[1,:] = sinegordon_soliton_speed(x+20, c=0.9, p=1)
 
     else:
-
-        raise NameError("Invalid initial state keyword string. Acceptable keywords: gaussian_even, gaussian_odd, "
-                        "gaussian_no_parity, translational_mode, internal_mode, tritone, 0_energy, trivial")
+        raise NameError("User-defined initial state keyword string not among built-in options.")
 
     return out
-
 
 def builtin_initial_state(initial_state_kw):
 
-    def my_initial_state_func(x):
-        return initial_state(x, initial_state_kw)
-
-    out = joe.initial_state(initial_state_kw, my_initial_state_func)
-
-    return out
+    return initial_state(initial_state_kw, lambda x : initial_state_func(x, initial_state_kw))
+    

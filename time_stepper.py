@@ -6,8 +6,8 @@ from scipy.fft import fftfreq, rfftfreq
 from scipy import sparse
 from scipy.sparse import linalg
 
-from utils import my_fft, my_ifft
-from sponge_layer import damping_coeff_lt, rayleigh_damping
+from .utils import my_fft, my_ifft
+from .sponge_layer import damping_coeff_lt, rayleigh_damping
 
 
 # The intention here is to make the code independent of the particular
@@ -496,7 +496,6 @@ def do_time_stepping(sim, method_kw='etdrk4'):
 
     # first check if we've already computed aux on the required space-time grid
     try:
-
         my_timestepper.load_aux()
 
     # if the auxfile is not found, compute aux here.

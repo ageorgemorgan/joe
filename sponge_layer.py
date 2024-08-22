@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import my_fft, my_ifft
+from .utils import my_fft, my_ifft
 
 # create all the stuff we need to implement the sponge layer (absorbing layer/segment near bdry where
 # artifical damping turns on)

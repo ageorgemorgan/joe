@@ -5,11 +5,10 @@ import numpy as np
 from numpy.fft import fft
 import matplotlib.pyplot as plt
 
-from time_stepper import do_time_stepping
-from initial_states import initial_state
-from visualization import hov_plot, save_movie, save_combomovie, spinner, plot_refinement_study, nice_plot
-from sponge_layer import clip_spongeless
-from utils import integrate
+from .time_stepper import do_time_stepping
+from .visualization import hov_plot, save_movie, save_combomovie, spinner, plot_refinement_study, nice_plot
+from .sponge_layer import clip_spongeless
+from .utils import integrate
 # a class for models. Note how the init takes in two callables for the symbol and forcing terms: to avoid making the
 # weird no-no of having callable attributes, we use a trick from
 # https://stackoverflow.com/questions/35321744/python-function-as-class-attribute-becomes-a-bound-method
