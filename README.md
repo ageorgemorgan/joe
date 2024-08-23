@@ -9,9 +9,9 @@ pip install joe-lab==0.0.2
 FEATURES
 
 -Fast, accurate numerical solutions of partial differential equations (PDEs) of the form 
-$$
-\partial_{t}^m u +L\left(\frac{1}{i}\partial_{x}\right)u + f(x,t,u,u_{x}, u_{xx},...) = 0,
-$$
+
+$\partial_{t}^m u +L\left(\frac{1}{i}\partial_{x}\right)u + f(x,t,u,u_{x}, u_{xx},...) = 0,$
+
 where $m=1$ or $m=2$, $u(x,t)$ is a real- or complex-valued scalar field defined on an interval, and $L(k)$ , $f$ are some nice functions supplied by the user.
 
 -Supports periodic boundary conditions as well as absorbing boundaries/sponge layers (to simulate waves going off to spatial infinity)
