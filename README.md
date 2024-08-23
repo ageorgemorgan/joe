@@ -1,4 +1,4 @@
-# joe
+# joe 
 A library for solving partial differential equations for real or complex scalar functions $u(x,t)$ that depend on one spatial variable and one temporal variable. *joe* uses Fourier spectral discretization in space and high-order exponential time-stepping to rapidly and precisely solve initial-value problems. 
 
 ```
@@ -54,3 +54,5 @@ FUTURE DIRECTIONS
 -Add functionality for fields defined on 2D domains 
 
 -Allow for higher-order-derivatives in time (ie. Timoshenko beam equations)
+
+*see also https://pypi.org/project/joe-lab/0.0.2 *
