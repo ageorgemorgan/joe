@@ -26,7 +26,7 @@ where $m=1$ or $m=2$, $u(x,t)$ is a real- or complex-valued scalar field defined
 
 DEPENDENCIES
 
-numpy, scipy, matplotlib, cmocean (https://matplotlib.org/cmocean/), alive-progress (https://pypi.org/project/alive-progress/1.0/). You may also want to download FFmpeg support for creating movies: I recommend using the PyAV package (https://pypi.org/project/av).
+numpy, scipy, matplotlib, cmocean (https://matplotlib.org/cmocean/), alive-progress (https://pypi.org/project/alive-progress/). You may also want to download FFmpeg support for creating movies: I recommend using the PyAV package (https://pypi.org/project/av).
 
 GETTING STARTED
  
