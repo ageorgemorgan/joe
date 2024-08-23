@@ -1,6 +1,11 @@
 # joe
 A library for solving partial differential equations for real or complex scalar functions $u(x,t)$ that depend on one spatial variable and one temporal variable. *joe* uses Fourier spectral discretization in space and high-order exponential time-stepping to rapidly and precisely solve initial-value problems. 
 
+```
+pip install joe-lab==0.0.2
+```
+![hovplot_length=100 5_T=150 0_N=128 0_dt=0 015625_modelkw=ks_ICkw=gaussian_even_alt_nonlinear=True_abslayer=False](https://github.com/user-attachments/assets/67d10328-5b6f-4559-85a2-375e83a67047)
+
 FEATURES
 
 -Fast, accurate numerical solutions of partial differential equations (PDEs) of the form 
@@ -38,6 +43,9 @@ or
 ```
 conda install av -c conda-forge
 ```
+
+![hovplot_real_length=100 0_T=100 0_N=256 0_dt=0 010000_modelkw=focusing_nls_ICkw=nls_soliton_nonlinear=True_abslayer=False](https://github.com/user-attachments/assets/06528efe-4cf6-43f2-9e9d-bf09cc81d8ce)
+
 
 FUTURE DIRECTIONS
 
