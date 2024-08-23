@@ -10,7 +10,7 @@ FEATURES
 
 -Fast, accurate numerical solutions of partial differential equations (PDEs) of the form 
 
-$\partial_{t}^m u +L\left(\frac{1}{i}\partial_{x}\right)u + f(x,t,u,u_{x},u_{t},u_{xx},u_{x,t}...) = 0,$
+$\partial_{t}^m u +L\left(\frac{1}{i}\partial_{x}\right)u + f(x,t,u,u_{x},u_{t},u_{xx},u_{xt}...) = 0,$
 
 where $m=1$ or $m=2$, $u(x,t)$ is a real- or complex-valued scalar field defined on an interval, and $L(k)$ , $f$ are some nice functions supplied by the user.
 
