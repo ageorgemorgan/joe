@@ -6,7 +6,7 @@ pip install joe-lab==0.0.2
 ```
 ![hovplot_length=100 5_T=150 0_N=128 0_dt=0 015625_modelkw=ks_ICkw=gaussian_even_alt_nonlinear=True_abslayer=False](https://github.com/user-attachments/assets/67d10328-5b6f-4559-85a2-375e83a67047)
 
-FEATURES
+**FEATURES**
 
 -Fast, accurate numerical solutions of partial differential equations (PDEs) of the form 
 
@@ -24,11 +24,11 @@ where $m=1$ or $m=2$, $u(x,t)$ is a real- or complex-valued scalar field defined
 
 -Producing publication-quality visuals is quick and easy with *joe*'s built-in functions: simply call the right plotting function on your simulation, tweak a few options, and you've got a plot or movie ready to go. Almost all the required matplotlib stuff is under the hood.  
 
-DEPENDENCIES
+**DEPENDENCIES**
 
 numpy, scipy, matplotlib, cmocean (https://matplotlib.org/cmocean/), alive-progress (https://pypi.org/project/alive-progress/). You may also want to download FFmpeg support for creating movies: I recommend using the PyAV package (https://pypi.org/project/av).
 
-GETTING STARTED
+**GETTING STARTED**
  
 Open up the Jupyter tutorial (https://github.com/ageorgemorgan/joe/blob/main/demos/tutorial_START_HERE!.ipynb) to see joe in action! More tutorials are coming soon. 
 
@@ -46,11 +46,13 @@ conda install av -c conda-forge
 
 ![hovplot_real_length=100 0_T=100 0_N=1024 0_dt=0 010000_modelkw=focusing_nls_ICkw=nls_soliton_nonlinear=True_sponge_layer=False](https://github.com/user-attachments/assets/6f61210e-8405-4de5-8bd1-14ea62643727)
 
-FUTURE DIRECTIONS
+**FUTURE DIRECTIONS**
 
 -Get support for movies on install without installing further packages!
 
 -Add functionality for fields defined on 2D domains 
+
+-Time-step adaptivity
 
 -Allow for higher-order-derivatives in time (ie. Timoshenko beam equations)
 
