@@ -2,7 +2,7 @@
 A library for solving partial differential equations for real or complex scalar functions $u(x,t)$ that depend on one spatial variable and one temporal variable. *joe* uses Fourier spectral discretization in space and high-order exponential time-stepping to rapidly and precisely solve initial-value problems. 
 
 ```
-pip install joe-lab==0.0.2
+pip install joe-lab==0.0.4
 ```
 ![hovplot_length=100 5_T=150 0_N=128 0_dt=0 015625_modelkw=ks_ICkw=gaussian_even_alt_nonlinear=True_abslayer=False](https://github.com/user-attachments/assets/67d10328-5b6f-4559-85a2-375e83a67047)
 
@@ -56,4 +56,4 @@ conda install av -c conda-forge
 
 -Allow for higher-order-derivatives in time (ie. Timoshenko beam equations)
 
-*see also https://pypi.org/project/joe-lab/0.0.2 *
+* see also https://pypi.org/project/joe-lab *
