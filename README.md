@@ -30,7 +30,7 @@ numpy, scipy, matplotlib, cmocean (https://matplotlib.org/cmocean/), alive-progr
 
 **GETTING STARTED**
  
-Open up the Jupyter tutorial (https://github.com/ageorgemorgan/joe/blob/main/demos/tutorial_START_HERE!.ipynb) to see joe in action! More tutorials are coming soon. 
+Open up the Jupyter tutorials (https://github.com/ageorgemorgan/joe/blob/main/demos/tutorials) to see joe in action!
 
 Currently getting FFmpeg support is a bit of a tough one and it *does not auto-install when you install joe*. I recommend using conda, installing *joe* in a conda environment, and then using conda to install PyAV via 
 
