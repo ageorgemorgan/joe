@@ -44,8 +44,7 @@ or
 conda install av -c conda-forge
 ```
 
-![hovplot_real_length=100 0_T=100 0_N=256 0_dt=0 010000_modelkw=focusing_nls_ICkw=nls_soliton_nonlinear=True_abslayer=False](https://github.com/user-attachments/assets/06528efe-4cf6-43f2-9e9d-bf09cc81d8ce)
-
+![hovplot_real_length=100 0_T=100 0_N=1024 0_dt=0 010000_modelkw=focusing_nls_ICkw=nls_soliton_nonlinear=True_sponge_layer=False](https://github.com/user-attachments/assets/6f61210e-8405-4de5-8bd1-14ea62643727)
 
 FUTURE DIRECTIONS
 
