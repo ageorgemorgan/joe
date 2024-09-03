@@ -56,4 +56,4 @@ conda install av -c conda-forge
 
 -Allow for higher-order-derivatives in time (ie. Timoshenko beam equations)
 
-* see also https://pypi.org/project/joe-lab *
+** see also https://pypi.org/project/joe-lab **
