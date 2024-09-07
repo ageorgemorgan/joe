@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>joe_lab.joe &mdash; joe Documentation 0.0.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            joe Documentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">joe Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">joe_lab.joe</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for joe_lab.joe</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">.time_stepper</span> <span class="kn">import</span> <span class="n">do_time_stepping</span>
+<span class="kn">from</span> <span class="nn">.visualization</span> <span class="kn">import</span> <span class="n">hov_plot</span><span class="p">,</span> <span class="n">save_movie</span><span class="p">,</span> <span class="n">save_combomovie</span><span class="p">,</span> <span class="n">spinner</span><span class="p">,</span> <span class="n">plot_refinement_study</span><span class="p">,</span> <span class="n">nice_plot</span>
+<span class="kn">from</span> <span class="nn">.sponge_layer</span> <span class="kn">import</span> <span class="n">clip_spongeless</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">integrate</span>
+
+<div class="viewcode-block" id="model">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.model">[docs]</a>
+<span class="k">class</span> <span class="nc">model</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A class for models, which in *joe* specifically refers to particular PDEs.</span>
+
+<span class="sd">    This defines a model PDE with the name &#39;model_kw&#39; in the Fourier-space form</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \left(\partial_t\right)^{\texttt{t\_ord}} V(k,t) + \texttt{symbol}(k) V(k,t) = \texttt{fourier\_forcing}</span>
+
+<span class="sd">    where :math:`V(k,t)` is the Fourier state.</span>
+
+<span class="sd">    Note how the init takes in two callables for the symbol and forcing terms, but these get converted to dicts.</span>
+<span class="sd">    This is to avoid making the weird no-no of having callable attributes. The trick comes from</span>
+<span class="sd">    &lt;https://stackoverflow.com/questions/35321744/python-function-as-class-attribute-becomes-a-bound-method&gt;... we</span>
+<span class="sd">    instead make the &quot;callable attributes&quot; !dicts! with callable entries. This dirty trick is all under the hood in</span>
+<span class="sd">    the model class, so when defining and using a model object the user doesn&#39;t need to care.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">        model_kw : str</span>
+<span class="sd">            A name for the model.</span>
+<span class="sd">        t_ord : int</span>
+<span class="sd">            Temporal order of derivatives in the model. Currently only t_ord=1,2 are supported.</span>
+<span class="sd">        symbol : dict</span>
+<span class="sd">            Symbol of the linear, constant-coefficient part of the PDE. symbol[&#39;symbol&#39;] must be a callable with a</span>
+<span class="sd">            single argument `k`, representing a Fourier-space frequency variable.</span>
+<span class="sd">        fourier_forcing : dict</span>
+<span class="sd">            Forcing term in the PDE, represented in Fourier space. fourier_forcing[&#39;fourier_forcing&#39;] must be a callable</span>
+<span class="sd">            that takes in four arguments `(V, k, x, nonlinear)` where `V,k,x` are ndarrays and `nonlinear` is a boolean.</span>
+<span class="sd">        nonlinear : boolean, optional</span>
+<span class="sd">            True if we include nonlinearity in the model, False otherwise. Default: True.</span>
+<span class="sd">        complex : boolean</span>
+<span class="sd">            False if solution to the PDE is supposed to be real, True otherwise. Default: False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_kw</span><span class="p">,</span> <span class="n">t_ord</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">fourier_forcing</span><span class="p">,</span> <span class="n">nonlinear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_kw</span> <span class="o">=</span> <span class="n">model_kw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">=</span> <span class="n">t_ord</span>  <span class="c1"># an integer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;symbol&#39;</span><span class="p">:</span> <span class="n">symbol</span><span class="p">}</span>  <span class="c1"># callable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fourier_forcing</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fourier_forcing&#39;</span><span class="p">:</span> <span class="n">fourier_forcing</span><span class="p">}</span>  <span class="c1"># callable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nonlinear</span> <span class="o">=</span> <span class="n">nonlinear</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complex</span> <span class="o">=</span> <span class="nb">complex</span>
+
+<div class="viewcode-block" id="model.get_symbol">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.model.get_symbol">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">[</span><span class="s1">&#39;symbol&#39;</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
+
+    <span class="c1"># obtain the forcing term in Fourier space</span>
+<div class="viewcode-block" id="model.get_fourier_forcing">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.model.get_fourier_forcing">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_fourier_forcing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourier_forcing</span><span class="p">[</span><span class="s1">&#39;fourier_forcing&#39;</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="initial_state">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.initial_state">[docs]</a>
+<span class="k">class</span> <span class="nc">initial_state</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A class for initial states.</span>
+
+<span class="sd">    Having a special class for initial states instead of just representing them as callables or keywords allows for</span>
+<span class="sd">    greater flexibility, as well as some symmetry with the `model` class :class:`~joe_lab.joe.model`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">        initial_state_kw : str</span>
+<span class="sd">            Name of the initial state.</span>
+<span class="sd">        initial_state_func : dict</span>
+<span class="sd">            A dict defined such that initial_state_func[&#39;initial_state_func&#39;] is a callable representing the actual</span>
+<span class="sd">            initial state function. One must be careful of this function&#39;s output&#39;s shape when dealing with second-order</span>
+<span class="sd">            problems.</span>
+<span class="sd">        initial_state : ndarray</span>
+<span class="sd">            The values of the initial state on our particular grid. Not defined during init, and should only be accessed</span>
+<span class="sd">            under-the-hood.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_state_kw</span><span class="p">,</span> <span class="n">initial_state_func</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_state_kw</span> <span class="o">=</span> <span class="n">initial_state_kw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_state_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;initial_state_func&#39;</span><span class="p">:</span> <span class="n">initial_state_func</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_state</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># obtain the actual initial state fnc</span>
+<div class="viewcode-block" id="initial_state.get_initial_state">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.initial_state.get_initial_state">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_state_func</span><span class="p">[</span><span class="s1">&#39;initial_state_func&#39;</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># a class for simulations.</span>
+
+<div class="viewcode-block" id="simulation">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation">[docs]</a>
+<span class="k">class</span> <span class="nc">simulation</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A class for simulations.</span>
+
+<span class="sd">    This class is the heart of *joe*, and most of the scientific information (including visualizations) can be accessed</span>
+<span class="sd">    via the attributes of methods of a simulation instance.</span>
+
+<span class="sd">    You init an instance with an `stgrid` (space-time grid) dict, an instance of the `model` class (:class:`~joe_lab.joe.model`) to</span>
+<span class="sd">    specify the PDE, and an instance of the `initial_state` class (:class:`~joe_lab.joe.initial_state`). Then you can</span>
+<span class="sd">    call a run simulation function on a simulation object to solve the IVP and store/save the solution, or load up the</span>
+<span class="sd">    solution from an experiment you&#39;ve already done.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">        length : float</span>
+<span class="sd">            Length of the spatial domain.</span>
+<span class="sd">        T : float</span>
+<span class="sd">            Total physical runtime of the simulation. That is, the spacetime grid covers the time interval [0,T].</span>
+<span class="sd">        N : int</span>
+<span class="sd">            Number of spatial locations on which to sample the solution to our PDE.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Time step size for numerical integration of the PDE.</span>
+<span class="sd">        model : model</span>
+<span class="sd">            An instance of the model class, see :class:`~joe_lab.joe.model`.</span>
+<span class="sd">        model_kw : str</span>
+<span class="sd">            A name for the model.</span>
+<span class="sd">        t_ord : int</span>
+<span class="sd">            Temporal order of derivatives in the model. Currently only `t_ord=1,2` are supported.</span>
+<span class="sd">        initial_state_kw : str</span>
+<span class="sd">            Name of the initial state.</span>
+<span class="sd">        ndump : int</span>
+<span class="sd">            Only every `ndump` timesteps are stored when saving simulation results.</span>
+<span class="sd">        Udata : ndarray</span>
+<span class="sd">            Values of the solution to our PDE sampled on our space-time grid, stored as an array. The 0 axis represents</span>
+<span class="sd">            temporal variation, and the 1 axis represents spatial variation (so each row is a fixed-time snapshot of</span>
+<span class="sd">            the solution on our spatial grid).</span>
+<span class="sd">        nonlinear : boolean</span>
+<span class="sd">            True if we include nonlinearity in the model, False otherwise. Default: True.</span>
+<span class="sd">        complex : boolean</span>
+<span class="sd">            False if solution to the PDE is supposed to be real, True otherwise. Default: False.</span>
+<span class="sd">        sponge_params : dict</span>
+<span class="sd">            Contains particular parameters for the sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`.</span>
+<span class="sd">        sponge_layer : boolean</span>
+<span class="sd">            True if sponge layer is included, False otherwise. Default: False.</span>
+<span class="sd">        sfrac : float</span>
+<span class="sd">            Fraction of the spatial grid that is not taken up by the sponge layer. By convention, this fraction is taken</span>
+<span class="sd">            from the middle of the grid.</span>
+<span class="sd">        x : ndarray</span>
+<span class="sd">            Spatial grid of [-0.5*`length`, 0.5*`length`].</span>
+<span class="sd">        initial_state : ndarray</span>
+<span class="sd">            Initial state function sampled at `x`</span>
+<span class="sd">        fm : ndarray</span>
+<span class="sd">            First moments (spatial integrals) of the solution to our PDE.</span>
+<span class="sd">        fm_error : ndarray</span>
+<span class="sd">            Absolute difference between `fm` and `fm[0]`, the initial first moment.</span>
+<span class="sd">        sm : ndarray</span>
+<span class="sd">            Second moments (spatial L2 - norms) of the solution to our PDE.</span>
+<span class="sd">        sm_error : ndarray</span>
+<span class="sd">            Absolute difference between `sm` and `sm[0]`, the initial second moment.</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the .pkl file the sim may be saved in= &#39;ic_plot, or loaded from.</span>
+<span class="sd">        ic_picname : str</span>
+<span class="sd">            Name of the initial state plot as a .png file.</span>
+<span class="sd">        picname : str</span>
+<span class="sd">            Name of the Hovmoeller (filled space-time contour) plot of the solution as a .png file.</span>
+<span class="sd">        realpicname : str</span>
+<span class="sd">            Name of the Hovmoeller plot of the real part of the solution as a .png file.</span>
+<span class="sd">        imagpicname : str</span>
+<span class="sd">            Name of the Hovmoeller plot of the imaginary part of the solution as a .png file.</span>
+<span class="sd">        modpicname : str</span>
+<span class="sd">            Name of the Hovmoeller plot of the modulus of the solution as a .png file.</span>
+<span class="sd">        moviename : str</span>
+<span class="sd">            Name of the movie of the solution as a .mp4 file.</span>
+<span class="sd">        realmoviename : str</span>
+<span class="sd">            Name of the movie of the real part of the solution as a .mp4 file.</span>
+<span class="sd">        imagmoviename : str</span>
+<span class="sd">            Name of the movie of the imaginary part of the solution as a .mp4 file.</span>
+<span class="sd">        modmoviename : str</span>
+<span class="sd">            Name of the movie of the modulus of the solution as a .mp4 file.</span>
+<span class="sd">        combomoviename : str</span>
+<span class="sd">            Name of the movie of the solution (or its modulus if `complex=True`) and its power spectrum as a .mp4 file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stgrid</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">bc</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndump</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">stgrid</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="n">stgrid</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">stgrid</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">stgrid</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>  <span class="c1"># a model object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_kw</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">model_kw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">t_ord</span>  <span class="c1"># an integer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_state_kw</span> <span class="o">=</span> <span class="n">initial_state</span><span class="o">.</span><span class="n">initial_state_kw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nonlinear</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">nonlinear</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sponge_params</span> <span class="o">=</span> <span class="n">sponge_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complex</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">complex</span>
+
+        <span class="k">if</span> <span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;sponge_layer&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;User-defined BC string not accepted. Valid BC strings: periodic, sponge_layer&#39;</span><span class="p">)</span>
+
+        <span class="c1"># the &quot;spongeless fraction&quot; attribute is a bit special for plotting and so deserves to be</span>
+        <span class="c1"># singled out early on</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sponge_params</span><span class="p">[</span><span class="s1">&#39;spongeless_frac&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span> <span class="o">=</span> <span class="mf">1.</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ndump</span> <span class="o">=</span> <span class="n">ndump</span>  <span class="c1"># hyperparameter describing how often we save our time steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_state</span> <span class="o">=</span> <span class="n">initial_state</span><span class="o">.</span><span class="n">get_initial_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="c1"># IMPORTANT: self.initial_state is an array, but the</span>
+        <span class="c1"># actual input initial_state to the simulation class is an initial_state object!</span>
+
+        <span class="n">my_string</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_length=</span><span class="si">%.1f</span><span class="s1">_T=</span><span class="si">%.1f</span><span class="s1">_N=</span><span class="si">%.1f</span><span class="s1">_dt=</span><span class="si">%.6f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span>
+                                                                       <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_modelkw=&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_kw</span>
+                     <span class="o">+</span> <span class="s1">&#39;_ICkw=&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_state_kw</span> <span class="o">+</span> <span class="s1">&#39;_nonlinear=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nonlinear</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_sponge_layer=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;simdata&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.pkl&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ic_picname</span> <span class="o">=</span> <span class="s1">&#39;ic_plot&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ic_imag_picname</span> <span class="o">=</span> <span class="s1">&#39;ic_plot_imag&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">picname</span> <span class="o">=</span> <span class="s1">&#39;hovplot&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">realpicname</span> <span class="o">=</span> <span class="s1">&#39;hovplot_real&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imagpicname</span> <span class="o">=</span> <span class="s1">&#39;hovplot_imag&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modpicname</span> <span class="o">=</span> <span class="s1">&#39;hovplot_mod&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">moviename</span> <span class="o">=</span> <span class="s1">&#39;movie&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.mp4&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">realmoviename</span> <span class="o">=</span> <span class="s1">&#39;movie_real&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.mp4&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imagmoviename</span> <span class="o">=</span> <span class="s1">&#39;movie_imag&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.mp4&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modmoviename</span> <span class="o">=</span> <span class="s1">&#39;movie_mod&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.mp4&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combomoviename</span> <span class="o">=</span> <span class="s1">&#39;combomovie&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.mp4&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># the Udata will be called later!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fm</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># first &amp; second moments, error in these will likewise be called later</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fm_error</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sm</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sm_error</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="simulation.run_sim">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.run_sim">[docs]</a>
+    <span class="k">def</span> <span class="nf">run_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_kw</span><span class="o">=</span><span class="s1">&#39;etdrk4&#39;</span><span class="p">,</span> <span class="n">print_runtime</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform the time-stepping starting from the initial state and ending at time `T`. Populates the attribute</span>
+<span class="sd">        `Udata` (the actual values of our solution throughout the simulation) in our `simulation`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method_kw : str, optional</span>
+<span class="sd">            Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
+<span class="sd">            and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.</span>
+<span class="sd">            Default: &#39;etdrk4&#39;.</span>
+<span class="sd">        print_runtime: boolean, optional</span>
+<span class="sd">            True if you would like to print the wall-clock runtime of the simulation, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">time</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">Udata</span> <span class="o">=</span> <span class="n">do_time_stepping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_kw</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span> <span class="o">=</span> <span class="n">Udata</span>
+
+        <span class="k">if</span> <span class="n">print_runtime</span><span class="p">:</span>
+            <span class="n">runtime</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Simulation runtime = </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">runtime</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="simulation.save">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.save">[docs]</a>
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save the simulation object to an external .pkl file in the joe_sim_archive directory using the pickle module.</span>
+
+<span class="sd">        For a technical python reason, calling this function reassigns the simulation&#39;s `model` attribute to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># OK this line needs some explaining! Basically the simulation object needs to track its</span>
+        <span class="c1"># model, and not just the model_kw, bcz during time-stepping we need to of course access the symbol and the</span>
+        <span class="c1"># forcing term. BUT to make the built-in (non-custom) models easily callable from just the model_kw, we need</span>
+        <span class="c1"># to define model objects that in turn involve nested functions. And these can&#39;t be pickled because of course not</span>
+        <span class="c1"># why would anything work. So, the best way I found to accommodate all of...</span>
+        <span class="c1"># 1) having the model available for time-stepping</span>
+        <span class="c1"># 2) being able to have users define custom models</span>
+        <span class="c1"># 3) being able to have users just call one of my built-in models with a model_kw</span>
+        <span class="c1"># was to just forget the actual model attribute of our simulation. Since we still keep the model_kw attribute</span>
+        <span class="c1"># this is not a big deal when it comes to saving/loading: as long as we have all of the data we have from the sim</span>
+        <span class="c1"># and the file is named properly, there&#39;s nothing to worry about. Said differently, we keep the full model attribute</span>
+        <span class="c1"># of a simulation object around only as long as we need it.</span>
+
+        <span class="n">my_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;joe_sim_archive&quot;</span><span class="p">)</span>
+
+        <span class="c1"># if the archive folder doesn&#39;t exist, make it</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">my_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">my_path</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;joe_sim_archive/&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outp</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outp</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="simulation.load">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.load">[docs]</a>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loads a sim from a .pkl file that already exists in the joe_sim_archive directory.</span>
+
+<span class="sd">        Since time-stepping only fills the `Udata` attribute to the `simulation` instance, &quot;loading&quot; a saved sim just means</span>
+
+<span class="sd">        1) loading the pickle and</span>
+
+<span class="sd">        2) adding the `Udata` attribute to our `simulation` instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;joe_sim_archive/&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inp</span><span class="p">:</span>
+                <span class="n">loaded_sim</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span> <span class="o">=</span> <span class="n">loaded_sim</span><span class="o">.</span><span class="n">Udata</span>
+
+        <span class="c1"># due to old filenaming conventions where sometimes what is now the boolean &quot;sponge_layer&quot; was called</span>
+        <span class="c1"># &quot;absorbing_layer&quot; or &quot;abslayer&quot;, we want to allow the possibility of loading old files.</span>
+        <span class="c1"># TODO: This is only for Adam George Morgan and should be deprecated in future releases/ once the relevant</span>
+        <span class="c1">#  papers are published</span>
+
+        <span class="k">except</span><span class="p">:</span>
+
+            <span class="n">old_string</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_length=</span><span class="si">%.1f</span><span class="s1">_T=</span><span class="si">%.1f</span><span class="s1">_N=</span><span class="si">%.1f</span><span class="s1">_dt=</span><span class="si">%.6f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">,</span>
+                                                                <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_modelkw=&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_kw</span> <span class="o">+</span> <span class="s1">&#39;_ICkw=&#39;</span> <span class="o">+</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">initial_state_kw</span> <span class="o">+</span> <span class="s1">&#39;_nonlinear=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nonlinear</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_abslayer=&#39;</span>
+                            <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span><span class="p">))</span>
+
+            <span class="n">old_filename</span> <span class="o">=</span> <span class="s1">&#39;simdata&#39;</span> <span class="o">+</span> <span class="n">old_string</span> <span class="o">+</span> <span class="s1">&#39;.pkl&#39;</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;joe_sim_archive/&#39;</span> <span class="o">+</span> <span class="n">old_filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">inp</span><span class="p">:</span>
+                <span class="n">loaded_sim</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span> <span class="o">=</span> <span class="n">loaded_sim</span><span class="o">.</span><span class="n">Udata</span></div>
+
+
+<div class="viewcode-block" id="simulation.load_or_run">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.load_or_run">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_or_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_kw</span><span class="o">=</span><span class="s1">&#39;etdrk4&#39;</span><span class="p">,</span> <span class="n">print_runtime</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load our simulation from the joe_sim_archive directory if it&#39;s there, or run the simulation if it can&#39;t be</span>
+<span class="sd">        found in joe_sim_archive. The end result is that our simulation&#39;s `Udata` attribute becomes populated with the</span>
+<span class="sd">        space-time grid values of our solution.</span>
+
+<span class="sd">        I recommend you use this method as your on-the-ground alternative to `run_sim`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">         method_kw : str, optional</span>
+<span class="sd">            Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
+<span class="sd">            and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.</span>
+<span class="sd">            Default: &#39;etdrk4&#39;.</span>
+<span class="sd">        print_runtime: boolean, optional</span>
+<span class="sd">            True if you would like to print the wall-clock runtime of the simulation, False otherwise.</span>
+<span class="sd">        save : boolean, optional</span>
+<span class="sd">            True if you definitely want the simulation saved, and False otherwise. Default: True.</span>
+<span class="sd">        verbose : boolean, optional</span>
+<span class="sd">            True if you want to see printed messages about whether a saved simulation was found in the</span>
+<span class="sd">            joe_sim_archive directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saved simulation found, loading saved data.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No saved simulation found, running simulation.&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_sim</span><span class="p">(</span><span class="n">method_kw</span><span class="o">=</span><span class="n">method_kw</span><span class="p">,</span> <span class="n">print_runtime</span><span class="o">=</span><span class="n">print_runtime</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="simulation.plot_initial_condition">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.plot_initial_condition">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_initial_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_ylim</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:cerulean&#39;</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Produce a line plot of the initial state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        custom_ylim : array_like, optional.</span>
+<span class="sd">            Custom values for the y-limits on the axes. Default: None.</span>
+<span class="sd">        dpi : int, optional</span>
+<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">        color : str, optional</span>
+<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
+<span class="sd">            Default: &#39;xkcd:cerulean&#39;.</span>
+<span class="sd">        fieldname : str, optional</span>
+<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">        usetex : boolean, optional</span>
+<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">        show_figure: boolean, optional</span>
+<span class="sd">            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
+<span class="sd">        save_figure: boolean, optional</span>
+<span class="sd">            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at all.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_state</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_state</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_state</span> <span class="c1"># this line here is to catch the weird case where you&#39;re second order</span>
+                <span class="c1"># but only prescribed one bc on u, not u_t. So when starting the time-stepper joe automatically assumes</span>
+                <span class="c1"># the inital u_t is zero.</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;t_ord must be 1 or 2.&#39;</span><span class="p">)</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="c1"># if the field is complex, we want to split it into its real and imaginary parts and plot these</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">usetex</span><span class="p">:</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">real_ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\mathrm</span><span class="si">{Re}</span><span class="s1">\left(u(x,0)\right)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                    <span class="n">imag_ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\mathrm</span><span class="si">{Im}</span><span class="s1">\left(u(x,0)\right)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                    <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$x$&#39;</span>
+
+                <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                    <span class="n">usetex</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="n">real_ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Re(u(x,0))&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                <span class="n">imag_ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Im(u(x,0))&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;x&#39;</span>
+
+            <span class="n">nice_plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">real_ylabel</span><span class="p">,</span> <span class="n">custom_ylim</span><span class="o">=</span><span class="n">custom_ylim</span><span class="p">,</span>
+                      <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="n">save_figure</span><span class="p">,</span> <span class="n">picname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ic_picname</span><span class="p">,</span>
+                      <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">,</span>
+                      <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+            <span class="n">nice_plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">imag_ylabel</span><span class="p">,</span> <span class="n">custom_ylim</span><span class="o">=</span><span class="n">custom_ylim</span><span class="p">,</span>
+                      <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="n">save_figure</span><span class="p">,</span> <span class="n">picname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ic_imag_picname</span><span class="p">,</span>
+                      <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">usetex</span><span class="p">:</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$u(x,t=0)$&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                    <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;$x$&#39;</span>
+
+                <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>  <span class="c1"># catch a user error thinking they have tex when they don&#39;t</span>
+                    <span class="n">usetex</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ylabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;u(x,t=0)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                <span class="n">xlabel</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;x&#39;</span>
+
+            <span class="n">nice_plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">,</span> <span class="n">custom_ylim</span><span class="o">=</span><span class="n">custom_ylim</span><span class="p">,</span>
+                      <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="n">save_figure</span><span class="p">,</span> <span class="n">picname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ic_picname</span><span class="p">,</span>
+                      <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="simulation.hov_plot">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.hov_plot">[docs]</a>
+    <span class="k">def</span> <span class="nf">hov_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">umin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;cmo.haline&#39;</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a Hovmoeller plot (filled contour plot in space-time) of the PDE solution.</span>
+
+<span class="sd">        If the PDE solution is complex-valued, this produces Hovmoeller plots of its real part and its imaginary part.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        umin : float, optional.</span>
+<span class="sd">            Minimum field value to include, used to construct colorbar lower limit. Default: None.</span>
+<span class="sd">        umax : float, optional.</span>
+<span class="sd">            Maximum field value to include, used to construct colorbar upper limit. Default: None.</span>
+<span class="sd">        dpi : int, optional</span>
+<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">        cmap : str</span>
+<span class="sd">            Name of the colormap to use. For a list of great colormaps see &lt;https://matplotlib.org/cmocean/&gt;.</span>
+<span class="sd">            Default: &#39;cmo.haline&#39;.</span>
+<span class="sd">        fieldname : str, optional</span>
+<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">        usetex : boolean, optional</span>
+<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">        show_figure: boolean, optional</span>
+<span class="sd">            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
+<span class="sd">        save_figure: boolean, optional</span>
+<span class="sd">            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at all.</span>
+<span class="sd">            Default: False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nsteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">nsteps</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;t_ord can only be 1 or 2.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># add right endpoint to prevent a stripe from appearing in the pics</span>
+        <span class="n">x_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">x_end</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="n">x_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex</span><span class="p">:</span>
+            <span class="n">u_end</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">u_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="n">u_end</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">u_end</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">u</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">u_end</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="n">u_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">spinner</span><span class="p">(</span><span class="s1">&#39;Rendering Hovmoeller plot...&#39;</span><span class="p">):</span>
+
+            <span class="c1"># if the field is real, nothing to do</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex</span><span class="p">:</span>
+
+                <span class="n">hov_plot</span><span class="p">(</span><span class="n">x_end</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">u_end</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="n">fieldname</span><span class="p">,</span> <span class="n">umin</span><span class="o">=</span><span class="n">umin</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="n">umax</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+                         <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="n">save_figure</span><span class="p">,</span>
+                         <span class="n">picname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">picname</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">)</span>
+
+            <span class="c1"># if the field is complex, we want to split it into its real and imaginary parts and plot these</span>
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="k">if</span> <span class="n">usetex</span><span class="p">:</span>
+
+                    <span class="n">real_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\mathrm</span><span class="si">{Re}</span><span class="s1">\left(u\right)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                    <span class="n">imag_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\mathrm</span><span class="si">{Im}</span><span class="s1">\left(u\right)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+                <span class="k">else</span><span class="p">:</span>
+
+                    <span class="n">real_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Re(u)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                    <span class="n">imag_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Im(u)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+                <span class="n">hov_plot</span><span class="p">(</span><span class="n">x_end</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">u_end</span><span class="p">),</span> <span class="n">fieldname</span><span class="o">=</span><span class="n">real_fieldname</span><span class="p">,</span> <span class="n">umin</span><span class="o">=</span><span class="n">umin</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="n">umax</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+                         <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="n">save_figure</span><span class="p">,</span>
+                         <span class="n">picname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">realpicname</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">)</span>
+
+                <span class="n">hov_plot</span><span class="p">(</span><span class="n">x_end</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">u_end</span><span class="p">),</span> <span class="n">fieldname</span><span class="o">=</span><span class="n">imag_fieldname</span><span class="p">,</span> <span class="n">umin</span><span class="o">=</span><span class="n">umin</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="n">umax</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+                         <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="n">save_figure</span><span class="p">,</span>
+                         <span class="n">picname</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">imagpicname</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="simulation.hov_plot_modulus">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.hov_plot_modulus">[docs]</a>
+    <span class="k">def</span> <span class="nf">hov_plot_modulus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">umin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;cmo.haline&#39;</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The same as :func:`~joe_lab.joe.hov_plot`, but with the modulus of the field.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        umin : float, optional.</span>
+<span class="sd">            Minimum field value to include, used to construct colorbar lower limit. Default: None.</span>
+<span class="sd">        umax : float, optional.</span>
+<span class="sd">            Maximum field value to include, used to construct colorbar upper limit. Default: None.</span>
+<span class="sd">        dpi : int, optional</span>
+<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">        cmap : str</span>
+<span class="sd">            Name of the colormap to use. For a list of great colormaps see &lt;https://matplotlib.org/cmocean/&gt;.</span>
+<span class="sd">            Default: &#39;cmo.haline&#39;.</span>
+<span class="sd">        fieldname : str, optional</span>
+<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">        usetex : boolean, optional</span>
+<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">        show_figure: boolean, optional</span>
+<span class="sd">            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
+<span class="sd">        save_figure: boolean, optional</span>
+<span class="sd">            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at</span>
+<span class="sd">            all. Default: False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nsteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">nsteps</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;t_ord can only be 1 or 2.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># add right endpoint to prevent a stripe from appearing in the pics</span>
+        <span class="n">x_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span>
+        <span class="n">x_end</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="n">x_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex</span><span class="p">:</span>
+
+            <span class="n">u_end</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">u_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="n">u_end</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">N</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="n">u_end</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">u</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">u_end</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="n">u_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="n">u_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">u_end</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">spinner</span><span class="p">(</span><span class="s1">&#39;Rendering Hovmoeller plot of modulus...&#39;</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">usetex</span><span class="p">:</span>
+
+                <span class="n">mod_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\left|u\right|&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="n">mod_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;|u|&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+            <span class="n">hov_plot</span><span class="p">(</span><span class="n">x_end</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">u_end</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="n">mod_fieldname</span><span class="p">,</span> <span class="n">umin</span><span class="o">=</span><span class="n">umin</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="n">umax</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+                     <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="n">save_figure</span><span class="p">,</span>
+                     <span class="n">picname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">modpicname</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="simulation.save_movie">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.save_movie">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_movie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="s1">&#39;xkcd:ocean green&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save a movie of the evolution of our solution as a .mp4 file.</span>
+
+<span class="sd">        If the PDE solution is complex-valued this produces movies of its real part and its imaginary part.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fps: int, optional</span>
+<span class="sd">            Frames-per-second for the movie. Default: 200.</span>
+<span class="sd">        dpi : int, optional</span>
+<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">        fieldname : str, optional</span>
+<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">        usetex : boolean, optional</span>
+<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">        fieldcolor: str, optional</span>
+<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
+<span class="sd">            Default: &#39;xkcd:ocean green&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">with</span> <span class="n">spinner</span><span class="p">(</span><span class="s1">&#39;Rendering movie...&#39;</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex</span><span class="p">:</span>
+                <span class="n">save_movie</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                           <span class="n">fieldname</span><span class="o">=</span><span class="n">fieldname</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span> <span class="n">ndump</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">moviename</span><span class="p">,</span>
+                           <span class="n">periodic</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="n">fieldcolor</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="k">if</span> <span class="n">usetex</span><span class="p">:</span>
+
+                    <span class="n">real_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\mathrm</span><span class="si">{Re}</span><span class="s1">\left(u\right)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                    <span class="n">imag_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\mathrm</span><span class="si">{Im}</span><span class="s1">\left(u\right)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+                <span class="k">else</span><span class="p">:</span>
+
+                    <span class="n">real_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Re(u)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+                    <span class="n">imag_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;Im(u)&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+                <span class="n">save_movie</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                           <span class="n">fieldname</span><span class="o">=</span><span class="n">real_fieldname</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span> <span class="n">ndump</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">realmoviename</span><span class="p">,</span>
+                           <span class="n">periodic</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="n">fieldcolor</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+                <span class="n">save_movie</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">u</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                           <span class="n">fieldname</span><span class="o">=</span><span class="n">imag_fieldname</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span> <span class="n">ndump</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">imagmoviename</span><span class="p">,</span>
+                           <span class="n">periodic</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="n">fieldcolor</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span></div>
+
+
+
+    <span class="c1"># save a movie the modulus</span>
+<div class="viewcode-block" id="simulation.save_movie_modulus">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.save_movie_modulus">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_movie_modulus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="s1">&#39;xkcd:ocean green&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The same as :func:`~joe_lab.joe.save_movie`, but with the modulus of the field plotted instead.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fps: int, optional</span>
+<span class="sd">            Frames-per-second for the movie. Default: 200.</span>
+<span class="sd">        dpi : int, optional</span>
+<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">        fieldname : str, optional</span>
+<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">        usetex : boolean, optional</span>
+<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">        fieldcolor: str, optional</span>
+<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
+<span class="sd">            Default: &#39;xkcd:ocean green&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">spinner</span><span class="p">(</span><span class="s1">&#39;Rendering movie of modulus...&#39;</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">usetex</span><span class="p">:</span>
+
+                <span class="n">mod_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\left|u\right|&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="n">mod_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;|u|&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+            <span class="n">save_movie</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                            <span class="n">fieldname</span><span class="o">=</span><span class="n">mod_fieldname</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span> <span class="n">ndump</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">modmoviename</span><span class="p">,</span>
+                            <span class="n">periodic</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="n">fieldcolor</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="simulation.save_combomovie">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.save_combomovie">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_combomovie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="s1">&#39;xkcd:ocean green&#39;</span><span class="p">,</span> <span class="n">speccolor</span><span class="o">=</span><span class="s1">&#39;xkcd:dark orange&#39;</span><span class="p">,</span>
+                        <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save a movie of the evolution of our field as well as a nested, tinier movie of its power spectrum.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fps: int, optional</span>
+<span class="sd">            Frames-per-second for the movie. Default: 200.</span>
+<span class="sd">        dpi : int, optional</span>
+<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">        fieldname : str, optional</span>
+<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">        usetex : boolean, optional</span>
+<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">        fieldcolor: str, optional</span>
+<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
+<span class="sd">            Default: &#39;xkcd:ocean green&#39;.</span>
+<span class="sd">        speccolor: str, optional</span>
+<span class="sd">            Name of the color you want the curve of the power spectrum to be. Default: &#39;xkcd:dark orange&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">spinner</span><span class="p">(</span><span class="s1">&#39;Rendering combo movie...&#39;</span><span class="p">):</span>
+
+            <span class="c1"># for a real field there&#39;s nothing to do....</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex</span><span class="p">:</span>
+
+                <span class="n">save_combomovie</span><span class="p">(</span><span class="n">u</span><span class="p">,</span>  <span class="n">x</span><span class="o">=</span><span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                <span class="n">fieldname</span><span class="o">=</span><span class="n">fieldname</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="n">fieldcolor</span><span class="p">,</span>
+                                <span class="n">speccolor</span><span class="o">=</span><span class="n">speccolor</span><span class="p">,</span> <span class="n">ndump</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">combomoviename</span><span class="p">,</span>
+                                <span class="n">periodic</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+            <span class="c1"># for a complex field just plot the modulus and the power spectrum</span>
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">usetex</span><span class="p">:</span>
+
+                    <span class="n">mod_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\left|u\right|&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+                <span class="k">else</span><span class="p">:</span>
+
+                    <span class="n">mod_fieldname</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;|u|&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fieldname</span><span class="p">))</span>
+
+                <span class="n">save_combomovie</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+                                <span class="n">fieldname</span><span class="o">=</span><span class="n">mod_fieldname</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="n">fieldcolor</span><span class="p">,</span>
+                                <span class="n">speccolor</span><span class="o">=</span><span class="n">speccolor</span><span class="p">,</span> <span class="n">ndump</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">combomoviename</span><span class="p">,</span>
+                                <span class="n">periodic</span><span class="o">=</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sponge_layer</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="simulation.get_fm">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.get_fm">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_fm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the first moment (spatial integral) of the solution to our PDE, `fm`.</span>
+
+<span class="sd">        Also gets the absolute difference between `fm` and `fm[0]`, the initial first moment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span>
+
+        <span class="n">fm</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">length</span><span class="p">)</span> <span class="o">*</span> <span class="n">integrate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span> <span class="c1"># take mean</span>
+
+        <span class="n">fm_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fm</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">fm</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fm</span> <span class="o">=</span> <span class="n">fm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fm_error</span> <span class="o">=</span> <span class="n">fm_error</span></div>
+
+
+    <span class="c1"># obtain second moment</span>
+<div class="viewcode-block" id="simulation.get_sm">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.get_sm">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_sm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the second moment (spatial L2 - norm) of the solution to our PDE, `sm`.</span>
+
+<span class="sd">        Also gets the absolute difference between `sm` and `sm[0]`, the initial second moment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">N</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Udata</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fm</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_fm</span><span class="p">()</span>
+
+        <span class="n">fm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fm</span>
+
+        <span class="n">sm</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">length</span><span class="p">)</span> <span class="o">*</span> <span class="n">integrate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span> <span class="c1"># np.absolute for complex-valued fields</span>
+        <span class="n">sm</span> <span class="o">-=</span> <span class="n">fm</span><span class="o">**</span><span class="mi">2</span>
+
+        <span class="n">sm_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sm</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">sm</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sm</span> <span class="o">=</span> <span class="n">sm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sm_error</span> <span class="o">=</span> <span class="n">sm_error</span></div>
+</div>
+
+
+<span class="c1"># TODO: the func below here because it doesn&#39;t have a better home right now, and it *almost* takes simulation</span>
+<span class="c1">#     objects in as input.</span>
+<div class="viewcode-block" id="do_refinement_study">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.do_refinement_study">[docs]</a>
+<span class="k">def</span> <span class="nf">do_refinement_study</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Ns</span><span class="p">,</span> <span class="n">dts</span><span class="p">,</span> <span class="n">method_kw</span><span class="o">=</span><span class="s1">&#39;etdrk4&#39;</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">fit_min</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fit_max</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a refinement study based on Richardson extrapolation for error estimation. Very useful for quickly</span>
+<span class="sd">    and painless checking accuracy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model: model</span>
+<span class="sd">        Instance of the class `model` :class:`~joe_lab.joe.model`.</span>
+<span class="sd">    initial_state: initial_state</span>
+<span class="sd">        Instance of the class `initial state` :class:`~joe_lab.joe.initial_state`.</span>
+<span class="sd">    length : float</span>
+<span class="sd">        Length of the spatial domain</span>
+<span class="sd">    T : float</span>
+<span class="sd">        Total physical runtime of the simulation. That is, the spacetime grid covers the time interval [0,T].</span>
+<span class="sd">    Ns : list of ints</span>
+<span class="sd">        Number of spatial locations on which to sample the solution to our PDE.</span>
+<span class="sd">    dts : list of floats</span>
+<span class="sd">        Time step sizes for numerical integration of the PDE.</span>
+<span class="sd">    method_kw : str, optional</span>
+<span class="sd">        Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
+<span class="sd">        and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.</span>
+<span class="sd">        Default: &#39;etdrk4&#39;.</span>
+<span class="sd">    bc : str, optional</span>
+<span class="sd">        String specifying the boundary conditions. Must be &#39;periodic&#39; or &#39;sponge_layer&#39;.</span>
+<span class="sd">    sponge_params: dict</span>
+<span class="sd">        Contains particular parameters for the sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`.</span>
+<span class="sd">    dpi : int, optional</span>
+<span class="sd">        Dots-per-inch on the image. Default: 400.</span>
+<span class="sd">    usetex : boolean, optional</span>
+<span class="sd">        True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">    show_figure: boolean, optional</span>
+<span class="sd">        True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
+<span class="sd">    save_figure: boolean, optional</span>
+<span class="sd">        True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at</span>
+<span class="sd">        all. Default: False.</span>
+<span class="sd">    fit_min: int, optional.</span>
+<span class="sd">        Index of dts at which we *start* pulling values from the Ns[-1] error curve to approximate slope of error curve.</span>
+<span class="sd">        Default: 3.</span>
+<span class="sd">    fit_max: int, optional</span>
+<span class="sd">        Index of dts at which we *stop* pulling values from the Ns[-1] error curve to approximate slope of error curve.</span>
+<span class="sd">        Default: 7.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;serif&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>  <span class="c1"># catch a user error thinking they have tex when they don&#39;t</span>
+        <span class="n">usetex</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">Ns</span> <span class="o">=</span> <span class="n">Ns</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">num_Ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Ns</span><span class="p">)</span>
+    <span class="n">num_dts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">dts</span><span class="p">)</span>
+
+    <span class="c1"># initialize outputs</span>
+
+    <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_Ns</span><span class="p">,</span> <span class="n">num_dts</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1">#start = time.time()</span>
+    <span class="k">with</span> <span class="n">spinner</span><span class="p">(</span><span class="s1">&#39;Performing refinement study...&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_Ns</span><span class="p">):</span>
+
+            <span class="n">N</span> <span class="o">=</span> <span class="n">Ns</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+            <span class="c1"># do simulation at the worst order (largest time step) first</span>
+            <span class="n">rough_st_grid</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;length&#39;</span><span class="p">:</span><span class="n">length</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span><span class="n">T</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span><span class="n">N</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">:</span><span class="n">dts</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+            <span class="n">rough_sim</span> <span class="o">=</span> <span class="n">simulation</span><span class="p">(</span><span class="n">rough_st_grid</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="n">bc</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="n">sponge_params</span><span class="p">)</span>
+
+            <span class="n">rough_sim</span><span class="o">.</span><span class="n">load_or_run</span><span class="p">(</span><span class="n">method_kw</span><span class="o">=</span><span class="n">method_kw</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dts</span><span class="p">:</span>
+
+                <span class="n">fine_st_grid</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="n">length</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">N</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">dt</span><span class="p">}</span>
+                <span class="n">fine_sim</span> <span class="o">=</span> <span class="n">simulation</span><span class="p">(</span><span class="n">fine_st_grid</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="n">bc</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="n">sponge_params</span><span class="p">)</span>
+
+                <span class="n">fine_sim</span><span class="o">.</span><span class="n">load_or_run</span><span class="p">(</span><span class="n">method_kw</span><span class="o">=</span><span class="n">method_kw</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="n">rough_Udata</span> <span class="o">=</span> <span class="n">rough_sim</span><span class="o">.</span><span class="n">Udata</span>
+
+                <span class="n">fine_Udata</span> <span class="o">=</span> <span class="n">fine_sim</span><span class="o">.</span><span class="n">Udata</span>
+
+                <span class="c1"># use fine sim and rough sim at last time step to get Richardson error estimate</span>
+
+                <span class="k">if</span> <span class="n">fine_sim</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+
+                    <span class="n">diff</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="n">rough_Udata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">fine_Udata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">fine_sim</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">fine_sim</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+
+                    <span class="n">diff</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="n">rough_Udata</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">fine_Udata</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">fine_sim</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Order of temporal derivatives must be 1 or 2&#39;</span><span class="p">)</span>
+
+                <span class="n">errors</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">cnt</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">((</span><span class="mi">2</span> <span class="o">**</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+
+                <span class="n">rough_sim</span> <span class="o">=</span> <span class="n">fine_sim</span>  <span class="c1"># redefine for efficiency... only works bcz we refine dt in powers of 1/2</span>
+
+                <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># reinit the counter</span>
+
+    <span class="c1">#end = time.time()</span>
+    <span class="c1">#runtime = end - start</span>
+    <span class="c1">#print(&#39;Runtime for accuracy tests = %.4f&#39; % runtime + &#39; s&#39;)</span>
+
+    <span class="c1"># now we produce a plot of the errors using an awkward but functioning purpose-built plotting fnc</span>
+    <span class="n">plot_refinement_study</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Ns</span><span class="p">,</span> <span class="n">dts</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="n">method_kw</span><span class="o">=</span><span class="n">method_kw</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="n">bc</span><span class="p">,</span>
+                        <span class="n">show_figure</span><span class="o">=</span><span class="n">show_figure</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="n">save_figure</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+    <span class="c1"># estimate the slope of particular error curves if you want. Needs a bit of by-hand tweaking (controlled by the</span>
+    <span class="c1"># inputs fit_min, fit_max) bcz for small enough dt we can get level-off or rounding error domination in the error</span>
+    <span class="c1"># curve, destroying the linear trend after a certain threshold</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dts</span><span class="p">[</span><span class="n">fit_min</span><span class="p">:</span><span class="n">fit_max</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">errors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fit_min</span><span class="p">:</span><span class="n">fit_max</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">slope</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Estimated Slope of Error Line at N = </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">Ns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; is slope = </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">slope</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">slope</span></div>
+
+
+
+<span class="c1"># TODO: this function below needs to be integrated into the other error test better, or scrubbed from the package!!!</span>
+<div class="viewcode-block" id="do_refinement_study_alt">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.do_refinement_study_alt">[docs]</a>
+<span class="k">def</span> <span class="nf">do_refinement_study_alt</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Ns</span><span class="p">,</span> <span class="n">dts</span><span class="p">,</span> <span class="n">benchmark_sim</span><span class="p">,</span> <span class="n">method_kw</span><span class="o">=</span><span class="s1">&#39;etdrk4&#39;</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">fit_min</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fit_max</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;serif&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="n">usetex</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>  <span class="c1"># catch a user error thinking they have tex when they don&#39;t</span>
+        <span class="n">usetex</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">Ns</span> <span class="o">=</span> <span class="n">Ns</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">num_Ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">Ns</span><span class="p">)</span>
+    <span class="n">num_dts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">dts</span><span class="p">)</span>
+
+    <span class="c1"># initialize outputs</span>
+
+    <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_Ns</span><span class="p">,</span> <span class="n">num_dts</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">benchmark_sim</span><span class="o">.</span><span class="n">load_or_run</span><span class="p">(</span><span class="n">method_kw</span><span class="o">=</span><span class="n">method_kw</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1">#start = time.time()</span>
+    <span class="k">with</span> <span class="n">spinner</span><span class="p">(</span><span class="s1">&#39;Performing refinement study...&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_Ns</span><span class="p">):</span>
+
+            <span class="n">N</span> <span class="o">=</span> <span class="n">Ns</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dts</span><span class="p">:</span>
+
+                <span class="n">stgrid</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;length&#39;</span><span class="p">:</span> <span class="n">length</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="n">N</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="n">dt</span><span class="p">}</span>
+                <span class="n">rough_sim</span> <span class="o">=</span> <span class="n">simulation</span><span class="p">(</span><span class="n">stgrid</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="n">bc</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="n">sponge_params</span><span class="p">)</span>
+
+                <span class="n">rough_sim</span><span class="o">.</span><span class="n">load_or_run</span><span class="p">(</span><span class="n">method_kw</span><span class="o">=</span><span class="n">method_kw</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_runtime</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="n">rough_Udata</span> <span class="o">=</span> <span class="n">rough_sim</span><span class="o">.</span><span class="n">Udata</span>
+
+                <span class="n">benchmark_Udata</span> <span class="o">=</span> <span class="n">benchmark_sim</span><span class="o">.</span><span class="n">Udata</span>
+
+                <span class="c1"># use fine sim and rough sim at last time step to get Richardson error estimate</span>
+
+                <span class="n">diff</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="n">rough_Udata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span><span class="o">-</span><span class="n">benchmark_Udata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">benchmark_sim</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
+
+                <span class="n">errors</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">cnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">))</span>
+
+                <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># reinit the counter</span>
+
+    <span class="c1">#end = time.time()</span>
+    <span class="c1">#runtime = end - start</span>
+    <span class="c1">#print(&#39;Runtime for accuracy tests = %.4f&#39; % runtime + &#39; s&#39;)</span>
+
+    <span class="c1"># now we produce a plot of the errors</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+    <span class="n">dts</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dts</span>
+
+    <span class="c1"># define the cycler</span>
+    <span class="n">my_cycler</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">cycler</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;xkcd:slate&#39;</span><span class="p">,</span> <span class="s1">&#39;xkcd:raspberry&#39;</span><span class="p">,</span> <span class="s1">&#39;xkcd:goldenrod&#39;</span><span class="p">,</span> <span class="s1">&#39;xkcd:deep green&#39;</span><span class="p">])</span>
+                <span class="o">+</span> <span class="n">plt</span><span class="o">.</span><span class="n">cycler</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+                <span class="o">+</span> <span class="n">plt</span><span class="o">.</span><span class="n">cycler</span><span class="p">(</span><span class="n">linestyle</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dotted&#39;</span><span class="p">,</span> <span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="s1">&#39;solid&#39;</span><span class="p">,</span> <span class="s1">&#39;dashdot&#39;</span><span class="p">])</span>
+                <span class="o">+</span> <span class="n">plt</span><span class="o">.</span><span class="n">cycler</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">])</span>
+                <span class="o">+</span> <span class="n">plt</span><span class="o">.</span><span class="n">cycler</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+    <span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_prop_cycle</span><span class="p">(</span><span class="n">my_cycler</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_Ns</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">usetex</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="n">errors</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;$N = z$&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Ns</span><span class="p">[</span><span class="n">m</span><span class="p">])))</span>
+        <span class="c1"># ^ an awesome trick from</span>
+        <span class="c1"># https://stackoverflow.com/questions/33786332/matplotlib-using-variables-in-latex-expressions</span>
+        <span class="c1"># was used to get the labels working as above</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span><span class="n">dts</span><span class="p">,</span> <span class="n">errors</span><span class="p">[</span><span class="n">m</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;N = z&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Ns</span><span class="p">[</span><span class="n">m</span><span class="p">])))</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">usetex</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\Delta t$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Absolute Error&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Δt&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Absolute Error&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">26</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">save_figure</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+
+        <span class="c1"># add the folder &quot;joe_visuals&quot; to our path</span>
+        <span class="n">my_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;joe_visuals&quot;</span><span class="p">)</span>
+
+        <span class="c1"># first, if the folder doesn&#39;t exist, make it</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">my_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">my_path</span><span class="p">)</span>
+
+        <span class="c1"># and now we can save the fig</span>
+        <span class="k">if</span> <span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;sponge_layer&#39;</span><span class="p">:</span>
+            <span class="n">sponge_layer</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">bc</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
+            <span class="n">sponge_layer</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">my_string</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_length=</span><span class="si">%.1f</span><span class="s1">_T=</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">length</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_modelkw=&#39;</span> <span class="o">+</span> <span class="n">model</span><span class="o">.</span><span class="n">model_kw</span> <span class="o">+</span> <span class="s1">&#39;_ICkw=&#39;</span> <span class="o">+</span> <span class="n">initial_state</span><span class="o">.</span><span class="n">initial_state_kw</span> <span class="o">+</span> <span class="s1">&#39;_method_kw=&#39;</span>
+                     <span class="o">+</span> <span class="n">method_kw</span> <span class="o">+</span> <span class="s1">&#39;_nonlinear=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">nonlinear</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_abslayer=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sponge_layer</span><span class="p">))</span>
+
+        <span class="n">picname</span> <span class="o">=</span> <span class="s1">&#39;refinement_study&#39;</span> <span class="o">+</span> <span class="n">my_string</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;joe_visuals/&#39;</span> <span class="o">+</span> <span class="n">picname</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="n">show_figure</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">pass</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># estimate the slope of particular error curves if you want. Needs a bit of by-hand tweaking (controlled by the</span>
+    <span class="c1"># inputs fit_min, fit_max) bcz for small enough dt we can get level-off or rounding error domination in the error</span>
+    <span class="c1"># curve, destroying the linear trend after a certain threshold</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dts</span><span class="p">[</span><span class="n">fit_min</span><span class="p">:</span><span class="n">fit_max</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">errors</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fit_min</span><span class="p">:</span><span class="n">fit_max</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">slope</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Estimated Slope of Error Line at N = </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">Ns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; is slope = </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">slope</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Adam George Morgan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
