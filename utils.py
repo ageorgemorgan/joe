@@ -59,7 +59,7 @@ def my_ifft(V, complex=False):
 
     return out
 
-def integrate(u, length, N):
+def integrate(u, length):
     r"""Integrates N samples of a real or complex space-time field over the spatial interval [-0.5*length, 0.5*length]
        using the FFT.
 
@@ -70,8 +70,6 @@ def integrate(u, length, N):
                 -1 axis.
             length : float
                 Total length of spatial domain.
-            N : int
-                Number of spatial points where our field is sampled.
 
         Returns
         -------
@@ -79,7 +77,7 @@ def integrate(u, length, N):
                 Approximation of the integral of the sampled space-time field over the spatial interval
                 [-0.5*length, 0.5*length].
     """
-    # TODO: Can we just say N = np.shape(u)[-1] and cut out an argument? Get this done!
+    N = np.shape(u)[-1]
     return (length/N) * np.real(fft(u, axis=-1)[..., 0])
 
 def dealiased_pow(V,p):

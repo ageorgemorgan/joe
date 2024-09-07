@@ -208,6 +208,7 @@ class simulation:
 
         self.filename = 'simdata' + my_string + '.pkl'
         self.ic_picname = 'ic_plot' + my_string + '.png'
+        self.ic_imag_picname = 'ic_plot_imag' + my_string + '.png'
         self.picname = 'hovplot' + my_string + '.png'
         self.realpicname = 'hovplot_real' + my_string + '.png'
         self.imagpicname = 'hovplot_imag' + my_string + '.png'
@@ -376,34 +377,65 @@ class simulation:
             u = self.initial_state
 
         elif self.t_ord == 2:
-            u = self.initial_state[0,:]
+
+            try:
+                u = self.initial_state[0,:]
+            except IndexError:
+                u = self.initial_state # this line here is to catch the weird case where you're second order
+                # but only prescribed one bc on u, not u_t. So when starting the time-stepper joe automatically assumes
+                # the inital u_t is zero.
 
         else:
             raise ValueError('t_ord must be 1 or 2.')
 
         u = clip_spongeless(u, self.sfrac)
 
-        if usetex:
+        # if the field is complex, we want to split it into its real and imaginary parts and plot these
+        if self.complex:
 
-            try:
-                ylabel = r'$u(x,t=0)$'.replace('u', str(fieldname))
+            if usetex:
 
-                nice_plot(x, u, r'$x$', ylabel, custom_ylim=custom_ylim,
-                          show_figure=show_figure, save_figure=save_figure, picname=self.ic_picname,
-                          linestyle='solid',
-                          color=color, usetex=True, dpi=dpi)
+                try:
+                    real_ylabel = r'\mathrm{Re}\left(u(x,0)\right)'.replace('u', str(fieldname))
+                    imag_ylabel = r'\mathrm{Im}\left(u(x,0)\right)'.replace('u', str(fieldname))
+                    xlabel = r'$x$'
 
-            except RuntimeError:  # catch a user error thinking they have tex when they don't
-                usetex = False
+                except RuntimeError:
+                    usetex = False
+
+            else:
+
+                real_ylabel = r'Re(u(x,0))'.replace('u', str(fieldname))
+                imag_ylabel = r'Im(u(x,0))'.replace('u', str(fieldname))
+                xlabel = r'x'
+
+            nice_plot(x, np.real(u), xlabel, real_ylabel, custom_ylim=custom_ylim,
+                      show_figure=show_figure, save_figure=save_figure, picname=self.ic_picname,
+                      linestyle='solid',
+                      color=color, usetex=True, dpi=dpi)
+
+            nice_plot(x, np.imag(u), xlabel, imag_ylabel, custom_ylim=custom_ylim,
+                      show_figure=show_figure, save_figure=save_figure, picname=self.ic_imag_picname,
+                      linestyle='solid', color=color, usetex=True, dpi=dpi)
 
         else:
 
-            ylabel = r'u(x,t=0)'.replace('u', str(fieldname))
+            if usetex:
 
-            nice_plot(x, u, r'x', ylabel, custom_ylim=custom_ylim, show_figure=show_figure,
-                      save_figure=save_figure, picname=self.ic_picname,
-                      linestyle='solid',
-                      color=color, usetex=False, dpi=dpi)
+                try:
+                    ylabel = r'$u(x,t=0)$'.replace('u', str(fieldname))
+                    xlabel = r'$x$'
+
+                except RuntimeError:  # catch a user error thinking they have tex when they don't
+                    usetex = False
+
+            else:
+                ylabel = r'u(x,t=0)'.replace('u', str(fieldname))
+                xlabel = r'x'
+
+            nice_plot(x, u, xlabel, ylabel, custom_ylim=custom_ylim,
+                      show_figure=show_figure, save_figure=save_figure, picname=self.ic_picname,
+                      linestyle='solid', color=color, usetex=True, dpi=dpi)
 
     def hov_plot(self, umin=None, umax=None, dpi=100, cmap='cmo.haline', fieldname='u', usetex=True, show_figure=True,
                  save_figure=False):
@@ -726,7 +758,7 @@ class simulation:
         N = self.N
         u = self.Udata
 
-        fm = (1./length) * integrate(u, length, N) # take mean
+        fm = (1./length) * integrate(u, length) # take mean
 
         fm_error = np.abs(fm[1:]-fm[0])
 
@@ -749,7 +781,7 @@ class simulation:
 
         fm = self.fm
 
-        sm = (1./length) * integrate(np.absolute(u)**2, length, N) # np.absolute for complex-valued fields
+        sm = (1./length) * integrate(np.absolute(u) ** 2, length) # np.absolute for complex-valued fields
         sm -= fm**2
 
         sm_error = np.abs(sm[1:]-sm[0])
@@ -881,7 +913,7 @@ def do_refinement_study(model, initial_state, length, T, Ns, dts, method_kw='etd
     slope = params[0]
     print('Estimated Slope of Error Line at N = %i' % Ns[-1] + ' is slope = %.3f' % slope)
 
-    return None
+    return slope
 
 
 # TODO: this function below needs to be integrated into the other error test better, or scrubbed from the package!!!
