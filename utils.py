@@ -2,7 +2,7 @@ import numpy as np
 from scipy.fft import fft, ifft, rfft, irfft
 
 
-def my_fft(u, complex=False):
+def my_fft(u, n=None, complex=False):
     r"""Takes FFT of a real or complex array along the -1 axis, optimizing storage if the array is real.
 
     Wraps the scipy.fft routines fft, rfft.
@@ -11,6 +11,8 @@ def my_fft(u, complex=False):
     ----------
         u : ndarray
             Real or complex numpy array.
+        n: int or None, optional.
+            Total number of frequencies to include, if padding. Default: None (no padding).
         complex : boolean, optional
             Equal to True if u is complex and False if u is real. Default: False.
 
@@ -22,15 +24,15 @@ def my_fft(u, complex=False):
     """
     if complex:
 
-        out = fft(u)
+        out = fft(u, n=n)
 
     else:
 
-        out = rfft(u)
+        out = rfft(u, n=n)
 
     return out
 
-def my_ifft(V, complex=False):
+def my_ifft(V, n=None, complex=False):
     r"""Takes inverse FFT of an array along the -1 axis, optimizing storage if the inverse FFT is expected to be real.
 
         Wraps the scipy.fft routines ifft, irfft.
@@ -39,6 +41,8 @@ def my_ifft(V, complex=False):
         ----------
             V : complex ndarray
                 Array to inverse FFT
+            n: int or None, optional.
+                Total number of frequencies to pad V with, if padding is desired. Default: None (no padding).
             complex : boolean, optional
                 Equal to True if inverse FFT of V is known to be complex and False if inverse FFT is known to be
                 real. Default: False.
@@ -51,11 +55,11 @@ def my_ifft(V, complex=False):
         """
     if complex:
 
-        out = ifft(V)
+        out = ifft(V, n=n)
 
     else:
 
-        out = irfft(V)
+        out = irfft(V, n=n)
 
     return out
 
