@@ -13,11 +13,35 @@ from .sponge_layer import damping_coeff_lt, rayleigh_damping
 # The intention here is to make the code independent of the particular
 # PDE we're considering insofar as is possible.
 
-# First, a function for computing all the Greeks ("weights" for exponential quadrature).
-# We do this by Pythonizing the code from Kassam and Trefethen 2005 (do Cauchy integrals).
-
 def get_greeks_first_order(N, dt, z):
-    M = 2 ** 6
+    r"""Computes all the Greeks ("Runge-Kutta weights" for exponential quadrature) for ETDRK4 applied to a
+     first-order-in-time problem.
+
+    This by done Pythonizing the code from Kassam and Trefethen 2005, that is, by numerically approximating Cauchy
+    integrals.
+
+    Parameters
+    ----------
+    N : int
+        Number of frequencies we sample.
+    dt : float
+        Time-step for the simulation.
+    z : ndarray
+        z should be vectorial (it has shape Nx1). In practice, z is the diagonal vector of the matrix of the
+        linear, constant-coefficient part of the PDE in Fourier space.
+
+    Returns
+    -------
+    [Q, f1, f2, f3] : list
+        A list whose entries are the Greeks
+
+    References
+    ----------
+    .. [1]  Aly-Khan Kassam, Lloyd N. Trefethen "Fourth-Order Time-Stepping for Stiff PDEs".
+    <https://epubs.siam.org/doi/abs/10.1137/S1064827502410633>.
+    """
+    # TODO: can we get rid of N in the governing function?
+    M = 2 ** 6 # number of points for quadrature
 
     theta = np.linspace(0., 2. * np.pi, num=M, endpoint=False)
 
@@ -27,8 +51,7 @@ def get_greeks_first_order(N, dt, z):
 
     Q = dt * np.mean((np.exp(0.5 * z0) - 1.) / z0, 0)  # note how we take mean over a certain axis
 
-    f1 = dt * np.mean((-4. - z0 + np.exp(z0) * (4. - 3. * z0 + z0 ** 2)) / (z0 ** 3), 0)  # again note axis
-    # argument of np.mean
+    f1 = dt * np.mean((-4. - z0 + np.exp(z0) * (4. - 3. * z0 + z0 ** 2)) / (z0 ** 3), 0)
 
     f2 = dt * np.mean((2. + z0 + np.exp(z0) * (-2. + z0)) / (z0 ** 3), 0)
 
@@ -39,7 +62,36 @@ def get_greeks_first_order(N, dt, z):
     return out
 
 
-def get_greeks_second_order(length, N, dt, A):
+def get_greeks_second_order(N, dt, A):
+    r"""Computes all the Greeks ("weights" for exponential quadrature) for EDTRK4 applied to a second-order-in-time problem.
+
+    This by done Pythonizing the code from Kassam and Trefethen 2005, that is, by numerically approximating Cauchy
+    integrals.
+
+    Note that, since the linear, constant-coefficient part of the PDE system is no longer diagonal when we have
+    a second-order-in-time problem, the code below is very different from the analogous function for first-order problems
+    :func:`~joe_lab.time_stepper.get_greeks_first_order`. In particular, the radius of our Cauchy integral contour
+    must be chosen based on the argument A.
+
+    Parameters
+    ----------
+    N : int
+        Number of frequencies we sample.
+    dt : float
+        Time-step for the simulation.
+    A : ndarray
+        A is the matrix of the linear, constant-coefficient part of the PDE in Fourier space.
+
+    Returns
+    -------
+    [Q, f1, f2, f3] : list
+        A list whose entries are the Greeks
+
+    References
+    ----------
+    .. [1]  Aly-Khan Kassam, Lloyd N. Trefethen "Fourth-Order Time-Stepping for Stiff PDEs".
+    <https://epubs.siam.org/doi/abs/10.1137/S1064827502410633>.
+    """
     M = 2 ** 6
     theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
 
@@ -84,6 +136,30 @@ def get_greeks_second_order(length, N, dt, A):
 
 
 def get_Q1(N, dt, z):
+    r"""Computes the single weight for first-order exponential quadrature for a first-order-in-time problem.
+
+    This by done by adapting the approach of Kassam and Trefethen 2005.
+
+    Parameters
+    ----------
+    N : int
+        Number of frequencies we sample.
+    dt : float
+        Time-step for the simulation.
+    z : ndarray
+        z should be vectorial (it has shape Nx1). In practice, z is the diagonal vector of the matrix of the
+        linear, constant-coefficient part of the PDE in Fourier space.
+
+    Returns
+    -------
+    out : ndarray
+        Exponential Runge-Kutta weight, Q1, for ETDRK1.
+
+    References
+    ----------
+    .. [1]  Aly-Khan Kassam, Lloyd N. Trefethen "Fourth-Order Time-Stepping for Stiff PDEs".
+    <https://epubs.siam.org/doi/abs/10.1137/S1064827502410633>.
+    """
     M = 2 ** 6
 
     theta = np.linspace(0, 2. * np.pi, num=M, endpoint=False)
@@ -114,8 +190,26 @@ def get_R2(N, dt, z):
 
 
 def do_etdrk1_step(V, propagator, forcing, Q1):
-    # remark on notation: Q1 = dt*phi1(dt*A)
+    r"""Performs a single step of ETDRK1 (the exponential Euler method).
 
+    Parameters
+    ----------
+        V : ndarray
+            Solution value at initial time.
+        propagator : ndarray
+            Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.
+            The time-step is already encoded in here (we propagate for a length of time equal to the time-step).
+        forcing : callable
+            Fourier-space forcing term in the PDE.
+        Q1 : ndarray
+            Exponential Runge-Kutta weight (see :func:`~joe_lab.time_stepper.get_Q1`).
+
+    Returns
+    -------
+        out : ndarray
+            Value of solution at time = initial time + time_step.
+    """
+    # remark on notation: Q1 = dt*phi1(dt*A)
     out = propagator * V + Q1 * forcing(V)
 
     return out
@@ -128,9 +222,29 @@ def do_etdrk2_step(V, propagator, forcing, Q1, R2):
 
     return out
 
-
-# code for a single ETDRK4 step, for a first-order-in-time PDE
 def do_etdrk4_step(V, propagator, propagator2, forcing, greeks):
+    r"""Performs a single step of ETDRK4 (fourth-order exponential Runge-Kutta) for a first-order-in-time problem.
+
+    Parameters
+    ----------
+        V : ndarray
+            Solution value at initial time.
+        propagator : ndarray
+            Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.
+            The time-step is already encoded in here (we propagate for a length of time equal to the time-step).
+        propagator2 : ndarray
+            The same as above, but for only *half* the time step.
+        forcing : callable
+            Fourier-space forcing term in the PDE.
+        greeks : list
+            Entries are the Greeks/fourth-order exponential Runge-Kutta weights
+            (see :func:`~joe_lab.time_stepper.get_greeks_first_order`).
+
+    Returns
+    -------
+        out : ndarray
+            Value of solution at time = initial time + time_step.
+    """
     Q = greeks['Q']
     f1 = greeks['f1']
     f2 = greeks['f2']
@@ -157,9 +271,33 @@ def do_etdrk4_step(V, propagator, propagator2, forcing, greeks):
 
     return out
 
-
-# code for a single ETDRK4 step, if the eqn is second order in time (basically the above code, but sparsified)
 def do_etdrk4_step_second_order(V, propagator, propagator2, forcing, greeks):
+    r"""Performs a single step of ETDRK4 (fourth-order exponential Runge-Kutta) for a second-order-in-time problem.
+
+    This is different from the analogous function for first-order problems
+    :func:`~joe_lab.time_stepper.do_etdrk4_step_first_order` because we must account for the Greeks now being sparse
+    matrices instead of simple vector-shaped arrays.
+
+    Parameters
+    ----------
+        V : ndarray
+            Solution value at initial time.
+        propagator : ndarray
+            Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.
+            the time-step is already encoded in here (we propagate for a length of time equal to the time-step).
+        propagator2 : ndarray
+            The same as above, but for only *half* the time step.
+        forcing : callable
+            Fourier-space forcing term in the PDE.
+        greeks : list
+            Entries are the Greeks/fourth-order exponential Runge-Kutta weights
+            (see :func:`~joe_lab.time_stepper.get_greeks_first_order`).
+
+    Returns
+    -------
+        out : ndarray
+            Value of solution at time = initial time + time_step.
+    """
     Q = greeks['Q']
     f1 = greeks['f1']
     f2 = greeks['f2']
@@ -189,16 +327,36 @@ def do_etdrk4_step_second_order(V, propagator, propagator2, forcing, greeks):
 
     fc = forcing(c)
 
-    # now assemble the guess at the new step. This is the temporal bottleneck of the time step (probably like 70% of step time)
+    # now assemble the guess at the new step.
+    # This is the temporal bottleneck of the time step (probably like 70% of step time)
     out = np.asarray(propagator @ V + f1 @ fV + 2. * f2 @ (fa + fb) + f3 @ fc)
 
     out = np.reshape(out, (2 * N,))
 
     return out
 
-
-# code for a single integrating factor Runge-Kutta fourth-order step
 def do_ifrk4_step(V, propagator, propagator2, forcing, dt):
+    r"""
+
+    Parameters
+    ----------
+        V : ndarray
+            Solution value at initial time.
+        propagator : ndarray
+            Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.
+            the time-step is already encoded in here (we propagate for a length of time equal to the time-step).
+        propagator2 : ndarray
+            The same as above, but for only *half* the time step.
+        forcing : callable
+            Fourier-space forcing term in the PDE.
+        dt : float
+            Time-step.
+
+    Returns
+    -------
+        out : ndarray
+            Value of solution at time = initial time + time_step.
+    """
     a = dt * forcing(V)
 
     b = dt * forcing(propagator2 * (V + 0.5 * a))
@@ -213,10 +371,36 @@ def do_ifrk4_step(V, propagator, propagator2, forcing, dt):
 
 
 def assemble_damping_mat(N, length, x, dt, sponge_params, complex = False):
-    # By "damping mat", we mean the matrix to be inverted at each time step in the damping stage.
-    # Currently only backward Euler inversion is implemented.
-    # TODO: try out Crank-Nicolson as well, perform cost v. accuracy analysis?
+    r"""Get the matrix that is to be inverted at each time step in the artificial damping stage. Only important
+    when the sponge layer is turned on.
 
+    Strictly speaking we store the matrix as a LinearOperator
+    <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html> for performance reasons:
+    the array is dense and too large for direct storage etc. to be performant.
+
+    Currently only backward Euler inversion is implemented.
+
+    Parameters
+    ----------
+        N : int
+            Number of grid points (or frequencies) we sample in our simulation.
+        length : float
+            Length of the spatial domain.
+        x : ndarray
+            Spatial grid of [-0.5*`length`, 0.5*`length`].
+        dt : float
+            Time step size for numerical integration of the PDE.
+        sponge_params : dict
+            Contains particular parameters for the sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`.
+        complex : boolean
+            False if solution to the PDE is supposed to be real, True otherwise. Default: False.
+
+    Returns
+    -------
+        out : scipy.sparse.linalg.LinearOperator
+            The damping matrix, represented by its shape and matrix-vector multiplication.
+    """
+    # TODO: try out Crank-Nicolson as well, perform cost v. accuracy analysis?
     if complex:
 
         k = 2 * np.pi * N * fftfreq(N) / length
@@ -250,6 +434,23 @@ def assemble_damping_mat(N, length, x, dt, sponge_params, complex = False):
 
 
 def do_diffusion_step(q, B):
+    r"""Solve the SPD linear system Bz = q via the conjugate gradient method. This practical shows up when doing a
+    step of diffusion when sponge layers are included.
+
+    Parameters
+    ----------
+        q : ndarray
+            Right-hand side of the relevant linear system.
+
+        B : scipy.sparse.linalg.LinearOpeartor
+            Matrix of the linear system (representing a Fourier-space discretization of the diffusion operator
+            that activates only in the sponge layer).
+
+    Returns
+    -------
+        out : ndarray
+            Solution to the linear system.
+    """
     B_LHS = B
 
     RHS = q
@@ -260,6 +461,28 @@ def do_diffusion_step(q, B):
 
 
 class timestepper:
+    r"""Completely encodes a time-stepping method: instances of this class perform time-stepping during simulations.
+
+    Attributes
+    ----------
+        method_kw : str
+            The name of the time-stepper (for instance, ETDRK4).
+        sim : `~joe_lab.joe.simulation`
+            The simulation our timestepper is supposed to work on.
+        t_ord : int
+            Temporal order of derivatives in the model. Currently only t_ord=1,2 are supported.
+        aux : list or ndarray
+            Auxiliary quantities (typically Greeks/exponential Runge-Kutta weights) that are needed for time-stepping.
+            These are usually computed in a pre-processing stage and saved in the directory `joe_timestepper_aux` after
+            the instance is created but before time-stepping occurs.
+        auxfilename: str
+            Name of the .pkl file containing `aux`.
+        complex : boolean
+            False if solution to the PDE is supposed to be real, True otherwise. Default: False.
+        scale : float, optional.
+            An often-unused parameter related to the splitting method in the sponge layer diffusion solve. scale = 0.5
+            if we use Strang splitting, and scale=1 otherwise.
+    """
     def __init__(self, method_kw, sim, scale=1., complex=False):
         self.method_kw = method_kw
         self.sim = sim
@@ -273,7 +496,7 @@ class timestepper:
             dt_new) + '_modelkw=' + sim.model_kw + '.pkl'  # need to save as pkl since we store aux as a dict
 
     def get_aux(self):
-
+        r"""Obtains auxiliary timestepping quantities `aux` via quadrature."""
         sim = self.sim
 
         t_ord = self.t_ord
@@ -323,7 +546,7 @@ class timestepper:
 
             elif t_ord == 2:
 
-                [Q, f1, f2, f3] = get_greeks_second_order(length, NN, dt, A)
+                [Q, f1, f2, f3] = get_greeks_second_order(NN, dt, A)
 
                 propagator2 = linalg.expm(A.multiply(0.5*dt))
 
@@ -338,7 +561,7 @@ class timestepper:
         self.aux = aux
 
     def save_aux(self):
-
+        r"""Save the auxiliary timestepping quantities `aux` in the directory `joe_timestepper_aux`."""
         # add the folder "joe_timestepper_aux" to our path... more on this below
         my_path = os.path.join("joe_timestepper_aux")
 
@@ -350,12 +573,25 @@ class timestepper:
             pickle.dump(self.aux, outp, pickle.HIGHEST_PROTOCOL)
 
     def load_aux(self):
-
+        r"""Load the auxiliary timestepping quantities `aux` from the directory `joe_timestepper_aux`."""
         with open('joe_timestepper_aux/'+self.auxfilename, 'rb') as inp:
             self.aux = pickle.load(inp)
 
     def do_time_step(self, V, forcing):
+        r"""Do a single time-step with the method of choice.
 
+        Parameters
+        ----------
+            V : ndarray
+                Solution value at initial time.
+            forcing : callable
+                Fourier-space forcing term in the PDE.
+
+        Returns
+        -------
+            out : ndarray
+                Value of solution at time = initial time + time_step.
+        """
         t_ord = self.t_ord
 
         aux = self.aux
@@ -401,6 +637,22 @@ class timestepper:
 
 
 def do_time_stepping(sim, method_kw='etdrk4'):
+    r"""Perform all the time steps in the simulation, starting from time = 0  and ending at time = T.
+
+    Parameters
+    ----------
+        sim : `~joe_lab.joe.simulation`
+            The simulation our timestepper is supposed to work on.
+        method_kw : str
+            The name of the time-stepper (for instance, ETDRK4).
+
+    Returns
+    -------
+        Udata : ndarray
+            Values of the solution to our PDE sampled on our space-time grid, stored as an array. The 0 axis represents
+            temporal variation, and the 1 axis represents spatial variation (so each row is a fixed-time snapshot of
+            the solution on our spatial grid).
+    """
     length = sim.length
 
     T = sim.T
@@ -487,7 +739,7 @@ def do_time_stepping(sim, method_kw='etdrk4'):
         # by modifying the forcing term ie. damping can be dealt with explicitly!
         if t_ord == 2 and sponge_layer:
 
-            out += rayleigh_damping(V, x, length, sponge_params, complex=complex)
+            out += rayleigh_damping(V, x, sponge_params, complex=complex)
 
         return out
 

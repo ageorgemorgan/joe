@@ -1,6 +1,6 @@
 import numpy as np
 
-from scipy.fft import fft, ifft, fftfreq, rfft, irfft, rfftfreq
+from scipy.fft import rfft, irfft
 
 from .joe import model
 
@@ -140,6 +140,22 @@ def fourier_forcing(V, k, x, model_kw, nonlinear=True):
 
 
 def builtin_model(model_kw, nonlinear=True):
+    r"""Access a given builtin model from a list of possibilities.
+
+    Parameters
+    ----------
+        model_kw : str
+            Name of the model to load up. Acceptable arguments: 'bbm', 'gardner', 'gardner-bbm', 'kdv', 'ks',
+            'phi4pert', 'sinegordon'.
+
+        nonlinear : boolean
+            True if we include nonlinearity in the model, False otherwise. Default: True.
+
+    Returns
+    -------
+        out : model :class:`~joe_lab.joe.model`
+            An instance of the *joe* model class with the given name.
+    """
 
     def my_symbol(k):
         return get_symbol(k, model_kw)

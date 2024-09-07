@@ -5,9 +5,27 @@ from .utils import my_fft, my_ifft
 # create all the stuff we need to implement the sponge layer (absorbing layer/segment near bdry where
 # artifical damping turns on)
 
-# first, create a function that gives the damping coefficient a la Lu/Trogdon 2023.
-# TODO: should this be made to work on both sides of the domain rather than just one?
 def damping_coeff_lt(x, sponge_params):
+    r"""Smooth damping coefficient used in Liu-Trogdon 2023 (see References below). Only applies on left side of domain.
+
+    Parameters
+    ----------
+        x : float or ndarray
+            Spatial point(s) to evaluation damping coefficient at/
+        sponge_params: dict
+            Contains particular parameters for the sponge layer.
+
+    Returns
+    -------
+        out: float or ndarray
+            Values of damping coefficient at the point(s) x.
+
+    References
+    ----------
+    .. [1] Anne Liu, Thomas Trogdon, "An artificially-damped Fourier method for dispersive evolution equations".
+    <https://www.sciencedirect.com/science/article/pii/S0168927423001526>.
+    """
+    # TODO: should this be made to work on both sides of the domain rather than just one?
     amp = 1.
 
     l_endpt = sponge_params['l_endpt']  # -length * 0.5 + 0.5 * length * 0.1
@@ -44,7 +62,34 @@ def damping_coeff_bronski(x, length, delta=0.1):
 
 # create the Rayleigh damping term that can be added to the forcing
 # syntax is inputs is the same as that for fourier_forcing
-def rayleigh_damping(V, x, length, sponge_params, complex=False):
+def rayleigh_damping(V, x, sponge_params, complex=False):
+    r"""Rayleigh damping term for use in second-order-in-time problems involving sponge layers. Uses the Liu-Trogdon
+    damping function :func:`~joe_lab.sponge_layer.damping_coeff_lt`, but sponging occurs on both sides of the domain.
+
+    Given a Fourier-space input :math:`V`, this function returns samples of the Rayleigh damping forcing term.
+
+    .. math::
+        \mathcal{F}\left(-\beta(x)\mathcal{F}^{-1}V\right)
+
+    where :math:`\mathcal{F}` denotes the Fourier transform and :math:`beta(x)` denotes a damping coefficient close to
+    1 near the boundary of our domain and effectively zero everywhere else.
+
+    Parameters
+    ----------
+        V : complex ndarray
+            Fourier-space representation of a given function sampled at some number of points.
+        x : ndarray
+            Points in physical space where function is sampled.
+        sponge_params : dict
+            Parameters of our sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`.
+        complex : boolean, optional.
+            True if the inverse FFT of V is complex and False if it is real. Default: False.
+
+    Returns
+    -------
+        out: complex ndarray
+            Fourier-space representation of the Rayleigh damping forcing term.
+    """
 
     N = x.size
 
@@ -77,8 +122,22 @@ def rayleigh_damping(V, x, length, sponge_params, complex=False):
     return out
 
 
-# helper function to clip the "spongeless" part of an array
 def clip_spongeless(z, sfrac):
+    r"""Obtain samples of `z` only coming from outside the sponge layer.
+
+    Parameters
+    ----------
+        z : ndarray
+            Viewed as samples of a function on our entire spatial grid (including the sponge layer).
+        sfrac : float
+            Fraction of the spatial grid that is not taken up by the sponge layer. By convention, this fraction is taken
+            from the middle of the grid.
+
+    Returns
+    -------
+        out : ndarray
+            The part of z coming only from our sponge layer.
+    """
     delta = 0.5 * (1. - sfrac)
     N = np.shape(z)[-1]
     out = z[..., int(delta * N):int((1. - delta) * N) + 1]

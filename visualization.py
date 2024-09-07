@@ -3,17 +3,18 @@ import os
 from typing import ContextManager, Optional
 from alive_progress import alive_bar
 
-#https://stackoverflow.com/questions/44851940/python-cli-progress-bar-spinner-without-iteration
 def spinner(title: Optional[str] = None) -> ContextManager:
-    """
-    Context manager to display a spinner while a long-running process is running.
+    r"""Displays a nice little progress bar to indicate that certain tasks are running.
 
-    Usage:
-        with spinner("Fetching data..."):
-            fetch_data()
+    The code is taken right from the reference.
 
-    Args:
-        title: The title of the spinner. If None, no title will be displayed.
+    Parameters
+    ----------
+        title : str, optional
+
+    References
+    ----------
+    .. [1] <https://stackoverflow.com/questions/44851940/python-cli-progress-bar-spinner-without-iteration>
     """
     return alive_bar(monitor=None, stats=None, title=title, force_tty=True)
 
@@ -26,12 +27,42 @@ os.environ["XDG_SESSION_TYPE"] = "xcb" # prevents a warning from being thrown up
 from scipy.interpolate import CubicSpline
 from numpy.fft import fft, fftfreq, fftshift
 
-# create Hovmoeller plot of a scalar field u
-
 
 def hov_plot(x, t, u, fieldname, umin=None, umax=None, dpi=100, show_figure=True, save_figure=False, picname="",
              cmap=cmo.haline, usetex=True):
+    r"""Create a Hovmoeller plot (filled contour plot in space-time) of the space-time field u.
 
+    This just wraps matplotlib code with a bunch of nice presets, labels, etc.!
+
+    Parameters
+    ----------
+        x : ndarray
+            Spatial sample locations of the field (horizontal axis).
+        t : ndarray
+            Temporal sample locations of the field (vertical axis).
+        u : ndarray
+            Samples values of the field (axis 0 is temporal variation, axis 1 is spatial variation.
+        umin : float, optional.
+            Minimum field value to include, used to construct colorbar lower limit. Default: None.
+        umax : float, optional.
+            Maximum field value to include, used to construct colorbar upper limit. Default: None.
+        dpi : int, optional
+            Dots-per-inch on the image. Default: 100.
+        cmap : str
+            Name of the colormap to use. For a list of great colormaps see <https://matplotlib.org/cmocean/>.
+            Default: 'cmo.haline'.
+        fieldname : str, optional
+            Name of the PDE solution, which will also be the label on the picture's y-axis. Default: 'u'.
+        usetex : boolean, optional
+            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.
+        show_figure: boolean, optional
+            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.
+        save_figure: boolean, optional
+            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at all.
+            Default: False.
+        picname : str, optional
+            Name of the .png file to save the figure to. Default: "".
+    """
     plt.rcParams["font.family"] = "serif"
 
     try:
@@ -112,11 +143,42 @@ def hov_plot(x, t, u, fieldname, umin=None, umax=None, dpi=100, show_figure=True
 
     plt.close()
 
-# create a nice 2D plot of y vs. x
+def nice_plot(x, y, xlabel, ylabel, dpi=100, custom_ylim=None, show_figure=True, save_figure=False, picname="",
+              linestyle='solid', color='xkcd:cerulean', usetex=True):
+    r"""Renders a nice 2D line plot of y as a function of x.
 
-def nice_plot(x, y, xlabel, ylabel, dpi=100, custom_ylim=None, show_figure=True, save_figure=False, picname="", linestyle='solid',
-              color='xkcd:cerulean', usetex=True):
+    This just wraps matplotlib code with a bunch of nice presets, labels, etc.!
 
+    Parameters
+    ----------
+        x : ndarray
+            Manipulated variable/horizontal axis.
+        y : ndarray
+            Responding variable/vertical axis.
+        xlabel : str
+            Label of the horizontal axis.
+        ylabel : str
+            Label of the vertical axis.
+        dpi : int, optional
+            Dots-per-inch on the image. Default: 100.
+        custom_ylim : tuple, optional
+            Custom values for the limits on the vertical axis.
+        usetex : boolean, optional
+            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.
+        color: str, optional
+            Name of the color you want the curve to be. For a list of great colors see <https://xkcd.com/color/rgb/>.
+            Default: 'xkcd:cerulean'.
+        linestyle : str, optional
+            Style of the lines, see matplotlib docs for a list of acceptable values:
+            <https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle>
+        show_figure: boolean, optional
+            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.
+        save_figure: boolean, optional
+            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at
+            all. Default: False.
+        picname : str, optional
+            Name of the .png file to save the figure to. Default: "".
+    """
     plt.rcParams["font.family"] = "serif"
 
     try:
@@ -180,6 +242,43 @@ def nice_plot(x, y, xlabel, ylabel, dpi=100, custom_ylim=None, show_figure=True,
 def nice_multiplot(xs, ys, xlabel, ylabel, curvelabels, linestyles, colors, linewidths, custom_ylim = None,
                    dpi=100, show_figure=True,
                    save_figure=False, picname="", usetex=True):
+    r"""Renders a nice 2D line plot of a bunch of y's as a function of a bunch of x's.
+
+    This just wraps matplotlib code with a bunch of nice presets, labels, etc.!
+
+    Parameters
+    ----------
+        xs : list of ndarrays
+               Manipulated variable/horizontal axis.
+        ys : list of ndarrays
+            Responding variable/vertical axis.
+        xlabel : str
+            Label of the horizontal axis.
+        ylabel : str
+            Label of the vertical axis.
+        curvelabels: list of strings
+            Each entry is a label for the corresponding curve, used to create the legend.
+        linestyles : list of strings
+            Style of the plotted lines, see matplotlib docs for a list of acceptable values:
+             <https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle>
+        colors: list of strings
+            Name of the colors you want each curve to be. For a list of great colors see <https://xkcd.com/color/rgb/>.
+        linestyles : list of floats
+            Widths of the plotted lines.
+        dpi : int, optional
+            Dots-per-inch on the image. Default: 100.
+        custom_ylim : tuple, optional
+            Custom values for the limits on the vertical axis.
+        usetex : boolean, optional
+            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.
+        show_figure: boolean, optional
+            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.
+        save_figure: boolean, optional
+            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at
+            all. Default: False.
+        picname : str, optional
+            Name of the .png file to save the figure to. Default: "".
+    """
 
     if len(xs) != len(ys) or len(xs) != len(curvelabels):
 
@@ -251,7 +350,31 @@ def nice_multiplot(xs, ys, xlabel, ylabel, curvelabels, linestyles, colors, line
 
 def nice_hist(data, xlabel, dpi=100, show_figure=True, save_figure=False, picname="",
               color='xkcd:deep pink', usetex=True):
+    r"""Renders a nice histogram of the given data.
 
+    This just wraps matplotlib code with a bunch of nice presets, labels, etc.!
+
+    Parameters
+    ----------
+        data : ndarray
+            Data to be binned and plotted.
+        xlabel : str
+            Label of the horizontal axis.
+        dpi : int, optional
+            Dots-per-inch on the image. Default: 100.
+        usetex : boolean, optional
+            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.
+        color: str, optional
+            Name of the color you want the curve to be. For a list of great colors see <https://xkcd.com/color/rgb/>.
+            Default: 'xkcd:deep pink'.
+        show_figure: boolean, optional
+            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.
+        save_figure: boolean, optional
+            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at
+            all. Default: False.
+        picname : str, optional
+            Name of the .png file to save the figure to. Default: "".
+    """
     plt.rcParams["font.family"] = "serif"
 
     try:
@@ -301,11 +424,44 @@ def nice_hist(data, xlabel, dpi=100, show_figure=True, save_figure=False, picnam
 
     plt.close()
 
-# code for plotting results of refinement study. The input syntax is pretty ugly but it gets the job done and prevents
-# the main script from getting too cluttered
 def plot_refinement_study(model, initial_state, length, T, Ns, dts, errors, method_kw='etdrk4', bc='periodic',
                         show_figure=True, save_figure=False, usetex=True, dpi=400):
+    r"""Plots a refinement study (see :func:`~joe_lab.joe.do_refinement_study`.
 
+    The actual code is a bit ugly but it gets the job done and prevents the main script from being too cluttered.
+
+    Parameters
+    ----------
+       model: model
+           Instance of the class `model` :class:`~joe_lab.joe.model`.
+       initial_state: initial_state
+           Instance of the class `initial state` :class:`~joe_lab.joe.initial_state`.
+       length : float
+           Length of the spatial domain
+       T : float
+           Total physical runtime of the simulation. That is, the spacetime grid covers the time interval [0,T].
+       Ns : list of ints
+           Number of spatial locations on which to sample the solution to our PDE.
+       dts : list of floats
+           Time step sizes for numerical integration of the PDE.
+       errors : list of ndarrays
+           Estimated errors for each choice of space-time grid.
+       method_kw : str, optional
+           Name of the numerical method. Currently, 'etdrk1', 'ifrk4' are available for first-order-in-time problems,
+           and 'etdrk4' is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.
+           Default: 'etdrk4'.
+       bc : str, optional
+           String specifying the boundary conditions. Must be 'periodic' or 'sponge_layer'.
+       dpi : int, optional
+           Dots-per-inch on the image. Default: 400.
+       usetex : boolean, optional
+           True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.
+       show_figure: boolean, optional
+           True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.
+       save_figure: boolean, optional
+           True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at
+           all. Default: False.
+    """
     plt.rcParams["font.family"] = "serif"
 
     try:
@@ -396,8 +552,38 @@ def plot_refinement_study(model, initial_state, length, T, Ns, dts, errors, meth
 
 def save_movie(u, x, length, dt, fieldname, ndump, filename, fps=200, periodic=True, usetex=True,
                fieldcolor='xkcd:ocean green', dpi=100):
-    # Create movie file in mp4 format. Warning: this is very slow!
+    r"""Save a movie of the evolution of a real scalar field as a .mp4 file.
 
+    This just wraps matplotlib code with a bunch of nice presets, labels, etc.!
+
+    Parameters
+    ----------
+        u : ndarray
+            Sampled values of our scalar field on a given space-time grid.
+        length : float
+            Length of the spatial domain.
+        x : ndarray
+            Spatial grid of [-0.5*`length`, 0.5*`length`].
+        dt : float
+            Lattice spacing on the time axis.
+        fieldname : str
+            Name of the PDE solution, which will also be the label on the picture's y-axis. Default: 'u'.
+        ndump : int
+            Only every `ndump` timesteps are stored in u.
+        filename : str
+             Name of the .mp4 file to save the movie as.
+        periodic : boolean, optional
+            True if the field physically obeys periodic boundary conditions, False otherwise.
+        usetex : boolean, optional
+            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.
+        fieldcolor: str, optional
+            Name of the color you want the curve to be. For a list of great colors see <https://xkcd.com/color/rgb/>.
+            Default: 'xkcd:ocean green'.
+        fps: int, optional
+            Frames-per-second for the movie. Default: 200.
+        dpi : int, optional
+            Dots-per-inch on the image. Default: 100.
+    """
     plt.rcParams["font.family"] = "serif"
 
     try:
@@ -550,9 +736,43 @@ def save_movie(u, x, length, dt, fieldname, ndump, filename, fps=200, periodic=T
     plt.close()
 
 def save_combomovie(u, x, length, dt, ndump, filename, fieldname,
-                    fps=200, periodic=True, usetex=True, fieldcolor='xkcd:ocean green', speccolor='xkcd: dark magenta', dpi=100):
-    # Create movie file in mp4 format. Warning: this is very slow!
+                    fps=200, periodic=True, usetex=True, fieldcolor='xkcd:ocean green', speccolor='xkcd: dark magenta',
+                    dpi=100):
+    r"""Save a movie of the evolution of a real scalar field as a .mp4 file, and a tinier embedded movie of its
+    power spectrum.
 
+    This just wraps matplotlib code with a bunch of nice presets, labels, etc.!
+
+    Parameters
+    ----------
+        u : ndarray
+            Sampled values of our scalar field on a given space-time grid.
+        length : float
+            Length of the spatial domain.
+        x : ndarray
+            Spatial grid of [-0.5*`length`, 0.5*`length`].
+        dt : float
+            Lattice spacing on the time axis.
+        fieldname : str
+            Name of the PDE solution, which will also be the label on the picture's y-axis. Default: 'u'.
+        ndump : int
+            Only every `ndump` timesteps are stored in u.
+        filename : str
+            Name of the .mp4 file to save the movie as.
+        periodic : boolean, optional
+            True if the field physically obeys periodic boundary conditions, False otherwise.
+        usetex : boolean, optional
+            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.
+        fieldcolor: str, optional
+            Name of the color you want the physical-space curve to be. For a list of great colors see
+            <https://xkcd.com/color/rgb/>. Default: 'xkcd:ocean green'.
+        speccolor: str, optional
+            Name of the color you want the Fourier-space power spectrum curve to be. Default: 'xkcd:dark magenta'.
+        fps: int, optional
+            Frames-per-second for the movie. Default: 200.
+        dpi : int, optional
+            Dots-per-inch on the image. Default: 100.
+    """
     plt.rcParams["font.family"] = "serif"
 
     try:
@@ -579,7 +799,7 @@ def save_combomovie(u, x, length, dt, ndump, filename, fieldname,
     kmin = np.amin(k)
     kmax = np.amax(k)
 
-    vmin = 1.05 * np.amin(v)
+    vmin = 0.9 * np.amin(v)
     vmax = 1.05 * np.amax(v)
 
     v = fftshift(v, axes=1)

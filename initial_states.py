@@ -2,6 +2,7 @@ import numpy as np
 
 from .joe import initial_state
 
+#TODO: clean up this script: way too many options, and disorganized!
 
 def kdv_soliton(x, c=1.):
     if c <= 0:
@@ -133,6 +134,21 @@ def initial_state_func(x, initial_state_kw):
     return out
 
 def builtin_initial_state(initial_state_kw):
+    r"""Pulls an initial state from a catalogue of built-in options.
 
+    Parameters
+    ----------
+     initial_state_kw : str
+         Name of the initial state. Acceptable values: 'sine', 'gaussian_even', 'gaussian_even_alt',
+         'gaussian_no_parity', 'gaussian_odd', 'kdv_soliton', 'kdv_multisoliton', 'gardner_soliton',
+         'bbm_solitary_wave', 'bbm_multisolitary', 'translational_mode',
+         'internal_mode', 'tritone', 'trivial', '0_energy', 'ks_chaos', 'bbm_weird_wavepacket',
+         'sinegordon_soliton_interaction', 'sinegordon_soliton_interaction_alt'.
+
+    Returns
+    -------
+        out : initial_state :class:`~joe_lab.joe.initial_state`
+            initial_state instance representing the specified choice.
+    """
     return initial_state(initial_state_kw, lambda x : initial_state_func(x, initial_state_kw))
     
