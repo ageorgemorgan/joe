@@ -25,7 +25,7 @@ error = np.amax(my_sim.fm_error)
 print('Maximum error in first moment = %.2E' % error)
 
 # do refinement study to verify accuracy
-#nmin, nmax = 1, 9
-#Ns = np.array([2**6, 2**7, 2**8])
-#dts = np.flip(np.logspace(-nmax, -nmin, num=nmax-nmin+1, base=2.))
-#do_refinement_study(my_model, my_initial_state, length, T, Ns, dts, bc='periodic', show_figure=True, save_figure=True, usetex=True)
+nmin, nmax = 1, 9
+Ns = np.array([2**6, 2**7, 2**8])
+dts = np.flip(np.logspace(-nmax, -nmin, num=nmax-nmin+1, base=2.))
+joe.do_refinement_study(my_model, my_initial_state, length, T, Ns, dts, bc='periodic', show_figure=True, save_figure=True, usetex=True)
