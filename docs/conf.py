@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath(".."))
 project = 'joe'
 copyright = '2024, Adam George Morgan'
 author = 'Adam George Morgan'
-version = 0.0.5 #release = importlib.metadata.version("joe_lab")
+#version = 0.0.5 #release = importlib.metadata.version("joe_lab")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
