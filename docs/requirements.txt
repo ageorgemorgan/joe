@@ -66,3 +66,10 @@ urllib3==1.26.13
 webencodings==0.5.1
 yarg==0.1.9
 zipp==3.11.0
+alive_progress>=3.0.0
+cmocean>=3.0.0
+joblib>=1.2.0
+numpy>=1.25.2
+scipy>=1.10.0
+jupyterlab
+pytest
