@@ -44,6 +44,8 @@ or
 conda install av -c conda-forge
 ```
 
+If you have questions, please see the documentation at http://joe-lab.rtfd.io/ . 
+
 ![hovplot_real_length=100 0_T=100 0_N=1024 0_dt=0 010000_modelkw=focusing_nls_ICkw=nls_soliton_nonlinear=True_sponge_layer=False](https://github.com/user-attachments/assets/6f61210e-8405-4de5-8bd1-14ea62643727)
 
 **FUTURE DIRECTIONS**
