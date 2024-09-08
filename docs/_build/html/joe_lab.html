@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>joe_lab package &mdash; joe 0.0.6 documentation</title>
+  <title>joe_lab package &mdash; joe 0.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=1fd71caa"></script>
+        <script src="_static/documentation_options.js?v=8c5712d9"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -36,6 +36,9 @@
           <a href="index.html" class="icon icon-home">
             joe
           </a>
+              <div class="version">
+                0.0.4
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -50,34 +53,22 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">joe_lab package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-joe_lab.initial_states">joe_lab.initial_states module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.initial_states.bbm_solitary_wave"><code class="docutils literal notranslate"><span class="pre">bbm_solitary_wave()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.initial_states.builtin_initial_state"><code class="docutils literal notranslate"><span class="pre">builtin_initial_state()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.initial_states.gardner_soliton"><code class="docutils literal notranslate"><span class="pre">gardner_soliton()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.initial_states.initial_state_func"><code class="docutils literal notranslate"><span class="pre">initial_state_func()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.initial_states.kdv_soliton"><code class="docutils literal notranslate"><span class="pre">kdv_soliton()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.initial_states.sinegordon_soliton"><code class="docutils literal notranslate"><span class="pre">sinegordon_soliton()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.initial_states.sinegordon_soliton_speed"><code class="docutils literal notranslate"><span class="pre">sinegordon_soliton_speed()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-joe_lab.joe">joe_lab.joe module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.joe.do_refinement_study"><code class="docutils literal notranslate"><span class="pre">do_refinement_study()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.joe.do_refinement_study_alt"><code class="docutils literal notranslate"><span class="pre">do_refinement_study_alt()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.joe.initial_state"><code class="docutils literal notranslate"><span class="pre">initial_state</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.joe.model"><code class="docutils literal notranslate"><span class="pre">model</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.joe.simulation"><code class="docutils literal notranslate"><span class="pre">simulation</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-joe_lab.models">joe_lab.models module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.models.K0"><code class="docutils literal notranslate"><span class="pre">K0()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.models.V0"><code class="docutils literal notranslate"><span class="pre">V0()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.models.builtin_model"><code class="docutils literal notranslate"><span class="pre">builtin_model()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.models.fourier_forcing"><code class="docutils literal notranslate"><span class="pre">fourier_forcing()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.models.get_symbol"><code class="docutils literal notranslate"><span class="pre">get_symbol()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-joe_lab.sponge_layer">joe_lab.sponge_layer module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.sponge_layer.clip_spongeless"><code class="docutils literal notranslate"><span class="pre">clip_spongeless()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.sponge_layer.damping_coeff_bronski"><code class="docutils literal notranslate"><span class="pre">damping_coeff_bronski()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.sponge_layer.damping_coeff_lt"><code class="docutils literal notranslate"><span class="pre">damping_coeff_lt()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.sponge_layer.rayleigh_damping"><code class="docutils literal notranslate"><span class="pre">rayleigh_damping()</span></code></a></li>
 </ul>
@@ -86,13 +77,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.assemble_damping_mat"><code class="docutils literal notranslate"><span class="pre">assemble_damping_mat()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.do_diffusion_step"><code class="docutils literal notranslate"><span class="pre">do_diffusion_step()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.do_etdrk1_step"><code class="docutils literal notranslate"><span class="pre">do_etdrk1_step()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.do_etdrk2_step"><code class="docutils literal notranslate"><span class="pre">do_etdrk2_step()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.do_etdrk4_step"><code class="docutils literal notranslate"><span class="pre">do_etdrk4_step()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.do_etdrk4_step_second_order"><code class="docutils literal notranslate"><span class="pre">do_etdrk4_step_second_order()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.do_ifrk4_step"><code class="docutils literal notranslate"><span class="pre">do_ifrk4_step()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.do_time_stepping"><code class="docutils literal notranslate"><span class="pre">do_time_stepping()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.get_Q1"><code class="docutils literal notranslate"><span class="pre">get_Q1()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.get_R2"><code class="docutils literal notranslate"><span class="pre">get_R2()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.get_greeks_first_order"><code class="docutils literal notranslate"><span class="pre">get_greeks_first_order()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.get_greeks_second_order"><code class="docutils literal notranslate"><span class="pre">get_greeks_second_order()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.time_stepper.timestepper"><code class="docutils literal notranslate"><span class="pre">timestepper</span></code></a></li>
@@ -116,7 +105,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#joe_lab.visualization.spinner"><code class="docutils literal notranslate"><span class="pre">spinner()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-joe_lab">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -156,11 +144,6 @@
 <section id="module-joe_lab.initial_states">
 <span id="joe-lab-initial-states-module"></span><h2>joe_lab.initial_states module<a class="headerlink" href="#module-joe_lab.initial_states" title="Link to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.initial_states.bbm_solitary_wave">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.initial_states.</span></span><span class="sig-name descname"><span class="pre">bbm_solitary_wave</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/initial_states.html#bbm_solitary_wave"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.initial_states.bbm_solitary_wave" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.initial_states.builtin_initial_state">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.initial_states.</span></span><span class="sig-name descname"><span class="pre">builtin_initial_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_state_kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/initial_states.html#builtin_initial_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.initial_states.builtin_initial_state" title="Link to this definition"></a></dt>
 <dd><p>Pulls an initial state from a catalogue of built-in options.</p>
@@ -180,38 +163,13 @@
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
 <blockquote>
-<div><dl>
-<dt>out<span class="classifier">initial_state <a class="reference internal" href="#joe_lab.joe.initial_state" title="joe_lab.joe.initial_state"><code class="xref py py-class docutils literal notranslate"><span class="pre">initial_state</span></code></a></span></dt><dd><p>initial_state instance representing the specified choice.</p>
+<div><dl class="simple">
+<dt>out<span class="classifier">initial_state</span></dt><dd><p><a class="reference internal" href="#joe_lab.joe.initial_state" title="joe_lab.joe.initial_state"><code class="xref py py-class docutils literal notranslate"><span class="pre">initial_state</span></code></a> instance representing the specified choice.</p>
 </dd>
 </dl>
 </div></blockquote>
 </section>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.initial_states.gardner_soliton">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.initial_states.</span></span><span class="sig-name descname"><span class="pre">gardner_soliton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/initial_states.html#gardner_soliton"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.initial_states.gardner_soliton" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.initial_states.initial_state_func">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.initial_states.</span></span><span class="sig-name descname"><span class="pre">initial_state_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_state_kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/initial_states.html#initial_state_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.initial_states.initial_state_func" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.initial_states.kdv_soliton">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.initial_states.</span></span><span class="sig-name descname"><span class="pre">kdv_soliton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/initial_states.html#kdv_soliton"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.initial_states.kdv_soliton" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.initial_states.sinegordon_soliton">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.initial_states.</span></span><span class="sig-name descname"><span class="pre">sinegordon_soliton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/initial_states.html#sinegordon_soliton"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.initial_states.sinegordon_soliton" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.initial_states.sinegordon_soliton_speed">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.initial_states.</span></span><span class="sig-name descname"><span class="pre">sinegordon_soliton_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/initial_states.html#sinegordon_soliton_speed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.initial_states.sinegordon_soliton_speed" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 </section>
 <section id="module-joe_lab.joe">
@@ -219,62 +177,73 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.joe.do_refinement_study">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.joe.</span></span><span class="sig-name descname"><span class="pre">do_refinement_study</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'etdrk4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sponge_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">400</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#do_refinement_study"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.do_refinement_study" title="Link to this definition"></a></dt>
-<dd><p>Performs a refinement study based on Richardson extrapolation for error estimation. Very useful for quickly
-and painless checking accuracy.</p>
+<dd><p>Performs a refinement study based on Richardson extrapolation for error estimation, and reports the slope of
+“estimated error” vs. “<span class="math notranslate nohighlight">\(\Delta t\)</span>” on a loglog plot
+(computed via np.polyfit <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html">https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html</a>).
+Useful for quickly and painlessly validating the accuracy of
+an implementation.</p>
 <section id="id1">
 <h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>model: model</dt><dd><p>Instance of the class <cite>model</cite> <a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><code class="xref py py-class docutils literal notranslate"><span class="pre">model</span></code></a>.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>model<span class="classifier">model</span></dt><dd><p>Instance of the class <a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><code class="xref py py-class docutils literal notranslate"><span class="pre">model</span></code></a>.</p>
 </dd>
-<dt>initial_state: initial_state</dt><dd><p>Instance of the class <cite>initial state</cite> <a class="reference internal" href="#joe_lab.joe.initial_state" title="joe_lab.joe.initial_state"><code class="xref py py-class docutils literal notranslate"><span class="pre">initial_state</span></code></a>.</p>
+<dt>initial_state<span class="classifier">initial_state</span></dt><dd><p>Instance of the class <a class="reference internal" href="#joe_lab.joe.initial_state" title="joe_lab.joe.initial_state"><code class="xref py py-class docutils literal notranslate"><span class="pre">initial_state</span></code></a>.</p>
 </dd>
-<dt>length<span class="classifier">float</span></dt><dd><p>Length of the spatial domain</p>
+<dt>length<span class="classifier">float</span></dt><dd><p>Length of the spatial domain.</p>
 </dd>
 <dt>T<span class="classifier">float</span></dt><dd><p>Total physical runtime of the simulation. That is, the spacetime grid covers the time interval [0,T].</p>
 </dd>
-<dt>Ns<span class="classifier">list of ints</span></dt><dd><p>Number of spatial locations on which to sample the solution to our PDE.</p>
+<dt>Ns<span class="classifier">list of ints</span></dt><dd><p>Number of spatial locations on which to sample the solution to our PDE. Get an error curve for each entry
+in Ns.</p>
 </dd>
 <dt>dts<span class="classifier">list of floats</span></dt><dd><p>Time step sizes for numerical integration of the PDE.</p>
 </dd>
 <dt>method_kw<span class="classifier">str, optional</span></dt><dd><p>Name of the numerical method. Currently, ‘etdrk1’, ‘ifrk4’ are available for first-order-in-time problems,
-and ‘etdrk4’ is available for all problems: see <code class="xref py py-class docutils literal notranslate"><span class="pre">time_stepper</span></code>.
+and ‘etdrk4’ is available for all problems: see <a class="reference internal" href="#joe_lab.time_stepper.timestepper" title="joe_lab.time_stepper.timestepper"><code class="xref py py-class docutils literal notranslate"><span class="pre">timestepper</span></code></a>.
 Default: ‘etdrk4’.</p>
 </dd>
-<dt>bc<span class="classifier">str, optional</span></dt><dd><p>String specifying the boundary conditions. Must be ‘periodic’ or ‘sponge_layer’.</p>
+<dt>bc<span class="classifier">str, optional</span></dt><dd><p>String specifying the boundary conditions. Must be ‘periodic’ or ‘sponge_layer’. Default: ‘periodic’.</p>
 </dd>
-<dt>sponge_params: dict</dt><dd><p>Contains particular parameters for the sponge layer, see <a class="reference internal" href="#joe_lab.sponge_layer.damping_coeff_lt" title="joe_lab.sponge_layer.damping_coeff_lt"><code class="xref py py-func docutils literal notranslate"><span class="pre">damping_coeff_lt()</span></code></a>.</p>
+<dt>sponge_params<span class="classifier">dict, optional</span></dt><dd><p>Contains particular parameters for the sponge layer, see <a class="reference internal" href="#joe_lab.sponge_layer.damping_coeff_lt" title="joe_lab.sponge_layer.damping_coeff_lt"><code class="xref py py-func docutils literal notranslate"><span class="pre">damping_coeff_lt()</span></code></a>.
+Default: None.</p>
 </dd>
 <dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots-per-inch on the image. Default: 400.</p>
 </dd>
 <dt>usetex<span class="classifier">boolean, optional</span></dt><dd><p>True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</p>
 </dd>
-<dt>show_figure: boolean, optional</dt><dd><p>True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</p>
+<dt>show_figure<span class="classifier">boolean, optional</span></dt><dd><p>True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</p>
 </dd>
-<dt>save_figure: boolean, optional</dt><dd><p>True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at
+<dt>save_figure<span class="classifier">boolean, optional</span></dt><dd><p>True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at
 all. Default: False.</p>
 </dd>
-<dt>fit_min: int, optional.</dt><dd><p>Index of dts at which we <em>start</em> pulling values from the Ns[-1] error curve to approximate slope of error curve.
+<dt>fit_min<span class="classifier">int, optional.</span></dt><dd><p>Index of dts at which we <em>start</em> pulling values from the Ns[-1] error curve to approximate slope of error curve.
 Default: 3.</p>
 </dd>
-<dt>fit_max: int, optional</dt><dd><p>Index of dts at which we <em>stop</em> pulling values from the Ns[-1] error curve to approximate slope of error curve.
+<dt>fit_max<span class="classifier">int, optional</span></dt><dd><p>Index of dts at which we <em>stop</em> pulling values from the Ns[-1] error curve to approximate slope of error curve.
 Default: 7.</p>
 </dd>
 </dl>
+</div></blockquote>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>slope<span class="classifier">float</span></dt><dd><p>Estimated slope of the “estimated error” vs. “<span class="math notranslate nohighlight">\(\Delta t\)</span>” line on a loglog plot.</p>
+</dd>
+</dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.joe.do_refinement_study_alt">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.joe.</span></span><span class="sig-name descname"><span class="pre">do_refinement_study_alt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark_sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'etdrk4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sponge_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#do_refinement_study_alt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.do_refinement_study_alt" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="joe_lab.joe.initial_state">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">joe_lab.joe.</span></span><span class="sig-name descname"><span class="pre">initial_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_state_kw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_state_func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#initial_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.initial_state" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">joe_lab.joe.</span></span><span class="sig-name descname"><span class="pre">initial_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_state_kw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_state_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">callable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#initial_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.initial_state" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class for initial states.</p>
 <p>Having a special class for initial states instead of just representing them as callables or keywords allows for
-greater flexibility, as well as some symmetry with the <cite>model</cite> class <a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><code class="xref py py-class docutils literal notranslate"><span class="pre">model</span></code></a>.</p>
+greater flexibility, as well as some symmetry with the class <a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><code class="xref py py-class docutils literal notranslate"><span class="pre">model</span></code></a>.</p>
 <section id="attributes">
 <h3>Attributes<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
 <blockquote>
@@ -282,7 +251,7 @@ greater flexibility, as well as some symmetry with the <cite>model</cite> class 
 <dt>initial_state_kw<span class="classifier">str</span></dt><dd><p>Name of the initial state.</p>
 </dd>
 <dt>initial_state_func<span class="classifier">dict</span></dt><dd><p>A dict defined such that initial_state_func[‘initial_state_func’] is a callable representing the actual
-initial state function. One must be careful of this function’s output’s shape when dealing with second-order
+initial state function (the input <cite>initial_state_func</cite>). One must be careful of the shape of this function’s outputs when dealing with second-order
 problems.</p>
 </dd>
 <dt>initial_state<span class="classifier">ndarray</span></dt><dd><p>The values of the initial state on our particular grid. Not defined during init, and should only be accessed
@@ -290,74 +259,60 @@ under-the-hood.</p>
 </dd>
 </dl>
 </div></blockquote>
-<dl class="py method">
-<dt class="sig sig-object py" id="joe_lab.joe.initial_state.get_initial_state">
-<span class="sig-name descname"><span class="pre">get_initial_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#initial_state.get_initial_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.initial_state.get_initial_state" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 </section>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="joe_lab.joe.model">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">joe_lab.joe.</span></span><span class="sig-name descname"><span class="pre">model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_kw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_ord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fourier_forcing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonlinear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.model" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">joe_lab.joe.</span></span><span class="sig-name descname"><span class="pre">model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_kw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_ord</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fourier_forcing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonlinear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.model" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class for models, which in <em>joe</em> specifically refers to particular PDEs.</p>
 <p>This defines a model PDE with the name ‘model_kw’ in the Fourier-space form</p>
 <div class="math notranslate nohighlight">
-\[\left(\partial_t\right)^{\texttt{t\_ord}} V(k,t) + \texttt{symbol}(k) V(k,t) = \texttt{fourier\_forcing}\]</div>
-<p>where <span class="math notranslate nohighlight">\(V(k,t)\)</span> is the Fourier state.</p>
+\[\left(\partial_t\right)^{\texttt{t_ord}} V(k,t) + \texttt{symbol}(k) V(k,t) = \texttt{fourier_forcing}\]</div>
+<p>where <span class="math notranslate nohighlight">\(V(k,t)\)</span> is the Fourier state (that is, if <span class="math notranslate nohighlight">\(u(x,t)\)</span> is the solution to our PDE, then
+<span class="math notranslate nohighlight">\(V=\mathcal{F}u\)</span> where <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> is the Fourier transform).</p>
 <p>Note how the init takes in two callables for the symbol and forcing terms, but these get converted to dicts.
-This is to avoid making the weird no-no of having callable attributes. The trick comes from
-&lt;<a class="reference external" href="https://stackoverflow.com/questions/35321744/python-function-as-class-attribute-becomes-a-bound-method">https://stackoverflow.com/questions/35321744/python-function-as-class-attribute-becomes-a-bound-method</a>&gt;… we
-instead make the “callable attributes” !dicts! with callable entries. This dirty trick is all under the hood in
+This is to avoid making the weird ‘no-no’ of having callable attributes. The trick comes from
+<a class="reference external" href="https://stackoverflow.com/questions/35321744/python-function-as-class-attribute-becomes-a-bound-method">https://stackoverflow.com/questions/35321744/python-function-as-class-attribute-becomes-a-bound-method</a>… we
+instead make the “callable attributes” <strong>dicts</strong> with callable entries. This is all under the hood in
 the model class, so when defining and using a model object the user doesn’t need to care.</p>
-<section id="id2">
-<h3>Attributes<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<section id="id3">
+<h3>Attributes<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>model_kw<span class="classifier">str</span></dt><dd><p>A name for the model.</p>
 </dd>
 <dt>t_ord<span class="classifier">int</span></dt><dd><p>Temporal order of derivatives in the model. Currently only t_ord=1,2 are supported.</p>
 </dd>
-<dt>symbol<span class="classifier">dict</span></dt><dd><p>Symbol of the linear, constant-coefficient part of the PDE. symbol[‘symbol’] must be a callable with a
-single argument <cite>k</cite>, representing a Fourier-space frequency variable.</p>
+<dt>symbol<span class="classifier">dict</span></dt><dd><p>Symbol of the linear, constant-coefficient part of the PDE. symbol[‘symbol’] is the callable <cite>symbol</cite> in the
+init, with a single parameter <cite>k</cite>, representing a Fourier-space frequency variable.</p>
 </dd>
-<dt>fourier_forcing<span class="classifier">dict</span></dt><dd><p>Forcing term in the PDE, represented in Fourier space. fourier_forcing[‘fourier_forcing’] must be a callable
-that takes in four arguments <cite>(V, k, x, nonlinear)</cite> where <cite>V,k,x</cite> are ndarrays and <cite>nonlinear</cite> is a boolean.</p>
+<dt>fourier_forcing<span class="classifier">dict</span></dt><dd><p>Forcing term in the PDE, represented in Fourier space. fourier_forcing[‘fourier_forcing’] is the callable
+<cite>fourier_forcing</cite> in the init, and has four arguments <cite>(V, k, x, nonlinear)</cite> where <cite>V,k,x</cite> are ndarrays and <cite>nonlinear</cite> is a boolean.</p>
 </dd>
 <dt>nonlinear<span class="classifier">boolean, optional</span></dt><dd><p>True if we include nonlinearity in the model, False otherwise. Default: True.</p>
 </dd>
-<dt>complex<span class="classifier">boolean</span></dt><dd><p>False if solution to the PDE is supposed to be real, True otherwise. Default: False.</p>
+<dt>complex<span class="classifier">boolean, optional</span></dt><dd><p>False if solution to the PDE is supposed to be real, True otherwise. Default: False.</p>
 </dd>
 </dl>
 </div></blockquote>
-<dl class="py method">
-<dt class="sig sig-object py" id="joe_lab.joe.model.get_fourier_forcing">
-<span class="sig-name descname"><span class="pre">get_fourier_forcing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#model.get_fourier_forcing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.model.get_fourier_forcing" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="joe_lab.joe.model.get_symbol">
-<span class="sig-name descname"><span class="pre">get_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#model.get_symbol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.model.get_symbol" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 </section>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="joe_lab.joe.simulation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">joe_lab.joe.</span></span><span class="sig-name descname"><span class="pre">simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stgrid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sponge_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">joe_lab.joe.</span></span><span class="sig-name descname"><span class="pre">simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stgrid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><span class="pre">model</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#joe_lab.joe.initial_state" title="joe_lab.joe.initial_state"><span class="pre">initial_state</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sponge_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class for simulations.</p>
-<p>This class is the heart of <em>joe</em>, and most of the scientific information (including visualizations) can be accessed
-via the attributes of methods of a simulation instance.</p>
+<p>This class is the heart of <em>joe</em>, and most of the scientific information <em>joe</em> provides (including visualizations)
+can be accessed via the attributes of methods of a simulation instance.</p>
 <p>You init an instance with an <cite>stgrid</cite> (space-time grid) dict, an instance of the <cite>model</cite> class (<a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><code class="xref py py-class docutils literal notranslate"><span class="pre">model</span></code></a>) to
 specify the PDE, and an instance of the <cite>initial_state</cite> class (<a class="reference internal" href="#joe_lab.joe.initial_state" title="joe_lab.joe.initial_state"><code class="xref py py-class docutils literal notranslate"><span class="pre">initial_state</span></code></a>). Then you can
 call a run simulation function on a simulation object to solve the IVP and store/save the solution, or load up the
 solution from an experiment you’ve already done.</p>
-<section id="id3">
-<h3>Attributes<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<section id="id4">
+<h3>Attributes<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>length<span class="classifier">float</span></dt><dd><p>Length of the spatial domain.</p>
@@ -376,8 +331,6 @@ solution from an experiment you’ve already done.</p>
 </dd>
 <dt>initial_state_kw<span class="classifier">str</span></dt><dd><p>Name of the initial state.</p>
 </dd>
-<dt>ndump<span class="classifier">int</span></dt><dd><p>Only every <cite>ndump</cite> timesteps are stored when saving simulation results.</p>
-</dd>
 <dt>Udata<span class="classifier">ndarray</span></dt><dd><p>Values of the solution to our PDE sampled on our space-time grid, stored as an array. The 0 axis represents
 temporal variation, and the 1 axis represents spatial variation (so each row is a fixed-time snapshot of
 the solution on our spatial grid).</p>
@@ -386,26 +339,28 @@ the solution on our spatial grid).</p>
 </dd>
 <dt>complex<span class="classifier">boolean</span></dt><dd><p>False if solution to the PDE is supposed to be real, True otherwise. Default: False.</p>
 </dd>
-<dt>sponge_params<span class="classifier">dict</span></dt><dd><p>Contains particular parameters for the sponge layer, see <a class="reference internal" href="#joe_lab.sponge_layer.damping_coeff_lt" title="joe_lab.sponge_layer.damping_coeff_lt"><code class="xref py py-func docutils literal notranslate"><span class="pre">damping_coeff_lt()</span></code></a>.</p>
+<dt>sponge_params<span class="classifier">dict or None</span></dt><dd><p>Contains particular parameters for the sponge layer, see <a class="reference internal" href="#joe_lab.sponge_layer.damping_coeff_lt" title="joe_lab.sponge_layer.damping_coeff_lt"><code class="xref py py-func docutils literal notranslate"><span class="pre">damping_coeff_lt()</span></code></a>. Default: None.</p>
 </dd>
 <dt>sponge_layer<span class="classifier">boolean</span></dt><dd><p>True if sponge layer is included, False otherwise. Default: False.</p>
 </dd>
 <dt>sfrac<span class="classifier">float</span></dt><dd><p>Fraction of the spatial grid that is not taken up by the sponge layer. By convention, this fraction is taken
 from the middle of the grid.</p>
 </dd>
-<dt>x<span class="classifier">ndarray</span></dt><dd><p>Spatial grid of [-0.5*`length`, 0.5*`length`].</p>
+<dt>x<span class="classifier">ndarray</span></dt><dd><p>Spatial grid of [-0.5*length, 0.5*length) with N points.</p>
 </dd>
-<dt>initial_state<span class="classifier">ndarray</span></dt><dd><p>Initial state function sampled at <cite>x</cite></p>
+<dt>initial_state<span class="classifier">ndarray</span></dt><dd><p>Initial state function sampled at <cite>x</cite>.</p>
 </dd>
 <dt>fm<span class="classifier">ndarray</span></dt><dd><p>First moments (spatial integrals) of the solution to our PDE.</p>
 </dd>
 <dt>fm_error<span class="classifier">ndarray</span></dt><dd><p>Absolute difference between <cite>fm</cite> and <cite>fm[0]</cite>, the initial first moment.</p>
 </dd>
-<dt>sm<span class="classifier">ndarray</span></dt><dd><p>Second moments (spatial L2 - norms) of the solution to our PDE.</p>
+<dt>sm<span class="classifier">ndarray</span></dt><dd><p>Second moments (spatial <span class="math notranslate nohighlight">\(L^2\)</span> norms) of the solution to our PDE.</p>
 </dd>
 <dt>sm_error<span class="classifier">ndarray</span></dt><dd><p>Absolute difference between <cite>sm</cite> and <cite>sm[0]</cite>, the initial second moment.</p>
 </dd>
-<dt>filename<span class="classifier">str</span></dt><dd><p>Name of the .pkl file the sim may be saved in= ‘ic_plot, or loaded from.</p>
+<dt>ndump<span class="classifier">int, optional</span></dt><dd><p>Only every <cite>ndump</cite> timesteps are stored when saving simulation results. Default: 10.</p>
+</dd>
+<dt>filename<span class="classifier">str</span></dt><dd><p>Name of the .pkl file the sim may be saved in, or loaded from.</p>
 </dd>
 <dt>ic_picname<span class="classifier">str</span></dt><dd><p>Name of the initial state plot as a .png file.</p>
 </dd>
@@ -432,14 +387,14 @@ from the middle of the grid.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="joe_lab.joe.simulation.get_fm">
 <span class="sig-name descname"><span class="pre">get_fm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation.get_fm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation.get_fm" title="Link to this definition"></a></dt>
-<dd><p>Get the first moment (spatial integral) of the solution to our PDE, <cite>fm</cite>.</p>
+<dd><p>Get the first moment (spatial integral) of the solution to our PDE, <cite>fm</cite>, at each sampled time.</p>
 <p>Also gets the absolute difference between <cite>fm</cite> and <cite>fm[0]</cite>, the initial first moment.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="joe_lab.joe.simulation.get_sm">
 <span class="sig-name descname"><span class="pre">get_sm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation.get_sm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation.get_sm" title="Link to this definition"></a></dt>
-<dd><p>Get the second moment (spatial L2 - norm) of the solution to our PDE, <cite>sm</cite>.</p>
+<dd><p>Get the second moment (spatial <span class="math notranslate nohighlight">\(L^2\)</span> norm) of the solution to our PDE, <cite>sm</cite>, at each sampled time.</p>
 <p>Also gets the absolute difference between <cite>sm</cite> and <cite>sm[0]</cite>, the initial second moment.</p>
 </dd></dl>
 
@@ -448,16 +403,17 @@ from the middle of the grid.</p>
 <span class="sig-name descname"><span class="pre">hov_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">umin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cmo.haline'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'u'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation.hov_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation.hov_plot" title="Link to this definition"></a></dt>
 <dd><p>Create a Hovmoeller plot (filled contour plot in space-time) of the PDE solution.</p>
 <p>If the PDE solution is complex-valued, this produces Hovmoeller plots of its real part and its imaginary part.</p>
-<section id="id4">
-<h4>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h4>
-<dl class="simple">
+<section id="id5">
+<h4>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
+<blockquote>
+<div><dl class="simple">
 <dt>umin<span class="classifier">float, optional.</span></dt><dd><p>Minimum field value to include, used to construct colorbar lower limit. Default: None.</p>
 </dd>
 <dt>umax<span class="classifier">float, optional.</span></dt><dd><p>Maximum field value to include, used to construct colorbar upper limit. Default: None.</p>
 </dd>
 <dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots-per-inch on the image. Default: 100.</p>
 </dd>
-<dt>cmap<span class="classifier">str</span></dt><dd><p>Name of the colormap to use. For a list of great colormaps see &lt;<a class="reference external" href="https://matplotlib.org/cmocean/">https://matplotlib.org/cmocean/</a>&gt;.
+<dt>cmap<span class="classifier">str, optional</span></dt><dd><p>Name of the colormap to use. For a list of great colormaps see <a class="reference external" href="https://matplotlib.org/cmocean/">https://matplotlib.org/cmocean/</a>.
 Default: ‘cmo.haline’.</p>
 </dd>
 <dt>fieldname<span class="classifier">str, optional</span></dt><dd><p>Name of the PDE solution, which will also be the label on the picture’s y-axis. Default: ‘u’.</p>
@@ -470,23 +426,25 @@ Default: ‘cmo.haline’.</p>
 Default: False.</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="joe_lab.joe.simulation.hov_plot_modulus">
 <span class="sig-name descname"><span class="pre">hov_plot_modulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">umin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cmo.haline'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'u'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation.hov_plot_modulus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation.hov_plot_modulus" title="Link to this definition"></a></dt>
-<dd><p>The same as <code class="xref py py-func docutils literal notranslate"><span class="pre">hov_plot()</span></code>, but with the modulus of the field.</p>
-<section id="id5">
-<h4>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h4>
-<dl class="simple">
+<dd><p>The same as <code class="xref py py-func docutils literal notranslate"><span class="pre">hov_plot()</span></code>, but only the modulus of the field is plotted.</p>
+<section id="id6">
+<h4>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
+<blockquote>
+<div><dl class="simple">
 <dt>umin<span class="classifier">float, optional.</span></dt><dd><p>Minimum field value to include, used to construct colorbar lower limit. Default: None.</p>
 </dd>
 <dt>umax<span class="classifier">float, optional.</span></dt><dd><p>Maximum field value to include, used to construct colorbar upper limit. Default: None.</p>
 </dd>
 <dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots-per-inch on the image. Default: 100.</p>
 </dd>
-<dt>cmap<span class="classifier">str</span></dt><dd><p>Name of the colormap to use. For a list of great colormaps see &lt;<a class="reference external" href="https://matplotlib.org/cmocean/">https://matplotlib.org/cmocean/</a>&gt;.
+<dt>cmap<span class="classifier">str</span></dt><dd><p>Name of the colormap to use. For a list of great colormaps see <a class="reference external" href="https://matplotlib.org/cmocean/">https://matplotlib.org/cmocean/</a>.
 Default: ‘cmo.haline’.</p>
 </dd>
 <dt>fieldname<span class="classifier">str, optional</span></dt><dd><p>Name of the PDE solution, which will also be the label on the picture’s y-axis. Default: ‘u’.</p>
@@ -499,6 +457,7 @@ Default: ‘cmo.haline’.</p>
 all. Default: False.</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
@@ -519,18 +478,15 @@ all. Default: False.</p>
 <dd><p>Load our simulation from the joe_sim_archive directory if it’s there, or run the simulation if it can’t be
 found in joe_sim_archive. The end result is that our simulation’s <cite>Udata</cite> attribute becomes populated with the
 space-time grid values of our solution.</p>
-<p>I recommend you use this method as your on-the-ground alternative to <cite>run_sim</cite>.</p>
-<section id="id6">
-<h4>Parameters<a class="headerlink" href="#id6" title="Link to this heading"></a></h4>
+<p>The development team recommends you use this method as your on-the-ground alternative to <cite>run_sim</cite>.</p>
+<section id="id7">
+<h4>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
 <blockquote>
 <div><dl class="simple">
 <dt>method_kw<span class="classifier">str, optional</span></dt><dd><p>Name of the numerical method. Currently, ‘etdrk1’, ‘ifrk4’ are available for first-order-in-time problems,
 and ‘etdrk4’ is available for all problems: see <code class="xref py py-class docutils literal notranslate"><span class="pre">time_stepper</span></code>.
 Default: ‘etdrk4’.</p>
 </dd>
-</dl>
-</div></blockquote>
-<dl class="simple">
 <dt>print_runtime: boolean, optional</dt><dd><p>True if you would like to print the wall-clock runtime of the simulation, False otherwise.</p>
 </dd>
 <dt>save<span class="classifier">boolean, optional</span></dt><dd><p>True if you definitely want the simulation saved, and False otherwise. Default: True.</p>
@@ -539,21 +495,24 @@ Default: ‘etdrk4’.</p>
 joe_sim_archive directory.</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="joe_lab.joe.simulation.plot_initial_condition">
 <span class="sig-name descname"><span class="pre">plot_initial_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">custom_ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xkcd:cerulean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'u'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation.plot_initial_condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation.plot_initial_condition" title="Link to this definition"></a></dt>
-<dd><p>Produce a line plot of the initial state.</p>
-<section id="id7">
-<h4>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
-<dl class="simple">
+<dd><p>Produce a line plot of the initial state. If the initial state is complex-valued, plots of both the real
+and imaginary parts are produced.</p>
+<section id="id8">
+<h4>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
+<blockquote>
+<div><dl class="simple">
 <dt>custom_ylim<span class="classifier">array_like, optional.</span></dt><dd><p>Custom values for the y-limits on the axes. Default: None.</p>
 </dd>
 <dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots-per-inch on the image. Default: 100.</p>
 </dd>
-<dt>color<span class="classifier">str, optional</span></dt><dd><p>Name of the color you want the curve to be. For a list of great colors see &lt;<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>&gt;.
+<dt>color<span class="classifier">str, optional</span></dt><dd><p>Name of the color you want the curve to be. For a list of great colors see <a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>.
 Default: ‘xkcd:cerulean’.</p>
 </dd>
 <dt>fieldname<span class="classifier">str, optional</span></dt><dd><p>Name of the PDE solution, which will also be the label on the picture’s y-axis. Default: ‘u’.</p>
@@ -565,6 +524,7 @@ Default: ‘xkcd:cerulean’.</p>
 <dt>save_figure: boolean, optional</dt><dd><p>True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at all.</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
@@ -572,10 +532,11 @@ Default: ‘xkcd:cerulean’.</p>
 <dt class="sig sig-object py" id="joe_lab.joe.simulation.run_sim">
 <span class="sig-name descname"><span class="pre">run_sim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'etdrk4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_runtime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation.run_sim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation.run_sim" title="Link to this definition"></a></dt>
 <dd><p>Perform the time-stepping starting from the initial state and ending at time <cite>T</cite>. Populates the attribute
-<cite>Udata</cite> (the actual values of our solution throughout the simulation) in our <cite>simulation</cite>.</p>
-<section id="id8">
-<h4>Parameters<a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
-<dl class="simple">
+<cite>Udata</cite> (the actual values of our solution throughout the simulation) in our <cite>simulation</cite> instance.</p>
+<section id="id9">
+<h4>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
+<blockquote>
+<div><dl class="simple">
 <dt>method_kw<span class="classifier">str, optional</span></dt><dd><p>Name of the numerical method. Currently, ‘etdrk1’, ‘ifrk4’ are available for first-order-in-time problems,
 and ‘etdrk4’ is available for all problems: see <code class="xref py py-class docutils literal notranslate"><span class="pre">time_stepper</span></code>.
 Default: ‘etdrk4’.</p>
@@ -583,6 +544,7 @@ Default: ‘etdrk4’.</p>
 <dt>print_runtime: boolean, optional</dt><dd><p>True if you would like to print the wall-clock runtime of the simulation, False otherwise.</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
@@ -596,10 +558,12 @@ Default: ‘etdrk4’.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="joe_lab.joe.simulation.save_combomovie">
 <span class="sig-name descname"><span class="pre">save_combomovie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'u'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldcolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xkcd:ocean</span> <span class="pre">green'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speccolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xkcd:dark</span> <span class="pre">orange'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation.save_combomovie"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation.save_combomovie" title="Link to this definition"></a></dt>
-<dd><p>Save a movie of the evolution of our field as well as a nested, tinier movie of its power spectrum.</p>
-<section id="id9">
-<h4>Parameters<a class="headerlink" href="#id9" title="Link to this heading"></a></h4>
-<dl class="simple">
+<dd><p>Save a movie of the evolution of our PDE solution as well as a nested, tinier movie of its power spectrum.</p>
+<p>If the PDE solution is complex-valued, we only show its modulus and power spectrum instead.</p>
+<section id="id10">
+<h4>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h4>
+<blockquote>
+<div><dl class="simple">
 <dt>fps: int, optional</dt><dd><p>Frames-per-second for the movie. Default: 200.</p>
 </dd>
 <dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots-per-inch on the image. Default: 100.</p>
@@ -608,12 +572,13 @@ Default: ‘etdrk4’.</p>
 </dd>
 <dt>usetex<span class="classifier">boolean, optional</span></dt><dd><p>True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</p>
 </dd>
-<dt>fieldcolor: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see &lt;<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>&gt;.
+<dt>fieldcolor: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see <a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>.
 Default: ‘xkcd:ocean green’.</p>
 </dd>
 <dt>speccolor: str, optional</dt><dd><p>Name of the color you want the curve of the power spectrum to be. Default: ‘xkcd:dark orange’.</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
@@ -622,9 +587,10 @@ Default: ‘xkcd:ocean green’.</p>
 <span class="sig-name descname"><span class="pre">save_movie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'u'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldcolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xkcd:ocean</span> <span class="pre">green'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation.save_movie"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation.save_movie" title="Link to this definition"></a></dt>
 <dd><p>Save a movie of the evolution of our solution as a .mp4 file.</p>
 <p>If the PDE solution is complex-valued this produces movies of its real part and its imaginary part.</p>
-<section id="id10">
-<h4>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h4>
-<dl class="simple">
+<section id="id11">
+<h4>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h4>
+<blockquote>
+<div><dl class="simple">
 <dt>fps: int, optional</dt><dd><p>Frames-per-second for the movie. Default: 200.</p>
 </dd>
 <dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots-per-inch on the image. Default: 100.</p>
@@ -633,10 +599,11 @@ Default: ‘xkcd:ocean green’.</p>
 </dd>
 <dt>usetex<span class="classifier">boolean, optional</span></dt><dd><p>True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</p>
 </dd>
-<dt>fieldcolor: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see &lt;<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>&gt;.
+<dt>fieldcolor: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see <a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>.
 Default: ‘xkcd:ocean green’.</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
@@ -644,9 +611,10 @@ Default: ‘xkcd:ocean green’.</p>
 <dt class="sig sig-object py" id="joe_lab.joe.simulation.save_movie_modulus">
 <span class="sig-name descname"><span class="pre">save_movie_modulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'u'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldcolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xkcd:ocean</span> <span class="pre">green'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/joe.html#simulation.save_movie_modulus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.joe.simulation.save_movie_modulus" title="Link to this definition"></a></dt>
 <dd><p>The same as <code class="xref py py-func docutils literal notranslate"><span class="pre">save_movie()</span></code>, but with the modulus of the field plotted instead.</p>
-<section id="id11">
-<h4>Parameters<a class="headerlink" href="#id11" title="Link to this heading"></a></h4>
-<dl class="simple">
+<section id="id12">
+<h4>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h4>
+<blockquote>
+<div><dl class="simple">
 <dt>fps: int, optional</dt><dd><p>Frames-per-second for the movie. Default: 200.</p>
 </dd>
 <dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots-per-inch on the image. Default: 100.</p>
@@ -655,10 +623,11 @@ Default: ‘xkcd:ocean green’.</p>
 </dd>
 <dt>usetex<span class="classifier">boolean, optional</span></dt><dd><p>True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</p>
 </dd>
-<dt>fieldcolor: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see &lt;<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>&gt;.
+<dt>fieldcolor: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see <a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>.
 Default: ‘xkcd:ocean green’.</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
 </dd></dl>
 
@@ -669,21 +638,11 @@ Default: ‘xkcd:ocean green’.</p>
 <section id="module-joe_lab.models">
 <span id="joe-lab-models-module"></span><h2>joe_lab.models module<a class="headerlink" href="#module-joe_lab.models" title="Link to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.models.K0">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.models.</span></span><span class="sig-name descname"><span class="pre">K0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/models.html#K0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.models.K0" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.models.V0">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.models.</span></span><span class="sig-name descname"><span class="pre">V0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/models.html#V0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.models.V0" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.models.builtin_model">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.models.</span></span><span class="sig-name descname"><span class="pre">builtin_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_kw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonlinear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/models.html#builtin_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.models.builtin_model" title="Link to this definition"></a></dt>
 <dd><p>Access a given builtin model from a list of possibilities.</p>
-<section id="id12">
-<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<section id="id13">
+<h3>Parameters<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>model_kw<span class="classifier">str</span></dt><dd><p>Name of the model to load up. Acceptable arguments: ‘bbm’, ‘gardner’, ‘gardner-bbm’, ‘kdv’, ‘ks’,
@@ -694,26 +653,16 @@ Default: ‘xkcd:ocean green’.</p>
 </dl>
 </div></blockquote>
 </section>
-<section id="id13">
-<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<section id="id14">
+<h3>Returns<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
 <blockquote>
-<div><dl>
-<dt>out<span class="classifier">model <a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><code class="xref py py-class docutils literal notranslate"><span class="pre">model</span></code></a></span></dt><dd><p>An instance of the <em>joe</em> model class with the given name.</p>
+<div><dl class="simple">
+<dt>out<span class="classifier">model</span></dt><dd><p>An instance of <a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><code class="xref py py-class docutils literal notranslate"><span class="pre">model</span></code></a> with the given name.</p>
 </dd>
 </dl>
 </div></blockquote>
 </section>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.models.fourier_forcing">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.models.</span></span><span class="sig-name descname"><span class="pre">fourier_forcing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_kw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nonlinear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/models.html#fourier_forcing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.models.fourier_forcing" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.models.get_symbol">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.models.</span></span><span class="sig-name descname"><span class="pre">get_symbol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/models.html#get_symbol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.models.get_symbol" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 </section>
 <section id="module-joe_lab.sponge_layer">
@@ -722,8 +671,8 @@ Default: ‘xkcd:ocean green’.</p>
 <dt class="sig sig-object py" id="joe_lab.sponge_layer.clip_spongeless">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.sponge_layer.</span></span><span class="sig-name descname"><span class="pre">clip_spongeless</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sfrac</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/sponge_layer.html#clip_spongeless"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.sponge_layer.clip_spongeless" title="Link to this definition"></a></dt>
 <dd><p>Obtain samples of <cite>z</cite> only coming from outside the sponge layer.</p>
-<section id="id14">
-<h3>Parameters<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>z<span class="classifier">ndarray</span></dt><dd><p>Viewed as samples of a function on our entire spatial grid (including the sponge layer).</p>
@@ -734,8 +683,8 @@ from the middle of the grid.</p>
 </dl>
 </div></blockquote>
 </section>
-<section id="id15">
-<h3>Returns<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>out<span class="classifier">ndarray</span></dt><dd><p>The part of z coming only from our sponge layer.</p>
@@ -746,30 +695,31 @@ from the middle of the grid.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.sponge_layer.damping_coeff_bronski">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.sponge_layer.</span></span><span class="sig-name descname"><span class="pre">damping_coeff_bronski</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/sponge_layer.html#damping_coeff_bronski"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.sponge_layer.damping_coeff_bronski" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.sponge_layer.damping_coeff_lt">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.sponge_layer.</span></span><span class="sig-name descname"><span class="pre">damping_coeff_lt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sponge_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/sponge_layer.html#damping_coeff_lt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.sponge_layer.damping_coeff_lt" title="Link to this definition"></a></dt>
 <dd><p>Smooth damping coefficient used in Liu-Trogdon 2023 (see References below). Only applies on left side of domain.</p>
-<section id="id16">
-<h3>Parameters<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<section id="id17">
+<h3>Parameters<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
 <blockquote>
-<div><dl class="simple">
-<dt>x<span class="classifier">float or ndarray</span></dt><dd><p>Spatial point(s) to evaluation damping coefficient at/</p>
+<div><dl>
+<dt>x<span class="classifier">float or ndarray</span></dt><dd><p>Spatial point(s) to evaluation damping coefficient at.</p>
 </dd>
-<dt>sponge_params: dict</dt><dd><p>Contains particular parameters for the sponge layer.</p>
+<dt>sponge_params<span class="classifier">dict</span></dt><dd><p>Contains particular parameters for the sponge layer: the keys are instructively named ‘l_endpt’, ‘r_endpt’,
+and ‘width’.</p>
+<p>For other purposes, it is useful to also populate the dict with keys ‘expdamp_freq’
+(number of steps between harsh exponential damping in the sponge), ‘damping_amplitude’ (amplitude of
+heat-flow coefficient in the sponge layer), ‘splitting_method_kw’ (‘naive’ or ‘strang’, default to ‘naive’),
+and ‘spongeless_frac’ (fraction of domain that is actually “physical” and not corrupted by the sponge):
+these keys are required for passing the sponge_params dict to a <a class="reference internal" href="#joe_lab.joe.simulation" title="joe_lab.joe.simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">simulation</span></code></a> instance.</p>
 </dd>
 </dl>
 </div></blockquote>
 </section>
-<section id="id17">
-<h3>Returns<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<section id="id18">
+<h3>Returns<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out: float or ndarray</dt><dd><p>Values of damping coefficient at the point(s) x.</p>
+<dt>out<span class="classifier">ndarray</span></dt><dd><p>Values of damping coefficient at the point(s) x.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -777,12 +727,12 @@ from the middle of the grid.</p>
 <section id="references">
 <h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id18" role="doc-footnote">
+<aside class="footnote brackets" id="id19" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>Anne Liu, Thomas Trogdon, “An artificially-damped Fourier method for dispersive evolution equations”.</p>
 </aside>
 </aside>
-<p>&lt;<a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S0168927423001526">https://www.sciencedirect.com/science/article/pii/S0168927423001526</a>&gt;.</p>
+<p><a class="reference external" href="https://doi.org/10.1016/j.apnum.2023.05.023">https://doi.org/10.1016/j.apnum.2023.05.023</a> .</p>
 </section>
 </dd></dl>
 
@@ -794,10 +744,10 @@ damping function <a class="reference internal" href="#joe_lab.sponge_layer.dampi
 <p>Given a Fourier-space input <span class="math notranslate nohighlight">\(V\)</span>, this function returns samples of the Rayleigh damping forcing term.</p>
 <div class="math notranslate nohighlight">
 \[\mathcal{F}\left(-\beta(x)\mathcal{F}^{-1}V\right)\]</div>
-<p>where <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> denotes the Fourier transform and <span class="math notranslate nohighlight">\(beta(x)\)</span> denotes a damping coefficient close to
+<p>where <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> denotes the Fourier transform and <span class="math notranslate nohighlight">\(\beta(x)\)</span> denotes a damping coefficient close to
 1 near the boundary of our domain and effectively zero everywhere else.</p>
-<section id="id19">
-<h3>Parameters<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<section id="id20">
+<h3>Parameters<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>V<span class="classifier">complex ndarray</span></dt><dd><p>Fourier-space representation of a given function sampled at some number of points.</p>
@@ -811,11 +761,11 @@ damping function <a class="reference internal" href="#joe_lab.sponge_layer.dampi
 </dl>
 </div></blockquote>
 </section>
-<section id="id20">
-<h3>Returns<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<section id="id21">
+<h3>Returns<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out: complex ndarray</dt><dd><p>Fourier-space representation of the Rayleigh damping forcing term.</p>
+<dt>out<span class="classifier">complex ndarray</span></dt><dd><p>Fourier-space representation of the Rayleigh damping forcing term.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -828,23 +778,22 @@ damping function <a class="reference internal" href="#joe_lab.sponge_layer.dampi
 <dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.time_stepper.assemble_damping_mat">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">assemble_damping_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sponge_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#assemble_damping_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.assemble_damping_mat" title="Link to this definition"></a></dt>
-<dd><p>Get the matrix that is to be inverted at each time step in the artificial damping stage. Only important
+<dd><p>Get the matrix that is to be inverted at each time-step in the artificial damping stage. Only important
 when the sponge layer is turned on.</p>
 <p>Strictly speaking we store the matrix as a LinearOperator
-&lt;<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html</a>&gt; for performance reasons:
-the array is dense and too large for direct storage etc. to be performant.</p>
-<p>Currently only backward Euler inversion is implemented.</p>
-<section id="id21">
-<h3>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h3>
+(<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html</a>) for performance reasons:
+the array is dense and too large for direct storage and direct multiplication to be performant.</p>
+<section id="id22">
+<h3>Parameters<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>N<span class="classifier">int</span></dt><dd><p>Number of grid points (or frequencies) we sample in our simulation.</p>
 </dd>
 <dt>length<span class="classifier">float</span></dt><dd><p>Length of the spatial domain.</p>
 </dd>
-<dt>x<span class="classifier">ndarray</span></dt><dd><p>Spatial grid of [-0.5*`length`, 0.5*`length`].</p>
+<dt>x<span class="classifier">ndarray</span></dt><dd><p>Spatial grid of [-0.5*length, 0.5*length].</p>
 </dd>
-<dt>dt<span class="classifier">float</span></dt><dd><p>Time step size for numerical integration of the PDE.</p>
+<dt>dt<span class="classifier">float</span></dt><dd><p>time-step size for numerical integration of the PDE.</p>
 </dd>
 <dt>sponge_params<span class="classifier">dict</span></dt><dd><p>Contains particular parameters for the sponge layer, see <a class="reference internal" href="#joe_lab.sponge_layer.damping_coeff_lt" title="joe_lab.sponge_layer.damping_coeff_lt"><code class="xref py py-func docutils literal notranslate"><span class="pre">damping_coeff_lt()</span></code></a>.</p>
 </dd>
@@ -853,11 +802,11 @@ the array is dense and too large for direct storage etc. to be performant.</p>
 </dl>
 </div></blockquote>
 </section>
-<section id="id22">
-<h3>Returns<a class="headerlink" href="#id22" title="Link to this heading"></a></h3>
+<section id="id23">
+<h3>Returns<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out<span class="classifier">scipy.sparse.linalg.LinearOperator</span></dt><dd><p>The damping matrix, represented by its shape and matrix-vector multiplication.</p>
+<dt>out<span class="classifier">scipy.sparse.linalg.LinearOperator</span></dt><dd><p>The damping matrix, represented by its shape and matrix-vector multiplication map.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -869,8 +818,8 @@ the array is dense and too large for direct storage etc. to be performant.</p>
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">do_diffusion_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#do_diffusion_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.do_diffusion_step" title="Link to this definition"></a></dt>
 <dd><p>Solve the SPD linear system Bz = q via the conjugate gradient method. This practical shows up when doing a
 step of diffusion when sponge layers are included.</p>
-<section id="id23">
-<h3>Parameters<a class="headerlink" href="#id23" title="Link to this heading"></a></h3>
+<section id="id24">
+<h3>Parameters<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>q<span class="classifier">ndarray</span></dt><dd><p>Right-hand side of the relevant linear system.</p>
@@ -881,8 +830,8 @@ that activates only in the sponge layer).</p>
 </dl>
 </div></blockquote>
 </section>
-<section id="id24">
-<h3>Returns<a class="headerlink" href="#id24" title="Link to this heading"></a></h3>
+<section id="id25">
+<h3>Returns<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>out<span class="classifier">ndarray</span></dt><dd><p>Solution to the linear system.</p>
@@ -896,8 +845,8 @@ that activates only in the sponge layer).</p>
 <dt class="sig sig-object py" id="joe_lab.time_stepper.do_etdrk1_step">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">do_etdrk1_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propagator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forcing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#do_etdrk1_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.do_etdrk1_step" title="Link to this definition"></a></dt>
 <dd><p>Performs a single step of ETDRK1 (the exponential Euler method).</p>
-<section id="id25">
-<h3>Parameters<a class="headerlink" href="#id25" title="Link to this heading"></a></h3>
+<section id="id26">
+<h3>Parameters<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>V<span class="classifier">ndarray</span></dt><dd><p>Solution value at initial time.</p>
@@ -912,11 +861,11 @@ The time-step is already encoded in here (we propagate for a length of time equa
 </dl>
 </div></blockquote>
 </section>
-<section id="id26">
-<h3>Returns<a class="headerlink" href="#id26" title="Link to this heading"></a></h3>
+<section id="id27">
+<h3>Returns<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time_step.</p>
+<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time-step length.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -924,16 +873,11 @@ The time-step is already encoded in here (we propagate for a length of time equa
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.time_stepper.do_etdrk2_step">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">do_etdrk2_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propagator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forcing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#do_etdrk2_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.do_etdrk2_step" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.time_stepper.do_etdrk4_step">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">do_etdrk4_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propagator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propagator2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forcing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">greeks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#do_etdrk4_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.do_etdrk4_step" title="Link to this definition"></a></dt>
 <dd><p>Performs a single step of ETDRK4 (fourth-order exponential Runge-Kutta) for a first-order-in-time problem.</p>
-<section id="id27">
-<h3>Parameters<a class="headerlink" href="#id27" title="Link to this heading"></a></h3>
+<section id="id28">
+<h3>Parameters<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>V<span class="classifier">ndarray</span></dt><dd><p>Solution value at initial time.</p>
@@ -941,7 +885,7 @@ The time-step is already encoded in here (we propagate for a length of time equa
 <dt>propagator<span class="classifier">ndarray</span></dt><dd><p>Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.
 The time-step is already encoded in here (we propagate for a length of time equal to the time-step).</p>
 </dd>
-<dt>propagator2<span class="classifier">ndarray</span></dt><dd><p>The same as above, but for only <em>half</em> the time step.</p>
+<dt>propagator2<span class="classifier">ndarray</span></dt><dd><p>The same as above, but for only <em>half</em> the time-step.</p>
 </dd>
 <dt>forcing<span class="classifier">callable</span></dt><dd><p>Fourier-space forcing term in the PDE.</p>
 </dd>
@@ -951,11 +895,11 @@ The time-step is already encoded in here (we propagate for a length of time equa
 </dl>
 </div></blockquote>
 </section>
-<section id="id28">
-<h3>Returns<a class="headerlink" href="#id28" title="Link to this heading"></a></h3>
+<section id="id29">
+<h3>Returns<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time_step.</p>
+<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time-step length.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -967,10 +911,10 @@ The time-step is already encoded in here (we propagate for a length of time equa
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">do_etdrk4_step_second_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propagator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propagator2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forcing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">greeks</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#do_etdrk4_step_second_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.do_etdrk4_step_second_order" title="Link to this definition"></a></dt>
 <dd><p>Performs a single step of ETDRK4 (fourth-order exponential Runge-Kutta) for a second-order-in-time problem.</p>
 <p>This is different from the analogous function for first-order problems
-<code class="xref py py-func docutils literal notranslate"><span class="pre">do_etdrk4_step_first_order()</span></code> because we must account for the Greeks now being sparse
+<a class="reference internal" href="#joe_lab.time_stepper.do_etdrk4_step" title="joe_lab.time_stepper.do_etdrk4_step"><code class="xref py py-func docutils literal notranslate"><span class="pre">do_etdrk4_step()</span></code></a> because we must account for the Greeks now being sparse
 matrices instead of simple vector-shaped arrays.</p>
-<section id="id29">
-<h3>Parameters<a class="headerlink" href="#id29" title="Link to this heading"></a></h3>
+<section id="id30">
+<h3>Parameters<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>V<span class="classifier">ndarray</span></dt><dd><p>Solution value at initial time.</p>
@@ -978,21 +922,21 @@ matrices instead of simple vector-shaped arrays.</p>
 <dt>propagator<span class="classifier">ndarray</span></dt><dd><p>Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.
 the time-step is already encoded in here (we propagate for a length of time equal to the time-step).</p>
 </dd>
-<dt>propagator2<span class="classifier">ndarray</span></dt><dd><p>The same as above, but for only <em>half</em> the time step.</p>
+<dt>propagator2<span class="classifier">ndarray</span></dt><dd><p>The same as above, but for only <em>half</em> the time-step.</p>
 </dd>
 <dt>forcing<span class="classifier">callable</span></dt><dd><p>Fourier-space forcing term in the PDE.</p>
 </dd>
 <dt>greeks<span class="classifier">list</span></dt><dd><p>Entries are the Greeks/fourth-order exponential Runge-Kutta weights
-(see <a class="reference internal" href="#joe_lab.time_stepper.get_greeks_first_order" title="joe_lab.time_stepper.get_greeks_first_order"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_greeks_first_order()</span></code></a>).</p>
+(see <a class="reference internal" href="#joe_lab.time_stepper.get_greeks_second_order" title="joe_lab.time_stepper.get_greeks_second_order"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_greeks_second_order()</span></code></a>).</p>
 </dd>
 </dl>
 </div></blockquote>
 </section>
-<section id="id30">
-<h3>Returns<a class="headerlink" href="#id30" title="Link to this heading"></a></h3>
+<section id="id31">
+<h3>Returns<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time_step.</p>
+<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time-step length.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -1002,8 +946,8 @@ the time-step is already encoded in here (we propagate for a length of time equa
 <dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.time_stepper.do_ifrk4_step">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">do_ifrk4_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propagator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propagator2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forcing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#do_ifrk4_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.do_ifrk4_step" title="Link to this definition"></a></dt>
-<dd><section id="id31">
-<h3>Parameters<a class="headerlink" href="#id31" title="Link to this heading"></a></h3>
+<dd><section id="id32">
+<h3>Parameters<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>V<span class="classifier">ndarray</span></dt><dd><p>Solution value at initial time.</p>
@@ -1011,7 +955,7 @@ the time-step is already encoded in here (we propagate for a length of time equa
 <dt>propagator<span class="classifier">ndarray</span></dt><dd><p>Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.
 the time-step is already encoded in here (we propagate for a length of time equal to the time-step).</p>
 </dd>
-<dt>propagator2<span class="classifier">ndarray</span></dt><dd><p>The same as above, but for only <em>half</em> the time step.</p>
+<dt>propagator2<span class="classifier">ndarray</span></dt><dd><p>The same as above, but for only <em>half</em> the time-step.</p>
 </dd>
 <dt>forcing<span class="classifier">callable</span></dt><dd><p>Fourier-space forcing term in the PDE.</p>
 </dd>
@@ -1020,11 +964,11 @@ the time-step is already encoded in here (we propagate for a length of time equa
 </dl>
 </div></blockquote>
 </section>
-<section id="id32">
-<h3>Returns<a class="headerlink" href="#id32" title="Link to this heading"></a></h3>
+<section id="id33">
+<h3>Returns<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time_step.</p>
+<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time-step length.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -1034,20 +978,20 @@ the time-step is already encoded in here (we propagate for a length of time equa
 <dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.time_stepper.do_time_stepping">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">do_time_stepping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'etdrk4'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#do_time_stepping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.do_time_stepping" title="Link to this definition"></a></dt>
-<dd><p>Perform all the time steps in the simulation, starting from time = 0  and ending at time = T.</p>
-<section id="id33">
-<h3>Parameters<a class="headerlink" href="#id33" title="Link to this heading"></a></h3>
+<dd><p>Perform all the time-steps in the simulation, starting from time = 0  and ending at time = T.</p>
+<section id="id34">
+<h3>Parameters<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
 <blockquote>
-<div><dl>
-<dt>sim<span class="classifier"><cite>~joe_lab.joe.simulation</cite></span></dt><dd><p>The simulation our timestepper is supposed to work on.</p>
+<div><dl class="simple">
+<dt>sim<span class="classifier">simulation</span></dt><dd><p>The instance of <a class="reference internal" href="#joe_lab.joe.simulation" title="joe_lab.joe.simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">simulation</span></code></a> our timestepper is supposed to work on.</p>
 </dd>
-<dt>method_kw<span class="classifier">str</span></dt><dd><p>The name of the time-stepper (for instance, ETDRK4).</p>
+<dt>method_kw<span class="classifier">str</span></dt><dd><p>The name of the time-stepper (for instance, ‘etdrk4’).</p>
 </dd>
 </dl>
 </div></blockquote>
 </section>
-<section id="id34">
-<h3>Returns<a class="headerlink" href="#id34" title="Link to this heading"></a></h3>
+<section id="id35">
+<h3>Returns<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>Udata<span class="classifier">ndarray</span></dt><dd><p>Values of the solution to our PDE sampled on our space-time grid, stored as an array. The 0 axis represents
@@ -1064,9 +1008,10 @@ the solution on our spatial grid).</p>
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">get_Q1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#get_Q1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.get_Q1" title="Link to this definition"></a></dt>
 <dd><p>Computes the single weight for first-order exponential quadrature for a first-order-in-time problem.</p>
 <p>This by done by adapting the approach of Kassam and Trefethen 2005.</p>
-<section id="id35">
-<h3>Parameters<a class="headerlink" href="#id35" title="Link to this heading"></a></h3>
-<dl class="simple">
+<section id="id36">
+<h3>Parameters<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
 <dt>N<span class="classifier">int</span></dt><dd><p>Number of frequencies we sample.</p>
 </dd>
 <dt>dt<span class="classifier">float</span></dt><dd><p>Time-step for the simulation.</p>
@@ -1075,43 +1020,38 @@ the solution on our spatial grid).</p>
 linear, constant-coefficient part of the PDE in Fourier space.</p>
 </dd>
 </dl>
+</div></blockquote>
 </section>
-<section id="id36">
-<h3>Returns<a class="headerlink" href="#id36" title="Link to this heading"></a></h3>
+<section id="id37">
+<h3>Returns<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>out<span class="classifier">ndarray</span></dt><dd><p>Exponential Runge-Kutta weight, Q1, for ETDRK1.</p>
+<dt>out<span class="classifier">ndarray</span></dt><dd><p>Exponential Runge-Kutta weight, Q1, for the exponential Euler method.</p>
 </dd>
 </dl>
 </section>
-<section id="id37">
-<h3>References<a class="headerlink" href="#id37" title="Link to this heading"></a></h3>
+<section id="id38">
+<h3>References<a class="headerlink" href="#id38" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id38" role="doc-footnote">
+<aside class="footnote brackets" id="id39" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>Aly-Khan Kassam, Lloyd N. Trefethen “Fourth-Order Time-Stepping for Stiff PDEs”.</p>
 </aside>
 </aside>
-<p>&lt;<a class="reference external" href="https://epubs.siam.org/doi/abs/10.1137/S1064827502410633">https://epubs.siam.org/doi/abs/10.1137/S1064827502410633</a>&gt;.</p>
+<p><a class="reference external" href="https://doi.org/10.1137/S1064827502410633">https://doi.org/10.1137/S1064827502410633</a> .</p>
 </section>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="joe_lab.time_stepper.get_R2">
-<span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">get_R2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#get_R2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.get_R2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.time_stepper.get_greeks_first_order">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">get_greeks_first_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#get_greeks_first_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.get_greeks_first_order" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Computes all the Greeks (“Runge-Kutta weights” for exponential quadrature) for ETDRK4 applied to a</dt><dd><p>first-order-in-time problem.</p>
-</dd>
-</dl>
+<dd><p>Computes all the Greeks (Runge-Kutta weights for exponential quadrature) for ETDRK4 applied to a
+first-order-in-time problem.</p>
 <p>This by done Pythonizing the code from Kassam and Trefethen 2005, that is, by numerically approximating Cauchy
 integrals.</p>
-<section id="id39">
-<h3>Parameters<a class="headerlink" href="#id39" title="Link to this heading"></a></h3>
-<dl class="simple">
+<section id="id40">
+<h3>Parameters<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
 <dt>N<span class="classifier">int</span></dt><dd><p>Number of frequencies we sample.</p>
 </dd>
 <dt>dt<span class="classifier">float</span></dt><dd><p>Time-step for the simulation.</p>
@@ -1120,39 +1060,44 @@ integrals.</p>
 linear, constant-coefficient part of the PDE in Fourier space.</p>
 </dd>
 </dl>
-</section>
-<section id="id40">
-<h3>Returns<a class="headerlink" href="#id40" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>[Q, f1, f2, f3]<span class="classifier">list</span></dt><dd><p>A list whose entries are the Greeks</p>
-</dd>
-</dl>
+</div></blockquote>
 </section>
 <section id="id41">
-<h3>References<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<h3>Returns<a class="headerlink" href="#id41" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>[Q, f1, f2, f3]<span class="classifier">list</span></dt><dd><p>A list whose entries are the Greeks (vector-shaped arrays).</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id42">
+<h3>References<a class="headerlink" href="#id42" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id42" role="doc-footnote">
+<aside class="footnote brackets" id="id43" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>Aly-Khan Kassam, Lloyd N. Trefethen “Fourth-Order Time-Stepping for Stiff PDEs”.</p>
 </aside>
 </aside>
-<p>&lt;<a class="reference external" href="https://epubs.siam.org/doi/abs/10.1137/S1064827502410633">https://epubs.siam.org/doi/abs/10.1137/S1064827502410633</a>&gt;.</p>
+<p><a class="reference external" href="https://doi.org/10.1137/S1064827502410633">https://doi.org/10.1137/S1064827502410633</a>.</p>
 </section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.time_stepper.get_greeks_second_order">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">get_greeks_second_order</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#get_greeks_second_order"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.get_greeks_second_order" title="Link to this definition"></a></dt>
-<dd><p>Computes all the Greeks (“weights” for exponential quadrature) for EDTRK4 applied to a second-order-in-time problem.</p>
+<dd><p>Computes all the Greeks (Runge-Kutta weights for exponential quadrature) for EDTRK4 applied to a
+second-order-in-time problem.</p>
 <p>This by done Pythonizing the code from Kassam and Trefethen 2005, that is, by numerically approximating Cauchy
 integrals.</p>
 <p>Note that, since the linear, constant-coefficient part of the PDE system is no longer diagonal when we have
 a second-order-in-time problem, the code below is very different from the analogous function for first-order problems
 <a class="reference internal" href="#joe_lab.time_stepper.get_greeks_first_order" title="joe_lab.time_stepper.get_greeks_first_order"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_greeks_first_order()</span></code></a>. In particular, the radius of our Cauchy integral contour
 must be chosen based on the argument A.</p>
-<section id="id43">
-<h3>Parameters<a class="headerlink" href="#id43" title="Link to this heading"></a></h3>
-<dl class="simple">
+<section id="id44">
+<h3>Parameters<a class="headerlink" href="#id44" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
 <dt>N<span class="classifier">int</span></dt><dd><p>Number of frequencies we sample.</p>
 </dd>
 <dt>dt<span class="classifier">float</span></dt><dd><p>Time-step for the simulation.</p>
@@ -1160,23 +1105,26 @@ must be chosen based on the argument A.</p>
 <dt>A<span class="classifier">ndarray</span></dt><dd><p>A is the matrix of the linear, constant-coefficient part of the PDE in Fourier space.</p>
 </dd>
 </dl>
-</section>
-<section id="id44">
-<h3>Returns<a class="headerlink" href="#id44" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>[Q, f1, f2, f3]<span class="classifier">list</span></dt><dd><p>A list whose entries are the Greeks</p>
-</dd>
-</dl>
+</div></blockquote>
 </section>
 <section id="id45">
-<h3>References<a class="headerlink" href="#id45" title="Link to this heading"></a></h3>
+<h3>Returns<a class="headerlink" href="#id45" title="Link to this heading"></a></h3>
+<blockquote>
+<div><dl class="simple">
+<dt>[Q, f1, f2, f3]<span class="classifier">list</span></dt><dd><p>A list whose entries are the Greeks (arrays).</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+<section id="id46">
+<h3>References<a class="headerlink" href="#id46" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id46" role="doc-footnote">
+<aside class="footnote brackets" id="id47" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>Aly-Khan Kassam, Lloyd N. Trefethen “Fourth-Order Time-Stepping for Stiff PDEs”.</p>
 </aside>
 </aside>
-<p>&lt;<a class="reference external" href="https://epubs.siam.org/doi/abs/10.1137/S1064827502410633">https://epubs.siam.org/doi/abs/10.1137/S1064827502410633</a>&gt;.</p>
+<p><a class="reference external" href="https://doi.org/10.1137/S1064827502410633">https://doi.org/10.1137/S1064827502410633</a> .</p>
 </section>
 </dd></dl>
 
@@ -1185,19 +1133,19 @@ must be chosen based on the argument A.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">joe_lab.time_stepper.</span></span><span class="sig-name descname"><span class="pre">timestepper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method_kw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#timestepper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.timestepper" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Completely encodes a time-stepping method: instances of this class perform time-stepping during simulations.</p>
-<section id="id47">
-<h3>Attributes<a class="headerlink" href="#id47" title="Link to this heading"></a></h3>
+<section id="id48">
+<h3>Attributes<a class="headerlink" href="#id48" title="Link to this heading"></a></h3>
 <blockquote>
-<div><dl>
-<dt>method_kw<span class="classifier">str</span></dt><dd><p>The name of the time-stepper (for instance, ETDRK4).</p>
+<div><dl class="simple">
+<dt>method_kw<span class="classifier">str</span></dt><dd><p>The name of the time-stepper (for instance,’etdrk4’).</p>
 </dd>
-<dt>sim<span class="classifier"><cite>~joe_lab.joe.simulation</cite></span></dt><dd><p>The simulation our timestepper is supposed to work on.</p>
+<dt>sim<span class="classifier">simulation</span></dt><dd><p>The instance of <a class="reference internal" href="#joe_lab.joe.simulation" title="joe_lab.joe.simulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">simulation</span></code></a> our timestepper is supposed to work on.</p>
 </dd>
 <dt>t_ord<span class="classifier">int</span></dt><dd><p>Temporal order of derivatives in the model. Currently only t_ord=1,2 are supported.</p>
 </dd>
-<dt>aux<span class="classifier">list or ndarray</span></dt><dd><p>Auxiliary quantities (typically Greeks/exponential Runge-Kutta weights) that are needed for time-stepping.
-These are usually computed in a pre-processing stage and saved in the directory <cite>joe_timestepper_aux</cite> after
-the instance is created but before time-stepping occurs.</p>
+<dt>aux<span class="classifier">list or ndarray</span></dt><dd><p>Auxiliary quantities (typically Greeks/exponential Runge-Kutta weights and propagators) that are needed
+for time-stepping. These are usually computed in a pre-processing stage and saved in the directory
+<cite>joe_timestepper_aux</cite> after the instance is created but before time-stepping occurs.</p>
 </dd>
 <dt>auxfilename: str</dt><dd><p>Name of the .pkl file containing <cite>aux</cite>.</p>
 </dd>
@@ -1212,8 +1160,8 @@ if we use Strang splitting, and scale=1 otherwise.</p>
 <dt class="sig sig-object py" id="joe_lab.time_stepper.timestepper.do_time_step">
 <span class="sig-name descname"><span class="pre">do_time_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forcing</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/time_stepper.html#timestepper.do_time_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.time_stepper.timestepper.do_time_step" title="Link to this definition"></a></dt>
 <dd><p>Do a single time-step with the method of choice.</p>
-<section id="id48">
-<h4>Parameters<a class="headerlink" href="#id48" title="Link to this heading"></a></h4>
+<section id="id49">
+<h4>Parameters<a class="headerlink" href="#id49" title="Link to this heading"></a></h4>
 <blockquote>
 <div><dl class="simple">
 <dt>V<span class="classifier">ndarray</span></dt><dd><p>Solution value at initial time.</p>
@@ -1223,11 +1171,11 @@ if we use Strang splitting, and scale=1 otherwise.</p>
 </dl>
 </div></blockquote>
 </section>
-<section id="id49">
-<h4>Returns<a class="headerlink" href="#id49" title="Link to this heading"></a></h4>
+<section id="id50">
+<h4>Returns<a class="headerlink" href="#id50" title="Link to this heading"></a></h4>
 <blockquote>
 <div><dl class="simple">
-<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time_step.</p>
+<dt>out<span class="classifier">ndarray</span></dt><dd><p>Value of solution at time = initial time + time-step length.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -1262,22 +1210,23 @@ if we use Strang splitting, and scale=1 otherwise.</p>
 <dt class="sig sig-object py" id="joe_lab.utils.dealiased_pow">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.utils.</span></span><span class="sig-name descname"><span class="pre">dealiased_pow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/utils.html#dealiased_pow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.utils.dealiased_pow" title="Link to this definition"></a></dt>
 <dd><p>Compute the Fourier-space version of a power of an array, dealiased by zero-padding.</p>
-<p>Important: this only works for REAL fields because for complex fields <span class="math notranslate nohighlight">\(u\)</span>, algebraic nonlinearities
-typically involve the complex conjugate <span class="math notranslate nohighlight">\(\overline{u}\)</span> as well as <a href="#id50"><span class="problematic" id="id51">:mathm:`u`</span></a>. So, padding for such
-nonlinearities terms should be done on-the-fly. A future release of <em>joe</em> may include support for complex
-powers.</p>
-<section id="id52">
-<h3>Parameters<a class="headerlink" href="#id52" title="Link to this heading"></a></h3>
+<p>Important: this only works for real-valued arrays because for complex arrays <span class="math notranslate nohighlight">\(u\)</span>, algebraic nonlinearities
+typically involve the complex conjugate <span class="math notranslate nohighlight">\(\overline{u}\)</span> as well as <span class="math notranslate nohighlight">\(u\)</span>. So, padding for such
+nonlinearities terms should be done on-the-fly.</p>
+<p>A future release of <em>joe</em> may include support for dealiased complex powers.</p>
+<section id="id51">
+<h3>Parameters<a class="headerlink" href="#id51" title="Link to this heading"></a></h3>
 <blockquote>
 <div><p>V : complex ndarray</p>
 <p>p : int</p>
 </div></blockquote>
 </section>
-<section id="id53">
-<h3>Returns<a class="headerlink" href="#id53" title="Link to this heading"></a></h3>
+<section id="id52">
+<h3>Returns<a class="headerlink" href="#id52" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out: complex ndarray</dt><dd><p>A version of rfft(irfft(V)**p) that has been dealiased via zero-padding</p>
+<dt>out: complex ndarray</dt><dd><p>A version of <span class="math notranslate nohighlight">\(\mathcal{F}\left[\left(\mathcal{F}^{-1}V\right)^p\right]\)</span> that has been dealiased
+via zero-padding.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -1287,10 +1236,13 @@ powers.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.utils.integrate">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.utils.</span></span><span class="sig-name descname"><span class="pre">integrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/utils.html#integrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.utils.integrate" title="Link to this definition"></a></dt>
-<dd><p>Integrates N samples of a real or complex space-time field over the spatial interval [-0.5*length, 0.5*length]
-using the FFT.</p>
+<dd><dl class="simple">
+<dt>Integrates N samples of a real or complex space-time field over the spatial interval [-0.5*length, 0.5*length]</dt><dd><p>using the FFT.</p>
+</dd>
+</dl>
+<section id="id53">
+<h3>Parameters<a class="headerlink" href="#id53" title="Link to this heading"></a></h3>
 <blockquote>
-<div><blockquote>
 <div><dl class="simple">
 <dt>u<span class="classifier">ndarray</span></dt><dd><p>Real or complex array to be integrated in space. Convention is that spatial variation is stored in the
 -1 axis.</p>
@@ -1299,6 +1251,9 @@ using the FFT.</p>
 </dd>
 </dl>
 </div></blockquote>
+</section>
+<section id="id54">
+<h3>Returns<a class="headerlink" href="#id54" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>out: float or ndarray</dt><dd><p>Approximation of the integral of the sampled space-time field over the spatial interval
@@ -1306,16 +1261,16 @@ using the FFT.</p>
 </dd>
 </dl>
 </div></blockquote>
-</div></blockquote>
+</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="joe_lab.utils.my_fft">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.utils.</span></span><span class="sig-name descname"><span class="pre">my_fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/utils.html#my_fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.utils.my_fft" title="Link to this definition"></a></dt>
 <dd><p>Takes FFT of a real or complex array along the -1 axis, optimizing storage if the array is real.</p>
-<p>Wraps the scipy.fft routines fft, rfft.</p>
-<section id="id54">
-<h3>Parameters<a class="headerlink" href="#id54" title="Link to this heading"></a></h3>
+<p>Wraps the scipy.fft routines fft, rfft (see <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/fft.html">https://docs.scipy.org/doc/scipy/reference/fft.html</a>).</p>
+<section id="id55">
+<h3>Parameters<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>u<span class="classifier">ndarray</span></dt><dd><p>Real or complex numpy array.</p>
@@ -1327,12 +1282,11 @@ using the FFT.</p>
 </dl>
 </div></blockquote>
 </section>
-<section id="id55">
-<h3>Returns<a class="headerlink" href="#id55" title="Link to this heading"></a></h3>
+<section id="id56">
+<h3>Returns<a class="headerlink" href="#id56" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out<span class="classifier">complex ndarray</span></dt><dd><p>Same shape conventions as scipy.fft.fft &lt;<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html#scipy.fft.fft">https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html#scipy.fft.fft</a>&gt;
-and scipy.fft.rfft &lt;<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.rfft.html#scipy.fft.rfft">https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.rfft.html#scipy.fft.rfft</a>&gt;.</p>
+<dt>out<span class="classifier">complex ndarray</span></dt><dd><p>Same shape conventions as scipy.fft.fft and scipy.fft.rfft (see <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/fft.html">https://docs.scipy.org/doc/scipy/reference/fft.html</a>).</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -1343,12 +1297,12 @@ and scipy.fft.rfft &lt;<a class="reference external" href="https://docs.scipy.or
 <dt class="sig sig-object py" id="joe_lab.utils.my_ifft">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.utils.</span></span><span class="sig-name descname"><span class="pre">my_ifft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/utils.html#my_ifft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.utils.my_ifft" title="Link to this definition"></a></dt>
 <dd><p>Takes inverse FFT of an array along the -1 axis, optimizing storage if the inverse FFT is expected to be real.</p>
-<p>Wraps the scipy.fft routines ifft, irfft.</p>
-<section id="id56">
-<h3>Parameters<a class="headerlink" href="#id56" title="Link to this heading"></a></h3>
+<p>Wraps the scipy.fft routines ifft, irfft (see <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/fft.html">https://docs.scipy.org/doc/scipy/reference/fft.html</a>).</p>
+<section id="id57">
+<h3>Parameters<a class="headerlink" href="#id57" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>V<span class="classifier">complex ndarray</span></dt><dd><p>Array to inverse FFT</p>
+<dt>V<span class="classifier">complex ndarray</span></dt><dd><p>Array we want to apply inverse FFT to.</p>
 </dd>
 <dt>n: int or None, optional.</dt><dd><p>Total number of frequencies to pad V with, if padding is desired. Default: None (no padding).</p>
 </dd>
@@ -1358,12 +1312,11 @@ real. Default: False.</p>
 </dl>
 </div></blockquote>
 </section>
-<section id="id57">
-<h3>Returns<a class="headerlink" href="#id57" title="Link to this heading"></a></h3>
+<section id="id58">
+<h3>Returns<a class="headerlink" href="#id58" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>out: ndarray</dt><dd><p>Same shape conventions as scipy.fft.ifft &lt;<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html#scipy.fft.ifft">https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html#scipy.fft.ifft</a>&gt;
-and scipy.fft.irfft &lt;<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.rfft.html#scipy.fft.irfft">https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.rfft.html#scipy.fft.irfft</a>&gt;.</p>
+<dt>out: ndarray</dt><dd><p>Same shape conventions as scipy.fft.ifft and scipy.fft.irfft (see <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/fft.html">https://docs.scipy.org/doc/scipy/reference/fft.html</a>).</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -1378,15 +1331,15 @@ and scipy.fft.irfft &lt;<a class="reference external" href="https://docs.scipy.o
 <span class="sig-prename descclassname"><span class="pre">joe_lab.visualization.</span></span><span class="sig-name descname"><span class="pre">hov_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umin=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umax=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi=100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">picname=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/visualization.html#hov_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.visualization.hov_plot" title="Link to this definition"></a></dt>
 <dd><p>Create a Hovmoeller plot (filled contour plot in space-time) of the space-time field u.</p>
 <p>This just wraps matplotlib code with a bunch of nice presets, labels, etc.!</p>
-<section id="id58">
-<h3>Parameters<a class="headerlink" href="#id58" title="Link to this heading"></a></h3>
+<section id="id59">
+<h3>Parameters<a class="headerlink" href="#id59" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>x<span class="classifier">ndarray</span></dt><dd><p>Spatial sample locations of the field (horizontal axis).</p>
 </dd>
 <dt>t<span class="classifier">ndarray</span></dt><dd><p>Temporal sample locations of the field (vertical axis).</p>
 </dd>
-<dt>u<span class="classifier">ndarray</span></dt><dd><p>Samples values of the field (axis 0 is temporal variation, axis 1 is spatial variation.</p>
+<dt>u<span class="classifier">ndarray</span></dt><dd><p>Samples values of the field (axis 0 is temporal variation, axis 1 is spatial variation).</p>
 </dd>
 <dt>umin<span class="classifier">float, optional.</span></dt><dd><p>Minimum field value to include, used to construct colorbar lower limit. Default: None.</p>
 </dd>
@@ -1394,7 +1347,7 @@ and scipy.fft.irfft &lt;<a class="reference external" href="https://docs.scipy.o
 </dd>
 <dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots-per-inch on the image. Default: 100.</p>
 </dd>
-<dt>cmap<span class="classifier">str</span></dt><dd><p>Name of the colormap to use. For a list of great colormaps see &lt;<a class="reference external" href="https://matplotlib.org/cmocean/">https://matplotlib.org/cmocean/</a>&gt;.
+<dt>cmap<span class="classifier">str, optional</span></dt><dd><p>Name of the colormap to use. For a list of great colormaps see <a class="reference external" href="https://matplotlib.org/cmocean/">https://matplotlib.org/cmocean/</a>.
 Default: ‘cmo.haline’.</p>
 </dd>
 <dt>fieldname<span class="classifier">str, optional</span></dt><dd><p>Name of the PDE solution, which will also be the label on the picture’s y-axis. Default: ‘u’.</p>
@@ -1418,8 +1371,8 @@ Default: False.</p>
 <span class="sig-prename descclassname"><span class="pre">joe_lab.visualization.</span></span><span class="sig-name descname"><span class="pre">nice_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">picname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xkcd:deep</span> <span class="pre">pink'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/visualization.html#nice_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.visualization.nice_hist" title="Link to this definition"></a></dt>
 <dd><p>Renders a nice histogram of the given data.</p>
 <p>This just wraps matplotlib code with a bunch of nice presets, labels, etc.!</p>
-<section id="id59">
-<h3>Parameters<a class="headerlink" href="#id59" title="Link to this heading"></a></h3>
+<section id="id60">
+<h3>Parameters<a class="headerlink" href="#id60" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>data<span class="classifier">ndarray</span></dt><dd><p>Data to be binned and plotted.</p>
@@ -1430,7 +1383,7 @@ Default: False.</p>
 </dd>
 <dt>usetex<span class="classifier">boolean, optional</span></dt><dd><p>True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</p>
 </dd>
-<dt>color: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see &lt;<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>&gt;.
+<dt>color: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see <a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>.
 Default: ‘xkcd:deep pink’.</p>
 </dd>
 <dt>show_figure: boolean, optional</dt><dd><p>True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</p>
@@ -1450,8 +1403,8 @@ all. Default: False.</p>
 <span class="sig-prename descclassname"><span class="pre">joe_lab.visualization.</span></span><span class="sig-name descname"><span class="pre">nice_multiplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curvelabels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linestyles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">picname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/visualization.html#nice_multiplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.visualization.nice_multiplot" title="Link to this definition"></a></dt>
 <dd><p>Renders a nice 2D line plot of a bunch of y’s as a function of a bunch of x’s.</p>
 <p>This just wraps matplotlib code with a bunch of nice presets, labels, etc.!</p>
-<section id="id60">
-<h3>Parameters<a class="headerlink" href="#id60" title="Link to this heading"></a></h3>
+<section id="id61">
+<h3>Parameters<a class="headerlink" href="#id61" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>xs<span class="classifier">list of ndarrays</span></dt><dd><p>Manipulated variable/horizontal axis.</p>
@@ -1464,14 +1417,12 @@ all. Default: False.</p>
 </dd>
 <dt>curvelabels: list of strings</dt><dd><p>Each entry is a label for the corresponding curve, used to create the legend.</p>
 </dd>
-<dt>linestyles<span class="classifier">list of strings</span></dt><dd><dl class="simple">
-<dt>Style of the plotted lines, see matplotlib docs for a list of acceptable values:</dt><dd><p>&lt;<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle">https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle</a>&gt;</p>
+<dt>linestyles<span class="classifier">list of strings</span></dt><dd><p>Style of the plotted lines, see matplotlib docs for a list of acceptable values:
+<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle">https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle</a></p>
 </dd>
-</dl>
+<dt>colors: list of strings</dt><dd><p>Name of the colors you want each curve to be. For a list of great colors see <a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>.</p>
 </dd>
-<dt>colors: list of strings</dt><dd><p>Name of the colors you want each curve to be. For a list of great colors see &lt;<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>&gt;.</p>
-</dd>
-<dt>linestyles<span class="classifier">list of floats</span></dt><dd><p>Widths of the plotted lines.</p>
+<dt>linewidths<span class="classifier">list of floats</span></dt><dd><p>Widths of the plotted lines.</p>
 </dd>
 <dt>dpi<span class="classifier">int, optional</span></dt><dd><p>Dots-per-inch on the image. Default: 100.</p>
 </dd>
@@ -1496,8 +1447,8 @@ all. Default: False.</p>
 <span class="sig-prename descclassname"><span class="pre">joe_lab.visualization.</span></span><span class="sig-name descname"><span class="pre">nice_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">picname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linestyle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'solid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xkcd:cerulean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/visualization.html#nice_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.visualization.nice_plot" title="Link to this definition"></a></dt>
 <dd><p>Renders a nice 2D line plot of y as a function of x.</p>
 <p>This just wraps matplotlib code with a bunch of nice presets, labels, etc.!</p>
-<section id="id61">
-<h3>Parameters<a class="headerlink" href="#id61" title="Link to this heading"></a></h3>
+<section id="id62">
+<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>x<span class="classifier">ndarray</span></dt><dd><p>Manipulated variable/horizontal axis.</p>
@@ -1514,11 +1465,11 @@ all. Default: False.</p>
 </dd>
 <dt>usetex<span class="classifier">boolean, optional</span></dt><dd><p>True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</p>
 </dd>
-<dt>color: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see &lt;<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>&gt;.
+<dt>color: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see <a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>.
 Default: ‘xkcd:cerulean’.</p>
 </dd>
-<dt>linestyle<span class="classifier">str, optional</span></dt><dd><p>Style of the lines, see matplotlib docs for a list of acceptable values:
-&lt;<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle">https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle</a>&gt;</p>
+<dt>linestyle<span class="classifier">str, optional</span></dt><dd><p>Style of the line, see matplotlib docs for a list of acceptable values:
+<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle">https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle</a> .</p>
 </dd>
 <dt>show_figure: boolean, optional</dt><dd><p>True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</p>
 </dd>
@@ -1536,14 +1487,14 @@ all. Default: False.</p>
 <dt class="sig sig-object py" id="joe_lab.visualization.plot_refinement_study">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.visualization.</span></span><span class="sig-name descname"><span class="pre">plot_refinement_study</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'etdrk4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">400</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/visualization.html#plot_refinement_study"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.visualization.plot_refinement_study" title="Link to this definition"></a></dt>
 <dd><p>Plots a refinement study (see <a class="reference internal" href="#joe_lab.joe.do_refinement_study" title="joe_lab.joe.do_refinement_study"><code class="xref py py-func docutils literal notranslate"><span class="pre">do_refinement_study()</span></code></a>.</p>
-<p>The actual code is a bit ugly but it gets the job done and prevents the main script from being too cluttered.</p>
-<section id="id62">
-<h3>Parameters<a class="headerlink" href="#id62" title="Link to this heading"></a></h3>
+<p>The actual code is a bit ugly but it gets the job done and prevents the main <em>joe</em> scripts from being too cluttered.</p>
+<section id="id63">
+<h3>Parameters<a class="headerlink" href="#id63" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
-<dt>model: model</dt><dd><p>Instance of the class <cite>model</cite> <a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><code class="xref py py-class docutils literal notranslate"><span class="pre">model</span></code></a>.</p>
+<dt>model: model</dt><dd><p>Instance of the class <a class="reference internal" href="#joe_lab.joe.model" title="joe_lab.joe.model"><code class="xref py py-class docutils literal notranslate"><span class="pre">model</span></code></a>.</p>
 </dd>
-<dt>initial_state: initial_state</dt><dd><p>Instance of the class <cite>initial state</cite> <a class="reference internal" href="#joe_lab.joe.initial_state" title="joe_lab.joe.initial_state"><code class="xref py py-class docutils literal notranslate"><span class="pre">initial_state</span></code></a>.</p>
+<dt>initial_state: initial_state</dt><dd><p>Instance of the class <a class="reference internal" href="#joe_lab.joe.initial_state" title="joe_lab.joe.initial_state"><code class="xref py py-class docutils literal notranslate"><span class="pre">initial_state</span></code></a>.</p>
 </dd>
 <dt>length<span class="classifier">float</span></dt><dd><p>Length of the spatial domain</p>
 </dd>
@@ -1556,7 +1507,7 @@ all. Default: False.</p>
 <dt>errors<span class="classifier">list of ndarrays</span></dt><dd><p>Estimated errors for each choice of space-time grid.</p>
 </dd>
 <dt>method_kw<span class="classifier">str, optional</span></dt><dd><p>Name of the numerical method. Currently, ‘etdrk1’, ‘ifrk4’ are available for first-order-in-time problems,
-and ‘etdrk4’ is available for all problems: see <code class="xref py py-class docutils literal notranslate"><span class="pre">time_stepper</span></code>.
+and ‘etdrk4’ is available for all problems: see <a class="reference internal" href="#joe_lab.time_stepper.timestepper" title="joe_lab.time_stepper.timestepper"><code class="xref py py-class docutils literal notranslate"><span class="pre">timestepper</span></code></a>.
 Default: ‘etdrk4’.</p>
 </dd>
 <dt>bc<span class="classifier">str, optional</span></dt><dd><p>String specifying the boundary conditions. Must be ‘periodic’ or ‘sponge_layer’.</p>
@@ -1581,15 +1532,15 @@ all. Default: False.</p>
 <dd><p>Save a movie of the evolution of a real scalar field as a .mp4 file, and a tinier embedded movie of its
 power spectrum.</p>
 <p>This just wraps matplotlib code with a bunch of nice presets, labels, etc.!</p>
-<section id="id63">
-<h3>Parameters<a class="headerlink" href="#id63" title="Link to this heading"></a></h3>
+<section id="id64">
+<h3>Parameters<a class="headerlink" href="#id64" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>u<span class="classifier">ndarray</span></dt><dd><p>Sampled values of our scalar field on a given space-time grid.</p>
 </dd>
 <dt>length<span class="classifier">float</span></dt><dd><p>Length of the spatial domain.</p>
 </dd>
-<dt>x<span class="classifier">ndarray</span></dt><dd><p>Spatial grid of [-0.5*`length`, 0.5*`length`].</p>
+<dt>x<span class="classifier">ndarray</span></dt><dd><p>Spatial grid of [-0.5*length, 0.5*length].</p>
 </dd>
 <dt>dt<span class="classifier">float</span></dt><dd><p>Lattice spacing on the time axis.</p>
 </dd>
@@ -1604,7 +1555,7 @@ power spectrum.</p>
 <dt>usetex<span class="classifier">boolean, optional</span></dt><dd><p>True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</p>
 </dd>
 <dt>fieldcolor: str, optional</dt><dd><p>Name of the color you want the physical-space curve to be. For a list of great colors see
-&lt;<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>&gt;. Default: ‘xkcd:ocean green’.</p>
+<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>. Default: ‘xkcd:ocean green’.</p>
 </dd>
 <dt>speccolor: str, optional</dt><dd><p>Name of the color you want the Fourier-space power spectrum curve to be. Default: ‘xkcd:dark magenta’.</p>
 </dd>
@@ -1622,15 +1573,15 @@ power spectrum.</p>
 <span class="sig-prename descclassname"><span class="pre">joe_lab.visualization.</span></span><span class="sig-name descname"><span class="pre">save_movie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ndump</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usetex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fieldcolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'xkcd:ocean</span> <span class="pre">green'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/joe_lab/visualization.html#save_movie"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.visualization.save_movie" title="Link to this definition"></a></dt>
 <dd><p>Save a movie of the evolution of a real scalar field as a .mp4 file.</p>
 <p>This just wraps matplotlib code with a bunch of nice presets, labels, etc.!</p>
-<section id="id64">
-<h3>Parameters<a class="headerlink" href="#id64" title="Link to this heading"></a></h3>
+<section id="id65">
+<h3>Parameters<a class="headerlink" href="#id65" title="Link to this heading"></a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>u<span class="classifier">ndarray</span></dt><dd><p>Sampled values of our scalar field on a given space-time grid.</p>
 </dd>
 <dt>length<span class="classifier">float</span></dt><dd><p>Length of the spatial domain.</p>
 </dd>
-<dt>x<span class="classifier">ndarray</span></dt><dd><p>Spatial grid of [-0.5*`length`, 0.5*`length`].</p>
+<dt>x<span class="classifier">ndarray</span></dt><dd><p>Spatial grid of [-0.5*length, 0.5*length].</p>
 </dd>
 <dt>dt<span class="classifier">float</span></dt><dd><p>Lattice spacing on the time axis.</p>
 </dd>
@@ -1644,7 +1595,7 @@ power spectrum.</p>
 </dd>
 <dt>usetex<span class="classifier">boolean, optional</span></dt><dd><p>True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</p>
 </dd>
-<dt>fieldcolor: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see &lt;<a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>&gt;.
+<dt>fieldcolor: str, optional</dt><dd><p>Name of the color you want the curve to be. For a list of great colors see <a class="reference external" href="https://xkcd.com/color/rgb/">https://xkcd.com/color/rgb/</a>.
 Default: ‘xkcd:ocean green’.</p>
 </dd>
 <dt>fps: int, optional</dt><dd><p>Frames-per-second for the movie. Default: 200.</p>
@@ -1660,17 +1611,17 @@ Default: ‘xkcd:ocean green’.</p>
 <dt class="sig sig-object py" id="joe_lab.visualization.spinner">
 <span class="sig-prename descclassname"><span class="pre">joe_lab.visualization.</span></span><span class="sig-name descname"><span class="pre">spinner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ContextManager</span></span></span><a class="reference internal" href="_modules/joe_lab/visualization.html#spinner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#joe_lab.visualization.spinner" title="Link to this definition"></a></dt>
 <dd><p>Displays a nice little progress bar to indicate that certain tasks are running.</p>
-<p>The code is taken right from the reference.</p>
-<section id="id65">
-<h3>Parameters<a class="headerlink" href="#id65" title="Link to this heading"></a></h3>
+<p>The code is taken right from the reference, with no real input from the <em>joe</em> development team.</p>
+<section id="id66">
+<h3>Parameters<a class="headerlink" href="#id66" title="Link to this heading"></a></h3>
 <blockquote>
 <div><p>title : str, optional</p>
 </div></blockquote>
 </section>
-<section id="id66">
-<h3>References<a class="headerlink" href="#id66" title="Link to this heading"></a></h3>
+<section id="id67">
+<h3>References<a class="headerlink" href="#id67" title="Link to this heading"></a></h3>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id67" role="doc-footnote">
+<aside class="footnote brackets" id="id68" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>&lt;<a class="reference external" href="https://stackoverflow.com/questions/44851940/python-cli-progress-bar-spinner-without-iteration">https://stackoverflow.com/questions/44851940/python-cli-progress-bar-spinner-without-iteration</a>&gt;</p>
 </aside>
@@ -1678,9 +1629,6 @@ Default: ‘xkcd:ocean green’.</p>
 </section>
 </dd></dl>
 
-</section>
-<section id="module-joe_lab">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-joe_lab" title="Link to this heading"></a></h2>
 </section>
 </section>
 

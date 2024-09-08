@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>joe_lab.visualization &mdash; joe Documentation 0.0.6 documentation</title>
+  <title>joe_lab.visualization &mdash; joe 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            joe Documentation
+            joe
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -52,7 +52,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">joe Documentation</a>
+          <a href="../../index.html">joe</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -81,7 +81,7 @@
 <span class="k">def</span> <span class="nf">spinner</span><span class="p">(</span><span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContextManager</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Displays a nice little progress bar to indicate that certain tasks are running.</span>
 
-<span class="sd">    The code is taken right from the reference.</span>
+<span class="sd">    The code is taken right from the reference, with no real input from the *joe* development team.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -119,15 +119,15 @@
 <span class="sd">        t : ndarray</span>
 <span class="sd">            Temporal sample locations of the field (vertical axis).</span>
 <span class="sd">        u : ndarray</span>
-<span class="sd">            Samples values of the field (axis 0 is temporal variation, axis 1 is spatial variation.</span>
+<span class="sd">            Samples values of the field (axis 0 is temporal variation, axis 1 is spatial variation).</span>
 <span class="sd">        umin : float, optional.</span>
 <span class="sd">            Minimum field value to include, used to construct colorbar lower limit. Default: None.</span>
 <span class="sd">        umax : float, optional.</span>
 <span class="sd">            Maximum field value to include, used to construct colorbar upper limit. Default: None.</span>
 <span class="sd">        dpi : int, optional</span>
 <span class="sd">            Dots-per-inch on the image. Default: 100.</span>
-<span class="sd">        cmap : str</span>
-<span class="sd">            Name of the colormap to use. For a list of great colormaps see &lt;https://matplotlib.org/cmocean/&gt;.</span>
+<span class="sd">        cmap : str, optional</span>
+<span class="sd">            Name of the colormap to use. For a list of great colormaps see https://matplotlib.org/cmocean/.</span>
 <span class="sd">            Default: &#39;cmo.haline&#39;.</span>
 <span class="sd">        fieldname : str, optional</span>
 <span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
@@ -247,11 +247,11 @@
 <span class="sd">        usetex : boolean, optional</span>
 <span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
 <span class="sd">        color: str, optional</span>
-<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
+<span class="sd">            Name of the color you want the curve to be. For a list of great colors see https://xkcd.com/color/rgb/.</span>
 <span class="sd">            Default: &#39;xkcd:cerulean&#39;.</span>
 <span class="sd">        linestyle : str, optional</span>
-<span class="sd">            Style of the lines, see matplotlib docs for a list of acceptable values:</span>
-<span class="sd">            &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle&gt;</span>
+<span class="sd">            Style of the line, see matplotlib docs for a list of acceptable values:</span>
+<span class="sd">            https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle .</span>
 <span class="sd">        show_figure: boolean, optional</span>
 <span class="sd">            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
 <span class="sd">        save_figure: boolean, optional</span>
@@ -344,10 +344,10 @@
 <span class="sd">            Each entry is a label for the corresponding curve, used to create the legend.</span>
 <span class="sd">        linestyles : list of strings</span>
 <span class="sd">            Style of the plotted lines, see matplotlib docs for a list of acceptable values:</span>
-<span class="sd">             &lt;https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle&gt;</span>
+<span class="sd">            https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D.set_linestyle</span>
 <span class="sd">        colors: list of strings</span>
-<span class="sd">            Name of the colors you want each curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
-<span class="sd">        linestyles : list of floats</span>
+<span class="sd">            Name of the colors you want each curve to be. For a list of great colors see https://xkcd.com/color/rgb/.</span>
+<span class="sd">        linewidths : list of floats</span>
 <span class="sd">            Widths of the plotted lines.</span>
 <span class="sd">        dpi : int, optional</span>
 <span class="sd">            Dots-per-inch on the image. Default: 100.</span>
@@ -452,7 +452,7 @@
 <span class="sd">        usetex : boolean, optional</span>
 <span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
 <span class="sd">        color: str, optional</span>
-<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
+<span class="sd">            Name of the color you want the curve to be. For a list of great colors see https://xkcd.com/color/rgb/.</span>
 <span class="sd">            Default: &#39;xkcd:deep pink&#39;.</span>
 <span class="sd">        show_figure: boolean, optional</span>
 <span class="sd">            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
@@ -518,14 +518,14 @@
                         <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">400</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plots a refinement study (see :func:`~joe_lab.joe.do_refinement_study`.</span>
 
-<span class="sd">    The actual code is a bit ugly but it gets the job done and prevents the main script from being too cluttered.</span>
+<span class="sd">    The actual code is a bit ugly but it gets the job done and prevents the main *joe* scripts from being too cluttered.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">       model: model</span>
-<span class="sd">           Instance of the class `model` :class:`~joe_lab.joe.model`.</span>
+<span class="sd">           Instance of the class :class:`~joe_lab.joe.model`.</span>
 <span class="sd">       initial_state: initial_state</span>
-<span class="sd">           Instance of the class `initial state` :class:`~joe_lab.joe.initial_state`.</span>
+<span class="sd">           Instance of the class :class:`~joe_lab.joe.initial_state`.</span>
 <span class="sd">       length : float</span>
 <span class="sd">           Length of the spatial domain</span>
 <span class="sd">       T : float</span>
@@ -538,7 +538,7 @@
 <span class="sd">           Estimated errors for each choice of space-time grid.</span>
 <span class="sd">       method_kw : str, optional</span>
 <span class="sd">           Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
-<span class="sd">           and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.</span>
+<span class="sd">           and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.timestepper`.</span>
 <span class="sd">           Default: &#39;etdrk4&#39;.</span>
 <span class="sd">       bc : str, optional</span>
 <span class="sd">           String specifying the boundary conditions. Must be &#39;periodic&#39; or &#39;sponge_layer&#39;.</span>
@@ -656,7 +656,7 @@
 <span class="sd">        length : float</span>
 <span class="sd">            Length of the spatial domain.</span>
 <span class="sd">        x : ndarray</span>
-<span class="sd">            Spatial grid of [-0.5*`length`, 0.5*`length`].</span>
+<span class="sd">            Spatial grid of [-0.5*length, 0.5*length].</span>
 <span class="sd">        dt : float</span>
 <span class="sd">            Lattice spacing on the time axis.</span>
 <span class="sd">        fieldname : str</span>
@@ -670,7 +670,7 @@
 <span class="sd">        usetex : boolean, optional</span>
 <span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
 <span class="sd">        fieldcolor: str, optional</span>
-<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
+<span class="sd">            Name of the color you want the curve to be. For a list of great colors see https://xkcd.com/color/rgb/.</span>
 <span class="sd">            Default: &#39;xkcd:ocean green&#39;.</span>
 <span class="sd">        fps: int, optional</span>
 <span class="sd">            Frames-per-second for the movie. Default: 200.</span>
@@ -846,7 +846,7 @@
 <span class="sd">        length : float</span>
 <span class="sd">            Length of the spatial domain.</span>
 <span class="sd">        x : ndarray</span>
-<span class="sd">            Spatial grid of [-0.5*`length`, 0.5*`length`].</span>
+<span class="sd">            Spatial grid of [-0.5*length, 0.5*length].</span>
 <span class="sd">        dt : float</span>
 <span class="sd">            Lattice spacing on the time axis.</span>
 <span class="sd">        fieldname : str</span>
@@ -861,7 +861,7 @@
 <span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
 <span class="sd">        fieldcolor: str, optional</span>
 <span class="sd">            Name of the color you want the physical-space curve to be. For a list of great colors see</span>
-<span class="sd">            &lt;https://xkcd.com/color/rgb/&gt;. Default: &#39;xkcd:ocean green&#39;.</span>
+<span class="sd">            https://xkcd.com/color/rgb/. Default: &#39;xkcd:ocean green&#39;.</span>
 <span class="sd">        speccolor: str, optional</span>
 <span class="sd">            Name of the color you want the Fourier-space power spectrum curve to be. Default: &#39;xkcd:dark magenta&#39;.</span>
 <span class="sd">        fps: int, optional</span>

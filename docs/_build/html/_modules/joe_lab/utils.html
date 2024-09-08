@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>joe_lab.utils &mdash; joe Documentation 0.0.6 documentation</title>
+  <title>joe_lab.utils &mdash; joe 0.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -14,7 +14,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+        <script src="../../_static/documentation_options.js?v=8c5712d9"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -31,8 +31,11 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            joe Documentation
+            joe
           </a>
+              <div class="version">
+                0.0.4
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -52,7 +55,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">joe Documentation</a>
+          <a href="../../index.html">joe</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -80,7 +83,7 @@
 <span class="k">def</span> <span class="nf">my_fft</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Takes FFT of a real or complex array along the -1 axis, optimizing storage if the array is real.</span>
 
-<span class="sd">    Wraps the scipy.fft routines fft, rfft.</span>
+<span class="sd">    Wraps the scipy.fft routines fft, rfft (see https://docs.scipy.org/doc/scipy/reference/fft.html).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -94,8 +97,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">        out : complex ndarray</span>
-<span class="sd">            Same shape conventions as scipy.fft.fft &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html#scipy.fft.fft&gt;</span>
-<span class="sd">            and scipy.fft.rfft &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.rfft.html#scipy.fft.rfft&gt;.</span>
+<span class="sd">            Same shape conventions as scipy.fft.fft and scipy.fft.rfft (see https://docs.scipy.org/doc/scipy/reference/fft.html).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">complex</span><span class="p">:</span>
 
@@ -113,12 +115,12 @@
 <span class="k">def</span> <span class="nf">my_ifft</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Takes inverse FFT of an array along the -1 axis, optimizing storage if the inverse FFT is expected to be real.</span>
 
-<span class="sd">        Wraps the scipy.fft routines ifft, irfft.</span>
+<span class="sd">        Wraps the scipy.fft routines ifft, irfft (see https://docs.scipy.org/doc/scipy/reference/fft.html).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">            V : complex ndarray</span>
-<span class="sd">                Array to inverse FFT</span>
+<span class="sd">                Array we want to apply inverse FFT to.</span>
 <span class="sd">            n: int or None, optional.</span>
 <span class="sd">                Total number of frequencies to pad V with, if padding is desired. Default: None (no padding).</span>
 <span class="sd">            complex : boolean, optional</span>
@@ -128,8 +130,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            out: ndarray</span>
-<span class="sd">                Same shape conventions as scipy.fft.ifft &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft.html#scipy.fft.ifft&gt;</span>
-<span class="sd">                and scipy.fft.irfft &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.rfft.html#scipy.fft.irfft&gt;.</span>
+<span class="sd">                Same shape conventions as scipy.fft.ifft and scipy.fft.irfft (see https://docs.scipy.org/doc/scipy/reference/fft.html).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">complex</span><span class="p">:</span>
 
@@ -148,19 +149,19 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Integrates N samples of a real or complex space-time field over the spatial interval [-0.5*length, 0.5*length]</span>
 <span class="sd">       using the FFT.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">            u : ndarray</span>
-<span class="sd">                Real or complex array to be integrated in space. Convention is that spatial variation is stored in the</span>
-<span class="sd">                -1 axis.</span>
-<span class="sd">            length : float</span>
-<span class="sd">                Total length of spatial domain.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        u : ndarray</span>
+<span class="sd">            Real or complex array to be integrated in space. Convention is that spatial variation is stored in the</span>
+<span class="sd">            -1 axis.</span>
+<span class="sd">        length : float</span>
+<span class="sd">            Total length of spatial domain.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">            out: float or ndarray</span>
-<span class="sd">                Approximation of the integral of the sampled space-time field over the spatial interval</span>
-<span class="sd">                [-0.5*length, 0.5*length].</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        out: float or ndarray</span>
+<span class="sd">            Approximation of the integral of the sampled space-time field over the spatial interval</span>
+<span class="sd">            [-0.5*length, 0.5*length].</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">u</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">length</span><span class="o">/</span><span class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span></div>
@@ -171,10 +172,11 @@
 <span class="k">def</span> <span class="nf">dealiased_pow</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Fourier-space version of a power of an array, dealiased by zero-padding.</span>
 
-<span class="sd">        Important: this only works for REAL fields because for complex fields :math:`u`, algebraic nonlinearities</span>
-<span class="sd">        typically involve the complex conjugate :math:`\overline{u}` as well as :mathm:`u`. So, padding for such</span>
-<span class="sd">        nonlinearities terms should be done on-the-fly. A future release of *joe* may include support for complex</span>
-<span class="sd">        powers.</span>
+<span class="sd">        Important: this only works for real-valued arrays because for complex arrays :math:`u`, algebraic nonlinearities</span>
+<span class="sd">        typically involve the complex conjugate :math:`\overline{u}` as well as :math:`u`. So, padding for such</span>
+<span class="sd">        nonlinearities terms should be done on-the-fly.</span>
+
+<span class="sd">        A future release of *joe* may include support for dealiased complex powers.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -185,7 +187,8 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            out: complex ndarray</span>
-<span class="sd">                A version of rfft(irfft(V)**p) that has been dealiased via zero-padding</span>
+<span class="sd">                A version of :math:`\mathcal{F}\left[\left(\mathcal{F}^{-1}V\right)^p\right]` that has been dealiased</span>
+<span class="sd">                via zero-padding.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#</span>
 

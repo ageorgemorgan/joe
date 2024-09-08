@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>joe_lab.time_stepper &mdash; joe Documentation 0.0.6 documentation</title>
+  <title>joe_lab.time_stepper &mdash; joe 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            joe Documentation
+            joe
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -52,7 +52,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">joe Documentation</a>
+          <a href="../../index.html">joe</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -89,31 +89,31 @@
 <div class="viewcode-block" id="get_greeks_first_order">
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.time_stepper.get_greeks_first_order">[docs]</a>
 <span class="k">def</span> <span class="nf">get_greeks_first_order</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes all the Greeks (&quot;Runge-Kutta weights&quot; for exponential quadrature) for ETDRK4 applied to a</span>
-<span class="sd">     first-order-in-time problem.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes all the Greeks (Runge-Kutta weights for exponential quadrature) for ETDRK4 applied to a</span>
+<span class="sd">    first-order-in-time problem.</span>
 
 <span class="sd">    This by done Pythonizing the code from Kassam and Trefethen 2005, that is, by numerically approximating Cauchy</span>
 <span class="sd">    integrals.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    N : int</span>
-<span class="sd">        Number of frequencies we sample.</span>
-<span class="sd">    dt : float</span>
-<span class="sd">        Time-step for the simulation.</span>
-<span class="sd">    z : ndarray</span>
-<span class="sd">        z should be vectorial (it has shape Nx1). In practice, z is the diagonal vector of the matrix of the</span>
-<span class="sd">        linear, constant-coefficient part of the PDE in Fourier space.</span>
+<span class="sd">        N : int</span>
+<span class="sd">            Number of frequencies we sample.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Time-step for the simulation.</span>
+<span class="sd">        z : ndarray</span>
+<span class="sd">            z should be vectorial (it has shape Nx1). In practice, z is the diagonal vector of the matrix of the</span>
+<span class="sd">            linear, constant-coefficient part of the PDE in Fourier space.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    [Q, f1, f2, f3] : list</span>
-<span class="sd">        A list whose entries are the Greeks</span>
+<span class="sd">        [Q, f1, f2, f3] : list</span>
+<span class="sd">            A list whose entries are the Greeks (vector-shaped arrays).</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1]  Aly-Khan Kassam, Lloyd N. Trefethen &quot;Fourth-Order Time-Stepping for Stiff PDEs&quot;.</span>
-<span class="sd">    &lt;https://epubs.siam.org/doi/abs/10.1137/S1064827502410633&gt;.</span>
+<span class="sd">    https://doi.org/10.1137/S1064827502410633.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: can we get rid of N in the governing function?</span>
     <span class="n">M</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">6</span> <span class="c1"># number of points for quadrature</span>
@@ -141,7 +141,8 @@
 <div class="viewcode-block" id="get_greeks_second_order">
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.time_stepper.get_greeks_second_order">[docs]</a>
 <span class="k">def</span> <span class="nf">get_greeks_second_order</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes all the Greeks (&quot;weights&quot; for exponential quadrature) for EDTRK4 applied to a second-order-in-time problem.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes all the Greeks (Runge-Kutta weights for exponential quadrature) for EDTRK4 applied to a</span>
+<span class="sd">    second-order-in-time problem.</span>
 
 <span class="sd">    This by done Pythonizing the code from Kassam and Trefethen 2005, that is, by numerically approximating Cauchy</span>
 <span class="sd">    integrals.</span>
@@ -153,22 +154,22 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    N : int</span>
-<span class="sd">        Number of frequencies we sample.</span>
-<span class="sd">    dt : float</span>
-<span class="sd">        Time-step for the simulation.</span>
-<span class="sd">    A : ndarray</span>
-<span class="sd">        A is the matrix of the linear, constant-coefficient part of the PDE in Fourier space.</span>
+<span class="sd">        N : int</span>
+<span class="sd">            Number of frequencies we sample.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Time-step for the simulation.</span>
+<span class="sd">        A : ndarray</span>
+<span class="sd">            A is the matrix of the linear, constant-coefficient part of the PDE in Fourier space.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    [Q, f1, f2, f3] : list</span>
-<span class="sd">        A list whose entries are the Greeks</span>
+<span class="sd">        [Q, f1, f2, f3] : list</span>
+<span class="sd">            A list whose entries are the Greeks (arrays).</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1]  Aly-Khan Kassam, Lloyd N. Trefethen &quot;Fourth-Order Time-Stepping for Stiff PDEs&quot;.</span>
-<span class="sd">    &lt;https://epubs.siam.org/doi/abs/10.1137/S1064827502410633&gt;.</span>
+<span class="sd">    https://doi.org/10.1137/S1064827502410633 .</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">M</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">6</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -223,23 +224,23 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    N : int</span>
-<span class="sd">        Number of frequencies we sample.</span>
-<span class="sd">    dt : float</span>
-<span class="sd">        Time-step for the simulation.</span>
-<span class="sd">    z : ndarray</span>
-<span class="sd">        z should be vectorial (it has shape Nx1). In practice, z is the diagonal vector of the matrix of the</span>
-<span class="sd">        linear, constant-coefficient part of the PDE in Fourier space.</span>
+<span class="sd">        N : int</span>
+<span class="sd">            Number of frequencies we sample.</span>
+<span class="sd">        dt : float</span>
+<span class="sd">            Time-step for the simulation.</span>
+<span class="sd">        z : ndarray</span>
+<span class="sd">            z should be vectorial (it has shape Nx1). In practice, z is the diagonal vector of the matrix of the</span>
+<span class="sd">            linear, constant-coefficient part of the PDE in Fourier space.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    out : ndarray</span>
-<span class="sd">        Exponential Runge-Kutta weight, Q1, for ETDRK1.</span>
+<span class="sd">        Exponential Runge-Kutta weight, Q1, for the exponential Euler method.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1]  Aly-Khan Kassam, Lloyd N. Trefethen &quot;Fourth-Order Time-Stepping for Stiff PDEs&quot;.</span>
-<span class="sd">    &lt;https://epubs.siam.org/doi/abs/10.1137/S1064827502410633&gt;.</span>
+<span class="sd">    https://doi.org/10.1137/S1064827502410633 .</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">M</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">6</span>
 
@@ -255,8 +256,6 @@
 
 
 
-<div class="viewcode-block" id="get_R2">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.time_stepper.get_R2">[docs]</a>
 <span class="k">def</span> <span class="nf">get_R2</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
     <span class="c1"># &quot;&quot;&quot;</span>
     <span class="n">M</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">5</span>
@@ -270,8 +269,7 @@
     <span class="n">out</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">z0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">z0</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># note how we take mean over a certain axis</span>
     <span class="c1"># &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="n">out</span></div>
-
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <div class="viewcode-block" id="do_etdrk1_step">
@@ -294,7 +292,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">        out : ndarray</span>
-<span class="sd">            Value of solution at time = initial time + time_step.</span>
+<span class="sd">            Value of solution at time = initial time + time-step length.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># remark on notation: Q1 = dt*phi1(dt*A)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">propagator</span> <span class="o">*</span> <span class="n">V</span> <span class="o">+</span> <span class="n">Q1</span> <span class="o">*</span> <span class="n">forcing</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
@@ -303,15 +301,12 @@
 
 
 
-<div class="viewcode-block" id="do_etdrk2_step">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.time_stepper.do_etdrk2_step">[docs]</a>
 <span class="k">def</span> <span class="nf">do_etdrk2_step</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">propagator</span><span class="p">,</span> <span class="n">forcing</span><span class="p">,</span> <span class="n">Q1</span><span class="p">,</span> <span class="n">R2</span><span class="p">):</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">do_etdrk1_step</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">propagator</span><span class="p">,</span> <span class="n">forcing</span><span class="p">,</span> <span class="n">Q1</span><span class="p">)</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">R2</span> <span class="o">*</span> <span class="p">(</span><span class="n">forcing</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">-</span> <span class="n">forcing</span><span class="p">(</span><span class="n">V</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">out</span></div>
-
+    <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="do_etdrk4_step">
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.time_stepper.do_etdrk4_step">[docs]</a>
@@ -326,7 +321,7 @@
 <span class="sd">            Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.</span>
 <span class="sd">            The time-step is already encoded in here (we propagate for a length of time equal to the time-step).</span>
 <span class="sd">        propagator2 : ndarray</span>
-<span class="sd">            The same as above, but for only *half* the time step.</span>
+<span class="sd">            The same as above, but for only *half* the time-step.</span>
 <span class="sd">        forcing : callable</span>
 <span class="sd">            Fourier-space forcing term in the PDE.</span>
 <span class="sd">        greeks : list</span>
@@ -336,7 +331,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">        out : ndarray</span>
-<span class="sd">            Value of solution at time = initial time + time_step.</span>
+<span class="sd">            Value of solution at time = initial time + time-step length.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Q</span> <span class="o">=</span> <span class="n">greeks</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
     <span class="n">f1</span> <span class="o">=</span> <span class="n">greeks</span><span class="p">[</span><span class="s1">&#39;f1&#39;</span><span class="p">]</span>
@@ -371,7 +366,7 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a single step of ETDRK4 (fourth-order exponential Runge-Kutta) for a second-order-in-time problem.</span>
 
 <span class="sd">    This is different from the analogous function for first-order problems</span>
-<span class="sd">    :func:`~joe_lab.time_stepper.do_etdrk4_step_first_order` because we must account for the Greeks now being sparse</span>
+<span class="sd">    :func:`~joe_lab.time_stepper.do_etdrk4_step` because we must account for the Greeks now being sparse</span>
 <span class="sd">    matrices instead of simple vector-shaped arrays.</span>
 
 <span class="sd">    Parameters</span>
@@ -382,17 +377,17 @@
 <span class="sd">            Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.</span>
 <span class="sd">            the time-step is already encoded in here (we propagate for a length of time equal to the time-step).</span>
 <span class="sd">        propagator2 : ndarray</span>
-<span class="sd">            The same as above, but for only *half* the time step.</span>
+<span class="sd">            The same as above, but for only *half* the time-step.</span>
 <span class="sd">        forcing : callable</span>
 <span class="sd">            Fourier-space forcing term in the PDE.</span>
 <span class="sd">        greeks : list</span>
 <span class="sd">            Entries are the Greeks/fourth-order exponential Runge-Kutta weights</span>
-<span class="sd">            (see :func:`~joe_lab.time_stepper.get_greeks_first_order`).</span>
+<span class="sd">            (see :func:`~joe_lab.time_stepper.get_greeks_second_order`).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">        out : ndarray</span>
-<span class="sd">            Value of solution at time = initial time + time_step.</span>
+<span class="sd">            Value of solution at time = initial time + time-step length.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Q</span> <span class="o">=</span> <span class="n">greeks</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
     <span class="n">f1</span> <span class="o">=</span> <span class="n">greeks</span><span class="p">[</span><span class="s1">&#39;f1&#39;</span><span class="p">]</span>
@@ -424,7 +419,7 @@
     <span class="n">fc</span> <span class="o">=</span> <span class="n">forcing</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 
     <span class="c1"># now assemble the guess at the new step.</span>
-    <span class="c1"># This is the temporal bottleneck of the time step (probably like 70% of step time)</span>
+    <span class="c1"># This is the temporal bottleneck of the time-step (probably like 70% of step time)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">propagator</span> <span class="o">@</span> <span class="n">V</span> <span class="o">+</span> <span class="n">f1</span> <span class="o">@</span> <span class="n">fV</span> <span class="o">+</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">f2</span> <span class="o">@</span> <span class="p">(</span><span class="n">fa</span> <span class="o">+</span> <span class="n">fb</span><span class="p">)</span> <span class="o">+</span> <span class="n">f3</span> <span class="o">@</span> <span class="n">fc</span><span class="p">)</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">,))</span>
@@ -445,7 +440,7 @@
 <span class="sd">            Fourier-space representation of the propagator associated to the linear, constant-coefficient part of the PDE.</span>
 <span class="sd">            the time-step is already encoded in here (we propagate for a length of time equal to the time-step).</span>
 <span class="sd">        propagator2 : ndarray</span>
-<span class="sd">            The same as above, but for only *half* the time step.</span>
+<span class="sd">            The same as above, but for only *half* the time-step.</span>
 <span class="sd">        forcing : callable</span>
 <span class="sd">            Fourier-space forcing term in the PDE.</span>
 <span class="sd">        dt : float</span>
@@ -454,7 +449,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">        out : ndarray</span>
-<span class="sd">            Value of solution at time = initial time + time_step.</span>
+<span class="sd">            Value of solution at time = initial time + time-step length.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">forcing</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
 
@@ -473,14 +468,12 @@
 <div class="viewcode-block" id="assemble_damping_mat">
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.time_stepper.assemble_damping_mat">[docs]</a>
 <span class="k">def</span> <span class="nf">assemble_damping_mat</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">sponge_params</span><span class="p">,</span> <span class="nb">complex</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the matrix that is to be inverted at each time step in the artificial damping stage. Only important</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the matrix that is to be inverted at each time-step in the artificial damping stage. Only important</span>
 <span class="sd">    when the sponge layer is turned on.</span>
 
 <span class="sd">    Strictly speaking we store the matrix as a LinearOperator</span>
-<span class="sd">    &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html&gt; for performance reasons:</span>
-<span class="sd">    the array is dense and too large for direct storage etc. to be performant.</span>
-
-<span class="sd">    Currently only backward Euler inversion is implemented.</span>
+<span class="sd">    (https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) for performance reasons:</span>
+<span class="sd">    the array is dense and too large for direct storage and direct multiplication to be performant.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -489,9 +482,9 @@
 <span class="sd">        length : float</span>
 <span class="sd">            Length of the spatial domain.</span>
 <span class="sd">        x : ndarray</span>
-<span class="sd">            Spatial grid of [-0.5*`length`, 0.5*`length`].</span>
+<span class="sd">            Spatial grid of [-0.5*length, 0.5*length].</span>
 <span class="sd">        dt : float</span>
-<span class="sd">            Time step size for numerical integration of the PDE.</span>
+<span class="sd">            time-step size for numerical integration of the PDE.</span>
 <span class="sd">        sponge_params : dict</span>
 <span class="sd">            Contains particular parameters for the sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`.</span>
 <span class="sd">        complex : boolean</span>
@@ -500,7 +493,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">        out : scipy.sparse.linalg.LinearOperator</span>
-<span class="sd">            The damping matrix, represented by its shape and matrix-vector multiplication.</span>
+<span class="sd">            The damping matrix, represented by its shape and matrix-vector multiplication map.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: try out Crank-Nicolson as well, perform cost v. accuracy analysis?</span>
     <span class="k">if</span> <span class="nb">complex</span><span class="p">:</span>
@@ -574,15 +567,15 @@
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">        method_kw : str</span>
-<span class="sd">            The name of the time-stepper (for instance, ETDRK4).</span>
-<span class="sd">        sim : `~joe_lab.joe.simulation`</span>
-<span class="sd">            The simulation our timestepper is supposed to work on.</span>
+<span class="sd">            The name of the time-stepper (for instance,&#39;etdrk4&#39;).</span>
+<span class="sd">        sim : simulation</span>
+<span class="sd">            The instance of :class:`~joe_lab.joe.simulation` our timestepper is supposed to work on.</span>
 <span class="sd">        t_ord : int</span>
 <span class="sd">            Temporal order of derivatives in the model. Currently only t_ord=1,2 are supported.</span>
 <span class="sd">        aux : list or ndarray</span>
-<span class="sd">            Auxiliary quantities (typically Greeks/exponential Runge-Kutta weights) that are needed for time-stepping.</span>
-<span class="sd">            These are usually computed in a pre-processing stage and saved in the directory `joe_timestepper_aux` after</span>
-<span class="sd">            the instance is created but before time-stepping occurs.</span>
+<span class="sd">            Auxiliary quantities (typically Greeks/exponential Runge-Kutta weights and propagators) that are needed</span>
+<span class="sd">            for time-stepping. These are usually computed in a pre-processing stage and saved in the directory</span>
+<span class="sd">            `joe_timestepper_aux` after the instance is created but before time-stepping occurs.</span>
 <span class="sd">        auxfilename: str</span>
 <span class="sd">            Name of the .pkl file containing `aux`.</span>
 <span class="sd">        complex : boolean</span>
@@ -709,7 +702,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            out : ndarray</span>
-<span class="sd">                Value of solution at time = initial time + time_step.</span>
+<span class="sd">                Value of solution at time = initial time + time-step length.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">t_ord</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span>
 
@@ -760,14 +753,14 @@
 <div class="viewcode-block" id="do_time_stepping">
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.time_stepper.do_time_stepping">[docs]</a>
 <span class="k">def</span> <span class="nf">do_time_stepping</span><span class="p">(</span><span class="n">sim</span><span class="p">,</span> <span class="n">method_kw</span><span class="o">=</span><span class="s1">&#39;etdrk4&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform all the time steps in the simulation, starting from time = 0  and ending at time = T.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform all the time-steps in the simulation, starting from time = 0  and ending at time = T.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">        sim : `~joe_lab.joe.simulation`</span>
-<span class="sd">            The simulation our timestepper is supposed to work on.</span>
+<span class="sd">        sim : simulation</span>
+<span class="sd">            The instance of :class:`~joe_lab.joe.simulation` our timestepper is supposed to work on.</span>
 <span class="sd">        method_kw : str</span>
-<span class="sd">            The name of the time-stepper (for instance, ETDRK4).</span>
+<span class="sd">            The name of the time-stepper (for instance, &#39;etdrk4&#39;).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

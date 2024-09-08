@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>joe_lab.joe &mdash; joe Documentation 0.0.6 documentation</title>
+  <title>joe_lab.joe &mdash; joe 0.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -14,7 +14,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+        <script src="../../_static/documentation_options.js?v=8c5712d9"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -31,8 +31,11 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            joe Documentation
+            joe
           </a>
+              <div class="version">
+                0.0.4
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -52,7 +55,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">joe Documentation</a>
+          <a href="../../index.html">joe</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -76,6 +79,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">jedi.inference.gradual.typing</span> <span class="kn">import</span> <span class="n">Callable</span>
 
 <span class="kn">from</span> <span class="nn">.time_stepper</span> <span class="kn">import</span> <span class="n">do_time_stepping</span>
 <span class="kn">from</span> <span class="nn">.visualization</span> <span class="kn">import</span> <span class="n">hov_plot</span><span class="p">,</span> <span class="n">save_movie</span><span class="p">,</span> <span class="n">save_combomovie</span><span class="p">,</span> <span class="n">spinner</span><span class="p">,</span> <span class="n">plot_refinement_study</span><span class="p">,</span> <span class="n">nice_plot</span>
@@ -90,14 +94,15 @@
 <span class="sd">    This defines a model PDE with the name &#39;model_kw&#39; in the Fourier-space form</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \left(\partial_t\right)^{\texttt{t\_ord}} V(k,t) + \texttt{symbol}(k) V(k,t) = \texttt{fourier\_forcing}</span>
+<span class="sd">        \left(\partial_t\right)^{\texttt{t_ord}} V(k,t) + \texttt{symbol}(k) V(k,t) = \texttt{fourier_forcing}</span>
 
-<span class="sd">    where :math:`V(k,t)` is the Fourier state.</span>
+<span class="sd">    where :math:`V(k,t)` is the Fourier state (that is, if :math:`u(x,t)` is the solution to our PDE, then</span>
+<span class="sd">    :math:`V=\mathcal{F}u` where :math:`\mathcal{F}` is the Fourier transform).</span>
 
 <span class="sd">    Note how the init takes in two callables for the symbol and forcing terms, but these get converted to dicts.</span>
-<span class="sd">    This is to avoid making the weird no-no of having callable attributes. The trick comes from</span>
-<span class="sd">    &lt;https://stackoverflow.com/questions/35321744/python-function-as-class-attribute-becomes-a-bound-method&gt;... we</span>
-<span class="sd">    instead make the &quot;callable attributes&quot; !dicts! with callable entries. This dirty trick is all under the hood in</span>
+<span class="sd">    This is to avoid making the weird &#39;no-no&#39; of having callable attributes. The trick comes from</span>
+<span class="sd">    https://stackoverflow.com/questions/35321744/python-function-as-class-attribute-becomes-a-bound-method... we</span>
+<span class="sd">    instead make the &quot;callable attributes&quot; **dicts** with callable entries. This is all under the hood in</span>
 <span class="sd">    the model class, so when defining and using a model object the user doesn&#39;t need to care.</span>
 
 <span class="sd">    Attributes</span>
@@ -107,17 +112,17 @@
 <span class="sd">        t_ord : int</span>
 <span class="sd">            Temporal order of derivatives in the model. Currently only t_ord=1,2 are supported.</span>
 <span class="sd">        symbol : dict</span>
-<span class="sd">            Symbol of the linear, constant-coefficient part of the PDE. symbol[&#39;symbol&#39;] must be a callable with a</span>
-<span class="sd">            single argument `k`, representing a Fourier-space frequency variable.</span>
+<span class="sd">            Symbol of the linear, constant-coefficient part of the PDE. symbol[&#39;symbol&#39;] is the callable `symbol` in the</span>
+<span class="sd">            init, with a single parameter `k`, representing a Fourier-space frequency variable.</span>
 <span class="sd">        fourier_forcing : dict</span>
-<span class="sd">            Forcing term in the PDE, represented in Fourier space. fourier_forcing[&#39;fourier_forcing&#39;] must be a callable</span>
-<span class="sd">            that takes in four arguments `(V, k, x, nonlinear)` where `V,k,x` are ndarrays and `nonlinear` is a boolean.</span>
+<span class="sd">            Forcing term in the PDE, represented in Fourier space. fourier_forcing[&#39;fourier_forcing&#39;] is the callable</span>
+<span class="sd">            `fourier_forcing` in the init, and has four arguments `(V, k, x, nonlinear)` where `V,k,x` are ndarrays and `nonlinear` is a boolean.</span>
 <span class="sd">        nonlinear : boolean, optional</span>
 <span class="sd">            True if we include nonlinearity in the model, False otherwise. Default: True.</span>
-<span class="sd">        complex : boolean</span>
+<span class="sd">        complex : boolean, optional</span>
 <span class="sd">            False if solution to the PDE is supposed to be real, True otherwise. Default: False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_kw</span><span class="p">,</span> <span class="n">t_ord</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">fourier_forcing</span><span class="p">,</span> <span class="n">nonlinear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_kw</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">t_ord</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">symbol</span> <span class="p">:</span> <span class="nb">callable</span><span class="p">,</span> <span class="n">fourier_forcing</span> <span class="p">:</span> <span class="nb">callable</span><span class="p">,</span> <span class="n">nonlinear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_kw</span> <span class="o">=</span> <span class="n">model_kw</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">=</span> <span class="n">t_ord</span>  <span class="c1"># an integer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;symbol&#39;</span><span class="p">:</span> <span class="n">symbol</span><span class="p">}</span>  <span class="c1"># callable</span>
@@ -125,18 +130,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nonlinear</span> <span class="o">=</span> <span class="n">nonlinear</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">complex</span> <span class="o">=</span> <span class="nb">complex</span>
 
-<div class="viewcode-block" id="model.get_symbol">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.model.get_symbol">[docs]</a>
     <span class="k">def</span> <span class="nf">get_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">[</span><span class="s1">&#39;symbol&#39;</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
-
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">[</span><span class="s1">&#39;symbol&#39;</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
     <span class="c1"># obtain the forcing term in Fourier space</span>
-<div class="viewcode-block" id="model.get_fourier_forcing">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.model.get_fourier_forcing">[docs]</a>
     <span class="k">def</span> <span class="nf">get_fourier_forcing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourier_forcing</span><span class="p">[</span><span class="s1">&#39;fourier_forcing&#39;</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
-</div>
 
 
 <div class="viewcode-block" id="initial_state">
@@ -145,7 +144,7 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A class for initial states.</span>
 
 <span class="sd">    Having a special class for initial states instead of just representing them as callables or keywords allows for</span>
-<span class="sd">    greater flexibility, as well as some symmetry with the `model` class :class:`~joe_lab.joe.model`.</span>
+<span class="sd">    greater flexibility, as well as some symmetry with the class :class:`~joe_lab.joe.model`.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -153,35 +152,29 @@
 <span class="sd">            Name of the initial state.</span>
 <span class="sd">        initial_state_func : dict</span>
 <span class="sd">            A dict defined such that initial_state_func[&#39;initial_state_func&#39;] is a callable representing the actual</span>
-<span class="sd">            initial state function. One must be careful of this function&#39;s output&#39;s shape when dealing with second-order</span>
+<span class="sd">            initial state function (the input `initial_state_func`). One must be careful of the shape of this function&#39;s outputs when dealing with second-order</span>
 <span class="sd">            problems.</span>
 <span class="sd">        initial_state : ndarray</span>
 <span class="sd">            The values of the initial state on our particular grid. Not defined during init, and should only be accessed</span>
 <span class="sd">            under-the-hood.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_state_kw</span><span class="p">,</span> <span class="n">initial_state_func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_state_kw</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">initial_state_func</span> <span class="p">:</span> <span class="nb">callable</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initial_state_kw</span> <span class="o">=</span> <span class="n">initial_state_kw</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initial_state_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;initial_state_func&#39;</span><span class="p">:</span> <span class="n">initial_state_func</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initial_state</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># obtain the actual initial state fnc</span>
-<div class="viewcode-block" id="initial_state.get_initial_state">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.initial_state.get_initial_state">[docs]</a>
     <span class="k">def</span> <span class="nf">get_initial_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_state_func</span><span class="p">[</span><span class="s1">&#39;initial_state_func&#39;</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
-</div>
 
-
-
-<span class="c1"># a class for simulations.</span>
 
 <div class="viewcode-block" id="simulation">
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation">[docs]</a>
 <span class="k">class</span> <span class="nc">simulation</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A class for simulations.</span>
 
-<span class="sd">    This class is the heart of *joe*, and most of the scientific information (including visualizations) can be accessed</span>
-<span class="sd">    via the attributes of methods of a simulation instance.</span>
+<span class="sd">    This class is the heart of *joe*, and most of the scientific information *joe* provides (including visualizations)</span>
+<span class="sd">    can be accessed via the attributes of methods of a simulation instance.</span>
 
 <span class="sd">    You init an instance with an `stgrid` (space-time grid) dict, an instance of the `model` class (:class:`~joe_lab.joe.model`) to</span>
 <span class="sd">    specify the PDE, and an instance of the `initial_state` class (:class:`~joe_lab.joe.initial_state`). Then you can</span>
@@ -206,8 +199,6 @@
 <span class="sd">            Temporal order of derivatives in the model. Currently only `t_ord=1,2` are supported.</span>
 <span class="sd">        initial_state_kw : str</span>
 <span class="sd">            Name of the initial state.</span>
-<span class="sd">        ndump : int</span>
-<span class="sd">            Only every `ndump` timesteps are stored when saving simulation results.</span>
 <span class="sd">        Udata : ndarray</span>
 <span class="sd">            Values of the solution to our PDE sampled on our space-time grid, stored as an array. The 0 axis represents</span>
 <span class="sd">            temporal variation, and the 1 axis represents spatial variation (so each row is a fixed-time snapshot of</span>
@@ -216,27 +207,29 @@
 <span class="sd">            True if we include nonlinearity in the model, False otherwise. Default: True.</span>
 <span class="sd">        complex : boolean</span>
 <span class="sd">            False if solution to the PDE is supposed to be real, True otherwise. Default: False.</span>
-<span class="sd">        sponge_params : dict</span>
-<span class="sd">            Contains particular parameters for the sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`.</span>
+<span class="sd">        sponge_params : dict or None</span>
+<span class="sd">            Contains particular parameters for the sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`. Default: None.</span>
 <span class="sd">        sponge_layer : boolean</span>
 <span class="sd">            True if sponge layer is included, False otherwise. Default: False.</span>
 <span class="sd">        sfrac : float</span>
 <span class="sd">            Fraction of the spatial grid that is not taken up by the sponge layer. By convention, this fraction is taken</span>
 <span class="sd">            from the middle of the grid.</span>
 <span class="sd">        x : ndarray</span>
-<span class="sd">            Spatial grid of [-0.5*`length`, 0.5*`length`].</span>
+<span class="sd">            Spatial grid of [-0.5*length, 0.5*length) with N points.</span>
 <span class="sd">        initial_state : ndarray</span>
-<span class="sd">            Initial state function sampled at `x`</span>
+<span class="sd">            Initial state function sampled at `x`.</span>
 <span class="sd">        fm : ndarray</span>
 <span class="sd">            First moments (spatial integrals) of the solution to our PDE.</span>
 <span class="sd">        fm_error : ndarray</span>
 <span class="sd">            Absolute difference between `fm` and `fm[0]`, the initial first moment.</span>
 <span class="sd">        sm : ndarray</span>
-<span class="sd">            Second moments (spatial L2 - norms) of the solution to our PDE.</span>
+<span class="sd">            Second moments (spatial :math:`L^2` norms) of the solution to our PDE.</span>
 <span class="sd">        sm_error : ndarray</span>
 <span class="sd">            Absolute difference between `sm` and `sm[0]`, the initial second moment.</span>
+<span class="sd">        ndump : int, optional</span>
+<span class="sd">            Only every `ndump` timesteps are stored when saving simulation results. Default: 10.</span>
 <span class="sd">        filename : str</span>
-<span class="sd">            Name of the .pkl file the sim may be saved in= &#39;ic_plot, or loaded from.</span>
+<span class="sd">            Name of the .pkl file the sim may be saved in, or loaded from.</span>
 <span class="sd">        ic_picname : str</span>
 <span class="sd">            Name of the initial state plot as a .png file.</span>
 <span class="sd">        picname : str</span>
@@ -258,7 +251,7 @@
 <span class="sd">        combomoviename : str</span>
 <span class="sd">            Name of the movie of the solution (or its modulus if `complex=True`) and its power spectrum as a .mp4 file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stgrid</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">bc</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndump</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stgrid</span> <span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">model</span> <span class="p">:</span> <span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span> <span class="p">:</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">bc</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ndump</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">stgrid</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="n">stgrid</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">stgrid</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
@@ -318,16 +311,16 @@
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.run_sim">[docs]</a>
     <span class="k">def</span> <span class="nf">run_sim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_kw</span><span class="o">=</span><span class="s1">&#39;etdrk4&#39;</span><span class="p">,</span> <span class="n">print_runtime</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform the time-stepping starting from the initial state and ending at time `T`. Populates the attribute</span>
-<span class="sd">        `Udata` (the actual values of our solution throughout the simulation) in our `simulation`.</span>
+<span class="sd">        `Udata` (the actual values of our solution throughout the simulation) in our `simulation` instance.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        method_kw : str, optional</span>
-<span class="sd">            Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
-<span class="sd">            and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.</span>
-<span class="sd">            Default: &#39;etdrk4&#39;.</span>
-<span class="sd">        print_runtime: boolean, optional</span>
-<span class="sd">            True if you would like to print the wall-clock runtime of the simulation, False otherwise.</span>
+<span class="sd">            method_kw : str, optional</span>
+<span class="sd">                Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
+<span class="sd">                and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.</span>
+<span class="sd">                Default: &#39;etdrk4&#39;.</span>
+<span class="sd">            print_runtime: boolean, optional</span>
+<span class="sd">                True if you would like to print the wall-clock runtime of the simulation, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">time</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -415,21 +408,21 @@
 <span class="sd">        found in joe_sim_archive. The end result is that our simulation&#39;s `Udata` attribute becomes populated with the</span>
 <span class="sd">        space-time grid values of our solution.</span>
 
-<span class="sd">        I recommend you use this method as your on-the-ground alternative to `run_sim`.</span>
+<span class="sd">        The development team recommends you use this method as your on-the-ground alternative to `run_sim`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">         method_kw : str, optional</span>
-<span class="sd">            Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
-<span class="sd">            and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.</span>
-<span class="sd">            Default: &#39;etdrk4&#39;.</span>
-<span class="sd">        print_runtime: boolean, optional</span>
-<span class="sd">            True if you would like to print the wall-clock runtime of the simulation, False otherwise.</span>
-<span class="sd">        save : boolean, optional</span>
-<span class="sd">            True if you definitely want the simulation saved, and False otherwise. Default: True.</span>
-<span class="sd">        verbose : boolean, optional</span>
-<span class="sd">            True if you want to see printed messages about whether a saved simulation was found in the</span>
-<span class="sd">            joe_sim_archive directory.</span>
+<span class="sd">            method_kw : str, optional</span>
+<span class="sd">                Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
+<span class="sd">                and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.</span>
+<span class="sd">                Default: &#39;etdrk4&#39;.</span>
+<span class="sd">            print_runtime: boolean, optional</span>
+<span class="sd">                True if you would like to print the wall-clock runtime of the simulation, False otherwise.</span>
+<span class="sd">            save : boolean, optional</span>
+<span class="sd">                True if you definitely want the simulation saved, and False otherwise. Default: True.</span>
+<span class="sd">            verbose : boolean, optional</span>
+<span class="sd">                True if you want to see printed messages about whether a saved simulation was found in the</span>
+<span class="sd">                joe_sim_archive directory.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -455,25 +448,26 @@
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.plot_initial_condition">[docs]</a>
     <span class="k">def</span> <span class="nf">plot_initial_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">custom_ylim</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;xkcd:cerulean&#39;</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                            <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Produce a line plot of the initial state.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Produce a line plot of the initial state. If the initial state is complex-valued, plots of both the real</span>
+<span class="sd">        and imaginary parts are produced.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        custom_ylim : array_like, optional.</span>
-<span class="sd">            Custom values for the y-limits on the axes. Default: None.</span>
-<span class="sd">        dpi : int, optional</span>
-<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
-<span class="sd">        color : str, optional</span>
-<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
-<span class="sd">            Default: &#39;xkcd:cerulean&#39;.</span>
-<span class="sd">        fieldname : str, optional</span>
-<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
-<span class="sd">        usetex : boolean, optional</span>
-<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
-<span class="sd">        show_figure: boolean, optional</span>
-<span class="sd">            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
-<span class="sd">        save_figure: boolean, optional</span>
-<span class="sd">            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at all.</span>
+<span class="sd">            custom_ylim : array_like, optional.</span>
+<span class="sd">                Custom values for the y-limits on the axes. Default: None.</span>
+<span class="sd">            dpi : int, optional</span>
+<span class="sd">                Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">            color : str, optional</span>
+<span class="sd">                Name of the color you want the curve to be. For a list of great colors see https://xkcd.com/color/rgb/.</span>
+<span class="sd">                Default: &#39;xkcd:cerulean&#39;.</span>
+<span class="sd">            fieldname : str, optional</span>
+<span class="sd">                Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">            usetex : boolean, optional</span>
+<span class="sd">                True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">            show_figure: boolean, optional</span>
+<span class="sd">                True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
+<span class="sd">            save_figure: boolean, optional</span>
+<span class="sd">                True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at all.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
 
@@ -552,24 +546,24 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        umin : float, optional.</span>
-<span class="sd">            Minimum field value to include, used to construct colorbar lower limit. Default: None.</span>
-<span class="sd">        umax : float, optional.</span>
-<span class="sd">            Maximum field value to include, used to construct colorbar upper limit. Default: None.</span>
-<span class="sd">        dpi : int, optional</span>
-<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
-<span class="sd">        cmap : str</span>
-<span class="sd">            Name of the colormap to use. For a list of great colormaps see &lt;https://matplotlib.org/cmocean/&gt;.</span>
-<span class="sd">            Default: &#39;cmo.haline&#39;.</span>
-<span class="sd">        fieldname : str, optional</span>
-<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
-<span class="sd">        usetex : boolean, optional</span>
-<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
-<span class="sd">        show_figure: boolean, optional</span>
-<span class="sd">            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
-<span class="sd">        save_figure: boolean, optional</span>
-<span class="sd">            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at all.</span>
-<span class="sd">            Default: False.</span>
+<span class="sd">            umin : float, optional.</span>
+<span class="sd">                Minimum field value to include, used to construct colorbar lower limit. Default: None.</span>
+<span class="sd">            umax : float, optional.</span>
+<span class="sd">                Maximum field value to include, used to construct colorbar upper limit. Default: None.</span>
+<span class="sd">            dpi : int, optional</span>
+<span class="sd">                Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">            cmap : str, optional</span>
+<span class="sd">                Name of the colormap to use. For a list of great colormaps see https://matplotlib.org/cmocean/.</span>
+<span class="sd">                Default: &#39;cmo.haline&#39;.</span>
+<span class="sd">            fieldname : str, optional</span>
+<span class="sd">                Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">            usetex : boolean, optional</span>
+<span class="sd">                True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">            show_figure: boolean, optional</span>
+<span class="sd">                True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
+<span class="sd">            save_figure: boolean, optional</span>
+<span class="sd">                True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at all.</span>
+<span class="sd">                Default: False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nsteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
         <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">nsteps</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -636,28 +630,28 @@
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.hov_plot_modulus">[docs]</a>
     <span class="k">def</span> <span class="nf">hov_plot_modulus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">umin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">umax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;cmo.haline&#39;</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                          <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The same as :func:`~joe_lab.joe.hov_plot`, but with the modulus of the field.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;The same as :func:`~joe_lab.joe.hov_plot`, but only the modulus of the field is plotted.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        umin : float, optional.</span>
-<span class="sd">            Minimum field value to include, used to construct colorbar lower limit. Default: None.</span>
-<span class="sd">        umax : float, optional.</span>
-<span class="sd">            Maximum field value to include, used to construct colorbar upper limit. Default: None.</span>
-<span class="sd">        dpi : int, optional</span>
-<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
-<span class="sd">        cmap : str</span>
-<span class="sd">            Name of the colormap to use. For a list of great colormaps see &lt;https://matplotlib.org/cmocean/&gt;.</span>
-<span class="sd">            Default: &#39;cmo.haline&#39;.</span>
-<span class="sd">        fieldname : str, optional</span>
-<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
-<span class="sd">        usetex : boolean, optional</span>
-<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
-<span class="sd">        show_figure: boolean, optional</span>
-<span class="sd">            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
-<span class="sd">        save_figure: boolean, optional</span>
-<span class="sd">            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at</span>
-<span class="sd">            all. Default: False.</span>
+<span class="sd">            umin : float, optional.</span>
+<span class="sd">                Minimum field value to include, used to construct colorbar lower limit. Default: None.</span>
+<span class="sd">            umax : float, optional.</span>
+<span class="sd">                Maximum field value to include, used to construct colorbar upper limit. Default: None.</span>
+<span class="sd">            dpi : int, optional</span>
+<span class="sd">                Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">            cmap : str</span>
+<span class="sd">                Name of the colormap to use. For a list of great colormaps see https://matplotlib.org/cmocean/.</span>
+<span class="sd">                Default: &#39;cmo.haline&#39;.</span>
+<span class="sd">            fieldname : str, optional</span>
+<span class="sd">                Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">            usetex : boolean, optional</span>
+<span class="sd">                True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">            show_figure: boolean, optional</span>
+<span class="sd">                True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
+<span class="sd">            save_figure: boolean, optional</span>
+<span class="sd">                True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at</span>
+<span class="sd">                all. Default: False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nsteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
         <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">nsteps</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndump</span><span class="p">),</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -715,17 +709,17 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        fps: int, optional</span>
-<span class="sd">            Frames-per-second for the movie. Default: 200.</span>
-<span class="sd">        dpi : int, optional</span>
-<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
-<span class="sd">        fieldname : str, optional</span>
-<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
-<span class="sd">        usetex : boolean, optional</span>
-<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
-<span class="sd">        fieldcolor: str, optional</span>
-<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
-<span class="sd">            Default: &#39;xkcd:ocean green&#39;.</span>
+<span class="sd">            fps: int, optional</span>
+<span class="sd">                Frames-per-second for the movie. Default: 200.</span>
+<span class="sd">            dpi : int, optional</span>
+<span class="sd">                Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">            fieldname : str, optional</span>
+<span class="sd">                Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">            usetex : boolean, optional</span>
+<span class="sd">                True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">            fieldcolor: str, optional</span>
+<span class="sd">                Name of the color you want the curve to be. For a list of great colors see https://xkcd.com/color/rgb/.</span>
+<span class="sd">                Default: &#39;xkcd:ocean green&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -774,17 +768,17 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        fps: int, optional</span>
-<span class="sd">            Frames-per-second for the movie. Default: 200.</span>
-<span class="sd">        dpi : int, optional</span>
-<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
-<span class="sd">        fieldname : str, optional</span>
-<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
-<span class="sd">        usetex : boolean, optional</span>
-<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
-<span class="sd">        fieldcolor: str, optional</span>
-<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
-<span class="sd">            Default: &#39;xkcd:ocean green&#39;.</span>
+<span class="sd">            fps: int, optional</span>
+<span class="sd">                Frames-per-second for the movie. Default: 200.</span>
+<span class="sd">            dpi : int, optional</span>
+<span class="sd">                Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">            fieldname : str, optional</span>
+<span class="sd">                Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">            usetex : boolean, optional</span>
+<span class="sd">                True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">            fieldcolor: str, optional</span>
+<span class="sd">                Name of the color you want the curve to be. For a list of great colors see https://xkcd.com/color/rgb/.</span>
+<span class="sd">                Default: &#39;xkcd:ocean green&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">u</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
@@ -816,23 +810,25 @@
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.save_combomovie">[docs]</a>
     <span class="k">def</span> <span class="nf">save_combomovie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">fieldname</span><span class="o">=</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="n">fieldcolor</span><span class="o">=</span><span class="s1">&#39;xkcd:ocean green&#39;</span><span class="p">,</span> <span class="n">speccolor</span><span class="o">=</span><span class="s1">&#39;xkcd:dark orange&#39;</span><span class="p">,</span>
                         <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save a movie of the evolution of our field as well as a nested, tinier movie of its power spectrum.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save a movie of the evolution of our PDE solution as well as a nested, tinier movie of its power spectrum.</span>
+
+<span class="sd">        If the PDE solution is complex-valued, we only show its modulus and power spectrum instead.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        fps: int, optional</span>
-<span class="sd">            Frames-per-second for the movie. Default: 200.</span>
-<span class="sd">        dpi : int, optional</span>
-<span class="sd">            Dots-per-inch on the image. Default: 100.</span>
-<span class="sd">        fieldname : str, optional</span>
-<span class="sd">            Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
-<span class="sd">        usetex : boolean, optional</span>
-<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
-<span class="sd">        fieldcolor: str, optional</span>
-<span class="sd">            Name of the color you want the curve to be. For a list of great colors see &lt;https://xkcd.com/color/rgb/&gt;.</span>
-<span class="sd">            Default: &#39;xkcd:ocean green&#39;.</span>
-<span class="sd">        speccolor: str, optional</span>
-<span class="sd">            Name of the color you want the curve of the power spectrum to be. Default: &#39;xkcd:dark orange&#39;.</span>
+<span class="sd">            fps: int, optional</span>
+<span class="sd">                Frames-per-second for the movie. Default: 200.</span>
+<span class="sd">            dpi : int, optional</span>
+<span class="sd">                Dots-per-inch on the image. Default: 100.</span>
+<span class="sd">            fieldname : str, optional</span>
+<span class="sd">                Name of the PDE solution, which will also be the label on the picture&#39;s y-axis. Default: &#39;u&#39;.</span>
+<span class="sd">            usetex : boolean, optional</span>
+<span class="sd">                True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">            fieldcolor: str, optional</span>
+<span class="sd">                Name of the color you want the curve to be. For a list of great colors see https://xkcd.com/color/rgb/.</span>
+<span class="sd">                Default: &#39;xkcd:ocean green&#39;.</span>
+<span class="sd">            speccolor: str, optional</span>
+<span class="sd">                Name of the color you want the curve of the power spectrum to be. Default: &#39;xkcd:dark orange&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_ord</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">u</span> <span class="o">=</span> <span class="n">clip_spongeless</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Udata</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfrac</span><span class="p">)</span>
@@ -872,7 +868,7 @@
 <div class="viewcode-block" id="simulation.get_fm">
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.get_fm">[docs]</a>
     <span class="k">def</span> <span class="nf">get_fm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the first moment (spatial integral) of the solution to our PDE, `fm`.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the first moment (spatial integral) of the solution to our PDE, `fm`, at each sampled time.</span>
 
 <span class="sd">        Also gets the absolute difference between `fm` and `fm[0]`, the initial first moment.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -892,7 +888,7 @@
 <div class="viewcode-block" id="simulation.get_sm">
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.simulation.get_sm">[docs]</a>
     <span class="k">def</span> <span class="nf">get_sm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the second moment (spatial L2 - norm) of the solution to our PDE, `sm`.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the second moment (spatial :math:`L^2` norm) of the solution to our PDE, `sm`, at each sampled time.</span>
 
 <span class="sd">        Also gets the absolute difference between `sm` and `sm[0]`, the initial second moment.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -918,50 +914,61 @@
 
 <span class="c1"># TODO: the func below here because it doesn&#39;t have a better home right now, and it *almost* takes simulation</span>
 <span class="c1">#     objects in as input.</span>
+
 <div class="viewcode-block" id="do_refinement_study">
 <a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.do_refinement_study">[docs]</a>
 <span class="k">def</span> <span class="nf">do_refinement_study</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Ns</span><span class="p">,</span> <span class="n">dts</span><span class="p">,</span> <span class="n">method_kw</span><span class="o">=</span><span class="s1">&#39;etdrk4&#39;</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">fit_min</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fit_max</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a refinement study based on Richardson extrapolation for error estimation. Very useful for quickly</span>
-<span class="sd">    and painless checking accuracy.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs a refinement study based on Richardson extrapolation for error estimation, and reports the slope of</span>
+<span class="sd">    &quot;estimated error&quot; vs. &quot;:math:`\Delta t`&quot; on a loglog plot</span>
+<span class="sd">    (computed via np.polyfit https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html).</span>
+<span class="sd">    Useful for quickly and painlessly validating the accuracy of</span>
+<span class="sd">    an implementation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    model: model</span>
-<span class="sd">        Instance of the class `model` :class:`~joe_lab.joe.model`.</span>
-<span class="sd">    initial_state: initial_state</span>
-<span class="sd">        Instance of the class `initial state` :class:`~joe_lab.joe.initial_state`.</span>
-<span class="sd">    length : float</span>
-<span class="sd">        Length of the spatial domain</span>
-<span class="sd">    T : float</span>
-<span class="sd">        Total physical runtime of the simulation. That is, the spacetime grid covers the time interval [0,T].</span>
-<span class="sd">    Ns : list of ints</span>
-<span class="sd">        Number of spatial locations on which to sample the solution to our PDE.</span>
-<span class="sd">    dts : list of floats</span>
-<span class="sd">        Time step sizes for numerical integration of the PDE.</span>
-<span class="sd">    method_kw : str, optional</span>
-<span class="sd">        Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
-<span class="sd">        and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.time_stepper`.</span>
-<span class="sd">        Default: &#39;etdrk4&#39;.</span>
-<span class="sd">    bc : str, optional</span>
-<span class="sd">        String specifying the boundary conditions. Must be &#39;periodic&#39; or &#39;sponge_layer&#39;.</span>
-<span class="sd">    sponge_params: dict</span>
-<span class="sd">        Contains particular parameters for the sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`.</span>
-<span class="sd">    dpi : int, optional</span>
-<span class="sd">        Dots-per-inch on the image. Default: 400.</span>
-<span class="sd">    usetex : boolean, optional</span>
-<span class="sd">        True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
-<span class="sd">    show_figure: boolean, optional</span>
-<span class="sd">        True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
-<span class="sd">    save_figure: boolean, optional</span>
-<span class="sd">        True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at</span>
-<span class="sd">        all. Default: False.</span>
-<span class="sd">    fit_min: int, optional.</span>
-<span class="sd">        Index of dts at which we *start* pulling values from the Ns[-1] error curve to approximate slope of error curve.</span>
-<span class="sd">        Default: 3.</span>
-<span class="sd">    fit_max: int, optional</span>
-<span class="sd">        Index of dts at which we *stop* pulling values from the Ns[-1] error curve to approximate slope of error curve.</span>
-<span class="sd">        Default: 7.</span>
+<span class="sd">        model : model</span>
+<span class="sd">            Instance of the class :class:`~joe_lab.joe.model`.</span>
+<span class="sd">        initial_state : initial_state</span>
+<span class="sd">            Instance of the class :class:`~joe_lab.joe.initial_state`.</span>
+<span class="sd">        length : float</span>
+<span class="sd">            Length of the spatial domain.</span>
+<span class="sd">        T : float</span>
+<span class="sd">            Total physical runtime of the simulation. That is, the spacetime grid covers the time interval [0,T].</span>
+<span class="sd">        Ns : list of ints</span>
+<span class="sd">            Number of spatial locations on which to sample the solution to our PDE. Get an error curve for each entry</span>
+<span class="sd">            in Ns.</span>
+<span class="sd">        dts : list of floats</span>
+<span class="sd">            Time step sizes for numerical integration of the PDE.</span>
+<span class="sd">        method_kw : str, optional</span>
+<span class="sd">            Name of the numerical method. Currently, &#39;etdrk1&#39;, &#39;ifrk4&#39; are available for first-order-in-time problems,</span>
+<span class="sd">            and &#39;etdrk4&#39; is available for all problems: see :class:`~joe_lab.time_stepper.timestepper`.</span>
+<span class="sd">            Default: &#39;etdrk4&#39;.</span>
+<span class="sd">        bc : str, optional</span>
+<span class="sd">            String specifying the boundary conditions. Must be &#39;periodic&#39; or &#39;sponge_layer&#39;. Default: &#39;periodic&#39;.</span>
+<span class="sd">        sponge_params : dict, optional</span>
+<span class="sd">            Contains particular parameters for the sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`.</span>
+<span class="sd">            Default: None.</span>
+<span class="sd">        dpi : int, optional</span>
+<span class="sd">            Dots-per-inch on the image. Default: 400.</span>
+<span class="sd">        usetex : boolean, optional</span>
+<span class="sd">            True if you want to render the plot labels in TeX, and False if you want no TeX. Default: True.</span>
+<span class="sd">        show_figure : boolean, optional</span>
+<span class="sd">            True if you want the figure to appear in a pop-up window once it is rendered, False otherwise. Default: True.</span>
+<span class="sd">        save_figure : boolean, optional</span>
+<span class="sd">            True if you want the figure to be saved as a .png file, False if you do not want the figure to be saved at</span>
+<span class="sd">            all. Default: False.</span>
+<span class="sd">        fit_min : int, optional.</span>
+<span class="sd">            Index of dts at which we *start* pulling values from the Ns[-1] error curve to approximate slope of error curve.</span>
+<span class="sd">            Default: 3.</span>
+<span class="sd">        fit_max : int, optional</span>
+<span class="sd">            Index of dts at which we *stop* pulling values from the Ns[-1] error curve to approximate slope of error curve.</span>
+<span class="sd">            Default: 7.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        slope : float</span>
+<span class="sd">            Estimated slope of the &quot;estimated error&quot; vs. &quot;:math:`\Delta t`&quot; line on a loglog plot.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;serif&quot;</span>
 
@@ -1047,8 +1054,6 @@
 
 
 <span class="c1"># TODO: this function below needs to be integrated into the other error test better, or scrubbed from the package!!!</span>
-<div class="viewcode-block" id="do_refinement_study_alt">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.joe.do_refinement_study_alt">[docs]</a>
 <span class="k">def</span> <span class="nf">do_refinement_study_alt</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">Ns</span><span class="p">,</span> <span class="n">dts</span><span class="p">,</span> <span class="n">benchmark_sim</span><span class="p">,</span> <span class="n">method_kw</span><span class="o">=</span><span class="s1">&#39;etdrk4&#39;</span><span class="p">,</span> <span class="n">bc</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="n">sponge_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_figure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">fit_min</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fit_max</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
 
@@ -1188,8 +1193,7 @@
     <span class="n">slope</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Estimated Slope of Error Line at N = </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">Ns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; is slope = </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">slope</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="kc">None</span></div>
-
+    <span class="k">return</span> <span class="kc">None</span>
 </pre></div>
 
            </div>

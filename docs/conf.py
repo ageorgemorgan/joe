@@ -8,13 +8,14 @@
 
 import os
 import sys
+import importlib.metadata
 
 sys.path.insert(0, os.path.abspath(".."))
 
 project = 'joe'
 copyright = '2024, Adam George Morgan'
 author = 'Adam George Morgan'
-release = '0.0.6'
+version = release = importlib.metadata.version("joe_lab")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

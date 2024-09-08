@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>joe_lab.sponge_layer &mdash; joe Documentation 0.0.6 documentation</title>
+  <title>joe_lab.sponge_layer &mdash; joe 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            joe Documentation
+            joe
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -52,7 +52,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">joe Documentation</a>
+          <a href="../../index.html">joe</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -86,19 +86,26 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">        x : float or ndarray</span>
-<span class="sd">            Spatial point(s) to evaluation damping coefficient at/</span>
-<span class="sd">        sponge_params: dict</span>
-<span class="sd">            Contains particular parameters for the sponge layer.</span>
+<span class="sd">            Spatial point(s) to evaluation damping coefficient at.</span>
+<span class="sd">        sponge_params : dict</span>
+<span class="sd">            Contains particular parameters for the sponge layer: the keys are instructively named &#39;l_endpt&#39;, &#39;r_endpt&#39;,</span>
+<span class="sd">            and &#39;width&#39;.</span>
+
+<span class="sd">            For other purposes, it is useful to also populate the dict with keys &#39;expdamp_freq&#39;</span>
+<span class="sd">            (number of steps between harsh exponential damping in the sponge), &#39;damping_amplitude&#39; (amplitude of</span>
+<span class="sd">            heat-flow coefficient in the sponge layer), &#39;splitting_method_kw&#39; (&#39;naive&#39; or &#39;strang&#39;, default to &#39;naive&#39;),</span>
+<span class="sd">            and &#39;spongeless_frac&#39; (fraction of domain that is actually &quot;physical&quot; and not corrupted by the sponge):</span>
+<span class="sd">            these keys are required for passing the sponge_params dict to a :class:`~joe_lab.joe.simulation` instance.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">        out: float or ndarray</span>
+<span class="sd">        out : ndarray</span>
 <span class="sd">            Values of damping coefficient at the point(s) x.</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] Anne Liu, Thomas Trogdon, &quot;An artificially-damped Fourier method for dispersive evolution equations&quot;.</span>
-<span class="sd">    &lt;https://www.sciencedirect.com/science/article/pii/S0168927423001526&gt;.</span>
+<span class="sd">    https://doi.org/10.1016/j.apnum.2023.05.023 .</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO: should this be made to work on both sides of the domain rather than just one?</span>
     <span class="n">amp</span> <span class="o">=</span> <span class="mf">1.</span>
@@ -117,8 +124,6 @@
 
 <span class="c1"># create a function that gives the damping coefficient a la Bronski 1998.</span>
 <span class="c1"># TODO: update this! needs to play nicely with sponge params.</span>
-<div class="viewcode-block" id="damping_coeff_bronski">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.sponge_layer.damping_coeff_bronski">[docs]</a>
 <span class="k">def</span> <span class="nf">damping_coeff_bronski</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
     <span class="c1"># left endpoint</span>
     <span class="n">lep</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">length</span>
@@ -135,8 +140,7 @@
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">piecewise</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">condlist</span><span class="p">,</span> <span class="n">funclist</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">out</span></div>
-
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <span class="c1"># create the Rayleigh damping term that can be added to the forcing</span>
@@ -152,7 +156,7 @@
 <span class="sd">    .. math::</span>
 <span class="sd">        \mathcal{F}\left(-\beta(x)\mathcal{F}^{-1}V\right)</span>
 
-<span class="sd">    where :math:`\mathcal{F}` denotes the Fourier transform and :math:`beta(x)` denotes a damping coefficient close to</span>
+<span class="sd">    where :math:`\mathcal{F}` denotes the Fourier transform and :math:`\beta(x)` denotes a damping coefficient close to</span>
 <span class="sd">    1 near the boundary of our domain and effectively zero everywhere else.</span>
 
 <span class="sd">    Parameters</span>
@@ -168,7 +172,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">        out: complex ndarray</span>
+<span class="sd">        out : complex ndarray</span>
 <span class="sd">            Fourier-space representation of the Rayleigh damping forcing term.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

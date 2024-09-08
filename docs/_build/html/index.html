@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>joe documentation &mdash; joe 0.0.6 documentation</title>
+  <title>joe documentation &mdash; joe 0.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=1fd71caa"></script>
+        <script src="_static/documentation_options.js?v=8c5712d9"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -36,6 +36,9 @@
           <a href="#" class="icon icon-home">
             joe
           </a>
+              <div class="version">
+                0.0.4
+              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -75,9 +78,27 @@
              
   <section id="joe-documentation">
 <h1>joe documentation<a class="headerlink" href="#joe-documentation" title="Link to this heading"></a></h1>
-<p>Add your content using <code class="docutils literal notranslate"><span class="pre">reStructuredText</span></code> syntax. See the
-<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
-documentation for details.</p>
+<p><em>joe</em> rapidly generates accurate solutions to partial differential equations for smooth real or complex scalar functions <span class="math notranslate nohighlight">\(u(x,t)\)</span> that depend on one
+spatial variable and one temporal variable.</p>
+<p><strong>FEATURES</strong></p>
+<p>-Fast, accurate numerical solutions of partial differential equations (PDEs) of the form</p>
+<div class="math notranslate nohighlight">
+\[\partial_{t}^m u +L\left(\frac{1}{i}\partial_{x}\right)u + f(x,t,u,u_{x}, u_{xx},...) = 0,\]</div>
+<p>where <span class="math notranslate nohighlight">\(m=1\)</span> or <span class="math notranslate nohighlight">\(m=2\)</span>, <span class="math notranslate nohighlight">\(u(x,t)\)</span> is a real- or complex-valued scalar field defined on an interval,
+and <span class="math notranslate nohighlight">\(L(k)\)</span> , <span class="math notranslate nohighlight">\(f\)</span> are some nice functions supplied by the user.</p>
+<p>-Supports periodic boundary conditions as well as absorbing boundaries/sponge layers (to simulate waves going off to spatial infinity)</p>
+<p>-Users can either call the PDE they want to simulate from a catalogue of built-in options, or define their own custom PDE.</p>
+<p>-Easily customizable initial conditions.</p>
+<p>-Clean, object-oriented approach to handling simulations makes post-processing (accuracy assesment) very straightforward.</p>
+<p>-Producing publication-quality visuals is quick and easy with <em>joe</em>’s built-in functions: simply call the right plotting
+function on your simulation, tweak a few options, and you’ve got a plot or movie ready to go. Almost all the required
+matplotlib stuff is under the hood.</p>
+<p><strong>DEPENDENCIES</strong></p>
+<p>numpy, scipy, matplotlib, jupyter (for accessing tutorials), cmocean (<a class="reference external" href="https://matplotlib.org/cmocean/">https://matplotlib.org/cmocean/</a>),
+alive-progress (<a class="reference external" href="https://pypi.org/project/alive-progress/1.0/">https://pypi.org/project/alive-progress/1.0/</a>). You may also want to download FFmpeg support for
+creating movies: see the <em>joe</em> GitHub page for tips on how to do this.</p>
+<p><strong>GETTING STARTED</strong></p>
+<p>Open up the Jupyter tutorials (<a class="reference external" href="https://github.com/ageorgemorgan/joe/blob/main/demos/tutorials/">https://github.com/ageorgemorgan/joe/blob/main/demos/tutorials/</a>) to see joe in action!</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>

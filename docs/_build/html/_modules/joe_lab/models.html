@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>joe_lab.models &mdash; joe Documentation 0.0.6 documentation</title>
+  <title>joe_lab.models &mdash; joe 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            joe Documentation
+            joe
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -52,7 +52,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">joe Documentation</a>
+          <a href="../../index.html">joe</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -80,32 +80,24 @@
 <span class="c1"># Aux functions needed for special cases...</span>
 
 <span class="c1"># obtain the kink</span>
-<div class="viewcode-block" id="K0">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.models.K0">[docs]</a>
 <span class="k">def</span> <span class="nf">K0</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">out</span></div>
-
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <span class="c1"># obtain the potential associated to the kink</span>
 <span class="c1"># Note: the +2 in the potential gets put into linear part of evolution eq.</span>
-<div class="viewcode-block" id="V0">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.models.V0">[docs]</a>
 <span class="k">def</span> <span class="nf">V0</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="n">out</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">**</span> <span class="o">-</span><span class="mi">2</span>
 
-    <span class="k">return</span> <span class="n">out</span></div>
-
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <span class="c1"># Here begins the actual core of the material</span>
 
 <span class="c1"># if model is first order in time, below just gives linear, const. coeff. part. in Fourier space</span>
 <span class="c1"># if model is second order in time, instead obtain the spatial operator for the first order system as a block matrix</span>
-<div class="viewcode-block" id="get_symbol">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.models.get_symbol">[docs]</a>
 <span class="k">def</span> <span class="nf">get_symbol</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">model_kw</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">model_kw</span> <span class="o">==</span> <span class="s1">&#39;phi4pert&#39;</span><span class="p">:</span>
@@ -128,12 +120,9 @@
 
         <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s2">&quot;Invalid model keyword string.&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">A</span></div>
+    <span class="k">return</span> <span class="n">A</span>
 
 
-
-<div class="viewcode-block" id="fourier_forcing">
-<a class="viewcode-back" href="../../joe_lab.html#joe_lab.models.fourier_forcing">[docs]</a>
 <span class="k">def</span> <span class="nf">fourier_forcing</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">model_kw</span><span class="p">,</span> <span class="n">nonlinear</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># Fourier transform of forcing term, acting on pair fncs V=(v_1, v_2)^T (concatenation)</span>
     <span class="c1"># on Fourier space. V has size 2N if complex, or size N+2 if real</span>
@@ -220,8 +209,7 @@
 
         <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s2">&quot;Invalid model keyword string.&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">out</span></div>
-
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <div class="viewcode-block" id="builtin_model">
@@ -240,8 +228,8 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">        out : model :class:`~joe_lab.joe.model`</span>
-<span class="sd">            An instance of the *joe* model class with the given name.</span>
+<span class="sd">        out : model</span>
+<span class="sd">            An instance of :class:`~joe_lab.joe.model` with the given name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">my_symbol</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
