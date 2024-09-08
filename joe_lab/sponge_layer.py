@@ -14,9 +14,7 @@ def damping_coeff_lt(x, sponge_params):
             Spatial point(s) to evaluation damping coefficient at.
         sponge_params : dict
             Contains particular parameters for the sponge layer: the keys are instructively named 'l_endpt', 'r_endpt',
-            and 'width'.
-
-            For other purposes, it is useful to also populate the dict with keys 'expdamp_freq'
+            and 'width'. For other purposes, it is useful to also populate the dict with keys 'expdamp_freq'
             (number of steps between harsh exponential damping in the sponge), 'damping_amplitude' (amplitude of
             heat-flow coefficient in the sponge layer), 'splitting_method_kw' ('naive' or 'strang', default to 'naive'),
             and 'spongeless_frac' (fraction of domain that is actually "physical" and not corrupted by the sponge):
