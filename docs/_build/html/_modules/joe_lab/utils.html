@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>joe_lab.utils &mdash; joe 0.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=8c5712d9"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            joe
+          </a>
+              <div class="version">
+                0.0.4
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">joe</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">joe_lab.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for joe_lab.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.fft</span> <span class="kn">import</span> <span class="n">fft</span><span class="p">,</span> <span class="n">ifft</span><span class="p">,</span> <span class="n">rfft</span><span class="p">,</span> <span class="n">irfft</span>
+
+
+<div class="viewcode-block" id="my_fft">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.utils.my_fft">[docs]</a>
+<span class="k">def</span> <span class="nf">my_fft</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Takes FFT of a real or complex array along the -1 axis, optimizing storage if the array is real.</span>
+
+<span class="sd">    Wraps the scipy.fft routines fft, rfft (see https://docs.scipy.org/doc/scipy/reference/fft.html).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        u : ndarray</span>
+<span class="sd">            Real or complex numpy array.</span>
+<span class="sd">        n: int or None, optional.</span>
+<span class="sd">            Total number of frequencies to include, if padding. Default: None (no padding).</span>
+<span class="sd">        complex : boolean, optional</span>
+<span class="sd">            Equal to True if u is complex and False if u is real. Default: False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        out : complex ndarray</span>
+<span class="sd">            Same shape conventions as scipy.fft.fft and scipy.fft.rfft (see https://docs.scipy.org/doc/scipy/reference/fft.html).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">complex</span><span class="p">:</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">fft</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">rfft</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="my_ifft">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.utils.my_ifft">[docs]</a>
+<span class="k">def</span> <span class="nf">my_ifft</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Takes inverse FFT of an array along the -1 axis, optimizing storage if the inverse FFT is expected to be real.</span>
+
+<span class="sd">        Wraps the scipy.fft routines ifft, irfft (see https://docs.scipy.org/doc/scipy/reference/fft.html).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            V : complex ndarray</span>
+<span class="sd">                Array we want to apply inverse FFT to.</span>
+<span class="sd">            n: int or None, optional.</span>
+<span class="sd">                Total number of frequencies to pad V with, if padding is desired. Default: None (no padding).</span>
+<span class="sd">            complex : boolean, optional</span>
+<span class="sd">                Equal to True if inverse FFT of V is known to be complex and False if inverse FFT is known to be</span>
+<span class="sd">                real. Default: False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            out: ndarray</span>
+<span class="sd">                Same shape conventions as scipy.fft.ifft and scipy.fft.irfft (see https://docs.scipy.org/doc/scipy/reference/fft.html).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">complex</span><span class="p">:</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">ifft</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">irfft</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="integrate">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.utils.integrate">[docs]</a>
+<span class="k">def</span> <span class="nf">integrate</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Integrates N samples of a real or complex space-time field over the spatial interval [-0.5*length, 0.5*length]</span>
+<span class="sd">       using the FFT.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        u : ndarray</span>
+<span class="sd">            Real or complex array to be integrated in space. Convention is that spatial variation is stored in the</span>
+<span class="sd">            -1 axis.</span>
+<span class="sd">        length : float</span>
+<span class="sd">            Total length of spatial domain.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        out: float or ndarray</span>
+<span class="sd">            Approximation of the integral of the sampled space-time field over the spatial interval</span>
+<span class="sd">            [-0.5*length, 0.5*length].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">u</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">length</span><span class="o">/</span><span class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fft</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="dealiased_pow">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.utils.dealiased_pow">[docs]</a>
+<span class="k">def</span> <span class="nf">dealiased_pow</span><span class="p">(</span><span class="n">V</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the Fourier-space version of a power of an array, dealiased by zero-padding.</span>
+
+<span class="sd">        Important: this only works for real-valued arrays because for complex arrays :math:`u`, algebraic nonlinearities</span>
+<span class="sd">        typically involve the complex conjugate :math:`\overline{u}` as well as :math:`u`. So, padding for such</span>
+<span class="sd">        nonlinearities terms should be done on-the-fly.</span>
+
+<span class="sd">        A future release of *joe* may include support for dealiased complex powers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            V : complex ndarray</span>
+
+<span class="sd">            p : int</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            out: complex ndarray</span>
+<span class="sd">                A version of :math:`\mathcal{F}\left[\left(\mathcal{F}^{-1}V\right)^p\right]` that has been dealiased</span>
+<span class="sd">                via zero-padding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#</span>
+
+    <span class="n">N</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">V</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">p</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">upad</span> <span class="o">=</span> <span class="n">my_ifft</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># FOR CLARITY/DEV. PURPOSES ONLY: the above lines of code produce the same result as the following block:</span>
+    <span class="c1">#Vpad = 1j * np.zeros(int(0.5 * K + 1), dtype=float)</span>
+    <span class="c1">#Vpad[0:len(V)] = V</span>
+    <span class="c1">#upad = irfft(Vpad, n=K)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="p">((</span><span class="n">K</span><span class="o">/</span><span class="n">N</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">my_fft</span><span class="p">(</span><span class="n">upad</span> <span class="o">**</span> <span class="n">p</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+
+    <span class="c1"># TODO: I discovered the correct normalizations via trial-and error, and by comparing Fu2, Fu3 against</span>
+    <span class="c1">#  rfft(irfft(V) ** 2), rfft(irfft(V) ** 3) resp. Make sure to write in a tutorial, or in the docs, a more</span>
+    <span class="c1">#  systematic way of determining this normalization. Dealiasing via padding would be a great topic for a</span>
+    <span class="c1">#  &quot;tutorial 5&quot;! U could also experiment with filtering vs. padding vs. doing nothing!</span>
+
+    <span class="k">return</span> <span class="n">out</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Adam George Morgan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>joe_lab.sponge_layer &mdash; joe 0.0.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            joe
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">joe</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">joe_lab.sponge_layer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for joe_lab.sponge_layer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">my_fft</span><span class="p">,</span> <span class="n">my_ifft</span>
+
+<span class="c1"># create all the stuff we need to implement the sponge layer (absorbing layer/segment near bdry where</span>
+<span class="c1"># artifical damping turns on)</span>
+
+<div class="viewcode-block" id="damping_coeff_lt">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.sponge_layer.damping_coeff_lt">[docs]</a>
+<span class="k">def</span> <span class="nf">damping_coeff_lt</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sponge_params</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Smooth damping coefficient used in Liu-Trogdon 2023 (see References below). Only applies on left side of domain.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        x : float or ndarray</span>
+<span class="sd">            Spatial point(s) to evaluation damping coefficient at.</span>
+<span class="sd">        sponge_params : dict</span>
+<span class="sd">            Contains particular parameters for the sponge layer: the keys are instructively named &#39;l_endpt&#39;, &#39;r_endpt&#39;,</span>
+<span class="sd">            and &#39;width&#39;.</span>
+
+<span class="sd">            For other purposes, it is useful to also populate the dict with keys &#39;expdamp_freq&#39;</span>
+<span class="sd">            (number of steps between harsh exponential damping in the sponge), &#39;damping_amplitude&#39; (amplitude of</span>
+<span class="sd">            heat-flow coefficient in the sponge layer), &#39;splitting_method_kw&#39; (&#39;naive&#39; or &#39;strang&#39;, default to &#39;naive&#39;),</span>
+<span class="sd">            and &#39;spongeless_frac&#39; (fraction of domain that is actually &quot;physical&quot; and not corrupted by the sponge):</span>
+<span class="sd">            these keys are required for passing the sponge_params dict to a :class:`~joe_lab.joe.simulation` instance.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        out : ndarray</span>
+<span class="sd">            Values of damping coefficient at the point(s) x.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Anne Liu, Thomas Trogdon, &quot;An artificially-damped Fourier method for dispersive evolution equations&quot;.</span>
+<span class="sd">    https://doi.org/10.1016/j.apnum.2023.05.023 .</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: should this be made to work on both sides of the domain rather than just one?</span>
+    <span class="n">amp</span> <span class="o">=</span> <span class="mf">1.</span>
+
+    <span class="n">l_endpt</span> <span class="o">=</span> <span class="n">sponge_params</span><span class="p">[</span><span class="s1">&#39;l_endpt&#39;</span><span class="p">]</span>  <span class="c1"># -length * 0.5 + 0.5 * length * 0.1</span>
+
+    <span class="n">r_endpt</span> <span class="o">=</span> <span class="n">sponge_params</span><span class="p">[</span><span class="s1">&#39;r_endpt&#39;</span><span class="p">]</span>  <span class="c1"># l_endpt + 0.01 * length</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="n">sponge_params</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span>  <span class="c1"># (2 ** -6) * length / 100.</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">l_endpt</span><span class="p">))</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">r_endpt</span><span class="p">))</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">amp</span> <span class="o">*</span> <span class="n">out</span></div>
+
+
+
+<span class="c1"># create a function that gives the damping coefficient a la Bronski 1998.</span>
+<span class="c1"># TODO: update this! needs to play nicely with sponge params.</span>
+<span class="k">def</span> <span class="nf">damping_coeff_bronski</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="c1"># left endpoint</span>
+    <span class="n">lep</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">length</span>
+
+    <span class="c1"># right endpoint</span>
+    <span class="n">rep</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">length</span>
+
+    <span class="n">condlist</span> <span class="o">=</span> <span class="p">[((</span><span class="n">lep</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">&lt;=</span> <span class="n">x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">rep</span> <span class="o">-</span> <span class="n">delta</span><span class="p">)),</span> <span class="p">((</span><span class="n">lep</span> <span class="o">&lt;=</span> <span class="n">x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">lep</span> <span class="o">+</span> <span class="n">delta</span><span class="p">)),</span>
+                <span class="p">((</span><span class="n">rep</span> <span class="o">-</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="n">x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;=</span> <span class="n">rep</span><span class="p">))]</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span>
+
+    <span class="n">funclist</span> <span class="o">=</span> <span class="p">[</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">lep</span><span class="p">)),</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="p">(</span><span class="n">rep</span> <span class="o">-</span> <span class="n">x</span><span class="p">))]</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">piecewise</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">condlist</span><span class="p">,</span> <span class="n">funclist</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="c1"># create the Rayleigh damping term that can be added to the forcing</span>
+<span class="c1"># syntax is inputs is the same as that for fourier_forcing</span>
+<div class="viewcode-block" id="rayleigh_damping">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.sponge_layer.rayleigh_damping">[docs]</a>
+<span class="k">def</span> <span class="nf">rayleigh_damping</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">sponge_params</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Rayleigh damping term for use in second-order-in-time problems involving sponge layers. Uses the Liu-Trogdon</span>
+<span class="sd">    damping function :func:`~joe_lab.sponge_layer.damping_coeff_lt`, but sponging occurs on both sides of the domain.</span>
+
+<span class="sd">    Given a Fourier-space input :math:`V`, this function returns samples of the Rayleigh damping forcing term.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \mathcal{F}\left(-\beta(x)\mathcal{F}^{-1}V\right)</span>
+
+<span class="sd">    where :math:`\mathcal{F}` denotes the Fourier transform and :math:`\beta(x)` denotes a damping coefficient close to</span>
+<span class="sd">    1 near the boundary of our domain and effectively zero everywhere else.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        V : complex ndarray</span>
+<span class="sd">            Fourier-space representation of a given function sampled at some number of points.</span>
+<span class="sd">        x : ndarray</span>
+<span class="sd">            Points in physical space where function is sampled.</span>
+<span class="sd">        sponge_params : dict</span>
+<span class="sd">            Parameters of our sponge layer, see :func:`~joe_lab.sponge_layer.damping_coeff_lt`.</span>
+<span class="sd">        complex : boolean, optional.</span>
+<span class="sd">            True if the inverse FFT of V is complex and False if it is real. Default: False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        out : complex ndarray</span>
+<span class="sd">            Fourier-space representation of the Rayleigh damping forcing term.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">N</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">N</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">V</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">==</span> <span class="n">N</span><span class="p">:</span>
+
+        <span class="k">pass</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The array V must be 2+(size of the array x) if our soln is real, &quot;</span>
+                        <span class="s2">&quot;or 2*(size of the array x) if our soln is complex.&quot;</span>
+                        <span class="s2">&quot; Size of V = &quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">V</span><span class="o">.</span><span class="n">size</span><span class="p">),</span> <span class="s2">&quot;size of x = &quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">complex</span><span class="p">:</span>
+
+        <span class="n">NN</span> <span class="o">=</span> <span class="n">N</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="n">NN</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">N</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">NN</span><span class="p">))</span>
+
+    <span class="n">v</span> <span class="o">=</span> <span class="n">my_ifft</span><span class="p">(</span><span class="n">V</span><span class="p">[</span><span class="n">NN</span><span class="p">:],</span> <span class="nb">complex</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>  <span class="c1"># only ifft last NN entries of V because of storage conventions</span>
+
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">damping_coeff_lt</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sponge_params</span><span class="p">)</span><span class="o">+</span><span class="n">damping_coeff_lt</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="n">sponge_params</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">NN</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="n">NN</span><span class="p">:]</span> <span class="o">=</span> <span class="n">my_fft</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">beta</span> <span class="o">*</span> <span class="n">v</span><span class="p">,</span> <span class="nb">complex</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="clip_spongeless">
+<a class="viewcode-back" href="../../joe_lab.html#joe_lab.sponge_layer.clip_spongeless">[docs]</a>
+<span class="k">def</span> <span class="nf">clip_spongeless</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">sfrac</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Obtain samples of `z` only coming from outside the sponge layer.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        z : ndarray</span>
+<span class="sd">            Viewed as samples of a function on our entire spatial grid (including the sponge layer).</span>
+<span class="sd">        sfrac : float</span>
+<span class="sd">            Fraction of the spatial grid that is not taken up by the sponge layer. By convention, this fraction is taken</span>
+<span class="sd">            from the middle of the grid.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        out : ndarray</span>
+<span class="sd">            The part of z coming only from our sponge layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">sfrac</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">z</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">delta</span> <span class="o">*</span> <span class="n">N</span><span class="p">):</span><span class="nb">int</span><span class="p">((</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">delta</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Adam George Morgan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
