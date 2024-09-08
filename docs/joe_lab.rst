@@ -1,9 +1,6 @@
 joe\_lab package
 ================
 
-Submodules
-----------
-
 joe\_lab.initial\_states module
 -------------------------------
 
