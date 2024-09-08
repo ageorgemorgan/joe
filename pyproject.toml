@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "joe_lab"
+version = "0.0.6"
+authors = [
+  { name="Adam George Morgan", email="adam.morgan@mail.utoronto.ca" },
+]
+description = "A package for solving 1+1-dimensional PDEs quickly and accurately with Fourier spectral discretization in space and high-order time-stepping."
+readme = "README.md" # path to readme
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies =[
+"alive_progress>=3.0.0", 
+"cmocean>=3.0.0", 
+"joblib>=1.2.0", 
+"numpy>=1.25.2", 
+"scipy>=1.10.0",
+"jupyterlab",
+"pytest",
+]
+
+# TODO: get FFMPEG support working automatically!!!!
+
+[project.optional-dependencies]
+docs = [
+  "myst_parser >=0.13",
+  "sphinx >=4.0",
+  "sphinx-copybutton",
+  "sphinx-autodoc-typehints",
+  'sphinx_rtd_theme',
+]
+
+
+[project.urls]
+Homepage = "https://github.com/ageorgemorgan/joe"
+Issues = "https://github.com/ageorgemorgan/joe/issues"
+
