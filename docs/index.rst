@@ -39,7 +39,7 @@ creating movies: see the *joe* GitHub page for tips on how to do this.
 
 **GETTING STARTED**
 
-Open up the Jupyter tutorials (https://github.com/ageorgemorgan/joe/blob/main/demos/tutorials/) to see joe in action!
+Open up the Jupyter tutorials (https://github.com/ageorgemorgan/joe/tree/main/joe_lab/demos/tutorials) to see joe in action!
 
 .. toctree::
    :maxdepth: 2
