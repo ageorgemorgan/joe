@@ -1,6 +1,6 @@
 # joe code for reproducing the experiments and (most) statistical results from a paper of Didenkulova
 # https://www.sciencedirect.com/science/article/abs/pii/S0167278918305657 BUT
-# using the non-integrable Gardner-BBM isntead of the "regular" Gardner eqn
+# using the non-integrable Gardner-BBM instead of the "regular" Gardner eqn
 
 import time
 
@@ -10,8 +10,7 @@ from scipy.signal import argrelmin, argrelmax # for postprocessing: amplitude hi
 from scipy.stats import ecdf # again for postprocessing
 
 import joe_lab.joe as joe
-import joe_lab.models as joe_models
-from joe_lab.utils import integrate
+from joe_lab.utils import integrate, dealiased_pow
 from joe_lab.visualization import spinner, nice_plot, nice_multiplot, nice_hist
 
 from joblib import Parallel, delayed
@@ -27,16 +26,30 @@ num_waves = 30
 ndump = 500
 
 # get stgrid
-length, T, N, dt = 600., 200., 2 ** 13, 2e-5
+length, T, N, dt = 930., 200., 2 ** 13, 2e-5
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 
 # get model
-my_model = joe_models.builtin_model('gardner-bbm', nonlinear=True)
+def my_symbol(k):
+    return 1j * (k ** 3) / (1. + k ** 2)
 
+def my_fourier_forcing(V,k,x,nonlinear=True):
+
+    Fu2 = dealiased_pow(V,2)
+    Fu3 = dealiased_pow(V,3)
+
+    out = 6. * float(nonlinear) * ((1j * k) / (1. + k ** 2)) * (
+            0.5 * Fu2 - (1. / 3.) * Fu3)
+
+    return out
+
+my_model = joe.model('gardner-bbm', 1, my_symbol, my_fourier_forcing, nonlinear=True)
+
+# get initial state
 def gardnerbbm_solitary_wave(x, c = 1., p = 1.):
 
     out = np.zeros_like(x, dtype=float)
-    xmax = 1e3
+    xmax = 7e2
     out[abs(x) > xmax] = 0.
     out[abs(x) <= xmax] = c / (-1. + p * np.sqrt(1. + c) * np.cosh(np.sqrt(c/(1.+c)) * x[abs(x) <= xmax]))
 
