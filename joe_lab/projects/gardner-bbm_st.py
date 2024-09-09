@@ -10,8 +10,10 @@ from scipy.signal import argrelmin, argrelmax # for postprocessing: amplitude hi
 from scipy.stats import ecdf # again for postprocessing
 
 import joe_lab.joe as joe
-from joe_lab.utils import integrate, dealiased_pow
+from joe_lab.utils import integrate
 from joe_lab.visualization import spinner, nice_plot, nice_multiplot, nice_hist
+
+from gbbm_utils import gardnerbbm_solitary_wave, gbbm_symbol, gbbm_fourier_forcing, energy
 
 from joblib import Parallel, delayed
 
@@ -30,31 +32,9 @@ length, T, N, dt = 930., 200., 2 ** 13, 2e-5
 stgrid = {'length': length, 'T': T, 'N': N, 'dt': dt}
 
 # get model
-def my_symbol(k):
-    return 1j * (k ** 3) / (1. + k ** 2)
-
-def my_fourier_forcing(V,k,x,nonlinear=True):
-
-    Fu2 = dealiased_pow(V,2)
-    Fu3 = dealiased_pow(V,3)
-
-    out = 6. * float(nonlinear) * ((1j * k) / (1. + k ** 2)) * (
-            0.5 * Fu2 - (1. / 3.) * Fu3)
-
-    return out
-
-my_model = joe.model('gardner-bbm', 1, my_symbol, my_fourier_forcing, nonlinear=True)
+my_model = joe.model('gardner-bbm', 1, gbbm_symbol, gbbm_fourier_forcing, nonlinear=True)
 
 # get initial state
-def gardnerbbm_solitary_wave(x, c = 1., p = 1.):
-
-    out = np.zeros_like(x, dtype=float)
-    xmax = 7e2
-    out[abs(x) > xmax] = 0.
-    out[abs(x) <= xmax] = c / (-1. + p * np.sqrt(1. + c) * np.cosh(np.sqrt(c/(1.+c)) * x[abs(x) <= xmax]))
-
-    return out
-
 def sw_gas_ic(x, m):
     out = 0.
 
@@ -89,20 +69,7 @@ def sw_gas_ic(x, m):
 
     return out
 
-# define a function that computes the H1 energy
-from scipy.fft import rfft, irfft, rfftfreq
-
-def energy(u):
-    # get wavenumbers for the grid of S^1 with N samples
-    k = 2. * np.pi * N * rfftfreq(N) / length
-
-    spring = irfft(1j * k * rfft(u)) ** 2
-
-    out = 0.5*integrate(np.absolute(u)**2 + spring, length)
-
-    return out
-
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 num_timesteps = 1+int(T/(dt*ndump))
 tt = ndump*dt*np.arange(0, num_timesteps)
 
@@ -122,7 +89,7 @@ def sample_st(sample):
     fm_error = np.amax(my_sim.fm_error)
 
     # error in energy
-    E = energy(my_sim.Udata)
+    E = energy(my_sim.Udata, length)
     print(E[0])
     #plt.plot(tt, E-E[0]) # (E-E[0])/E[0])
     #plt.show()
@@ -170,7 +137,7 @@ def get_higher_moments(u,fm,sm):
     return skew, kurt
 
 # code for computing CDF of unif distribution on [a,b]
-def unif_cdf(x, a=-1, b=1.):
+def unif_cdf(x, a=-1., b=1.):
     out = np.zeros_like(x, dtype=float)
     out[x>a] = (x[x>a] - a)/(b-a)
     out[x>=b] = 1.
@@ -206,7 +173,7 @@ for sample in range(1, num_samples+1):
 
         my_sim.save_combomovie(dpi=80, fps=400, usetex=False, fieldcolor='xkcd:cerulean', fieldname='u')
 
-        #E = energy(my_sim.Udata)
+        #E = energy(my_sim.Udata, my_sim.length)
         
         #picname = 'gardnerbbm_st_energy_length=%.1f_T=%.1f_N=%.1f_dt=%.6f' % (length, T, N, dt) + '.png'
         #nice_plot(tt, (E-E[0])/E[0], r"$t$", r"Relative Error in Energy", custom_ylim=None,
