@@ -62,8 +62,7 @@ def my_ifft(V, n=None, complex=False):
     return out
 
 def integrate(u, length):
-    r"""Integrates N samples of a real or complex space-time field over the spatial interval [-0.5*length, 0.5*length]
-       using the FFT.
+    r"""Integrates N samples of a real or complex space-time field over the spatial interval [-0.5*length, 0.5*length] using the FFT.
 
     Parameters
     ----------
