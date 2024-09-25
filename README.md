@@ -32,7 +32,7 @@ numpy, scipy, matplotlib, cmocean (https://matplotlib.org/cmocean/), alive-progr
  
 Open up the Jupyter tutorials (https://github.com/ageorgemorgan/joe/tree/main/joe_lab/demos/tutorials) to see joe in action!
 
-Currently getting FFmpeg support is a bit of a tough one and it *does not auto-install when you install joe*. I recommend using conda, installing *joe* in a conda environment, and then using conda to install PyAV via 
+Currently getting FFmpeg support is a bit of a tough one and it *does not auto-install when you install joe*. I recommend using conda, installing *joe* in a conda environment, and then (on Ubuntu) using conda to install PyAV via 
 
 ```
 conda install av
@@ -42,6 +42,12 @@ or
 
 ```
 conda install av -c conda-forge
+```
+
+If you're using Mac OS, the command below may work better: 
+
+```
+conda install x264 ffmpeg -c conda-forge
 ```
 
 If you have questions, please see the documentation at http://joe-lab.rtfd.io/ . 
