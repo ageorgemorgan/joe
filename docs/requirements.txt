@@ -16,7 +16,7 @@ importlib-metadata==5.1.0
 influxdb==5.3.1
 jaraco.classes==3.2.3
 jeepney==0.8.0
-Jinja2==3.1.2
+Jinja2==3.1.6
 keyring==23.11.0
 livereload==2.6.3
 markdown-it-py==2.2.0
