@@ -65,7 +65,7 @@ typing_extensions==4.4.0
 urllib3==2.6.0
 webencodings==0.5.1
 yarg==0.1.9
-zipp==3.11.0
+zipp==3.19.1
 alive_progress>=3.0.0
 cmocean>=3.0.0
 joblib>=1.2.0
